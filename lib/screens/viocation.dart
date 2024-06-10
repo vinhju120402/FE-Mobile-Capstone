@@ -17,9 +17,9 @@ class _ViolationScreenState extends State<ViolationScreen> {
   ];
   List<Color> catColors = [
     Color(0xFFFFCF2F),
-    Color(0xFF6EF08D),
-    Color(0xFFCB84Fb),
-    Color(0xFF61BDFB),
+    Color(0xFFFFCF2F),
+    Color(0xFFFFCF2F),
+    Color(0xFFFFCF2F),
   ];
   List<Icon> catIcons = [
     Icon(Icons.rule, color: Colors.white, size: 30),
