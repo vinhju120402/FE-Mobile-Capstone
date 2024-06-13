@@ -1,4 +1,3 @@
-import 'package:eduappui/screens/home_screen.dart';
 import 'package:eduappui/screens/welcom_screen.dart';
 import 'package:flutter/material.dart';
 
