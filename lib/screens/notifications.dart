@@ -27,7 +27,7 @@ class NotificationScreen extends StatelessWidget {
         ),
         title: Center(
           child: Text(
-            'Notification',
+            'Notifications',
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -65,7 +65,11 @@ class NotificationScreen extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Container(
-                    color: Color.fromARGB(188, 85, 239, 126),
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(188, 85, 239, 126),
+                      borderRadius: BorderRadius.circular(30.0),
+                      border: Border.all(color: Colors.black, width: 1.0),
+                    ),
                     padding: EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
