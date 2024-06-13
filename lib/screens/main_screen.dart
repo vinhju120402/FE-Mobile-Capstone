@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:eduappui/screens/contact.dart';
 import 'package:eduappui/screens/duty.dart';
 import 'package:eduappui/screens/historyviolation.dart';
+import 'package:eduappui/screens/more.dart';
 import 'package:eduappui/screens/notifications.dart';
 import 'package:eduappui/screens/profile.dart';
 import 'package:eduappui/screens/rule.dart';
@@ -34,12 +35,12 @@ class _MainScreenState extends State<MainScreen> {
     Officer(name: 'Tan Phuoc', profilePicture: 'images/pho4.jpg'),
   ];
   List<Color> catColors = [
-    Color(0xFFFFCF2F),
-    Color(0xFF6EF08D),
-    Color(0xFFFFCF2F),
-    Color(0xFF6EF08D),
-    Color(0xFFFFCF2F),
-    Color(0xFF6EF08D),
+    Color(0xff1d74f6),
+    Color(0xff1d74f6),
+    Color(0xff1d74f6),
+    Color(0xff1d74f6),
+    Color(0xff1d74f6),
+    Color(0xff1d74f6),
   ];
   List<Icon> catIcons = [
     Icon(Icons.rule, color: Colors.white, size: 30),
@@ -113,7 +114,7 @@ class _MainScreenState extends State<MainScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
+                        const Row(
                           children: [
                             CircleAvatar(
                               radius: 25, // Adjust the radius as needed
@@ -307,19 +308,41 @@ class _MainScreenState extends State<MainScreen> {
                   ],
                 ),
               ),
-              Padding(
+             Padding(
                 padding: const EdgeInsets.all(1.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '   List of officers',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '   List of officers',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
+                      ),
                     ),
-                  ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OfficersScreen()),
+                        );
+                      },
+                      child: Text(
+                        'More',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.black, // Customize the color as needed
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Row(

@@ -16,10 +16,10 @@ class _ViolationScreenState extends State<ViolationScreen> {
     "Clothing",
   ];
   List<Color> catColors = [
-    Color(0xFFFFCF2F),
-    Color(0xFFFFCF2F),
-    Color(0xFFFFCF2F),
-    Color(0xFFFFCF2F),
+    Color(0xff1d74f6),
+    Color(0xff1d74f6),
+    Color(0xff1d74f6),
+    Color(0xff1d74f6),
   ];
   List<Icon> catIcons = [
     Icon(Icons.rule, color: Colors.white, size: 30),
@@ -86,6 +86,7 @@ class _ViolationScreenState extends State<ViolationScreen> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black.withOpacity(0.7),
+                                
                               ),
                             ),
                           ],
@@ -102,3 +103,4 @@ class _ViolationScreenState extends State<ViolationScreen> {
     );
   }
 }
+
