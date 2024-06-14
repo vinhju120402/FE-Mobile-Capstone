@@ -62,8 +62,24 @@ class _ViolationScreenState extends State<ViolationScreen> {
                               MaterialPageRoute(
                                   builder: (context) => DataEntryForm()),
                             );
-                          } else if (catNames[index] == "Note") {
-                            // Add your navigation code here
+                          } else if (catNames[index] == "Footwear") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DataEntryForm()),
+                            );
+                          } else if (catNames[index] == "Orther") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DataEntryForm()),
+                            );
+                          } else if (catNames[index] == "Clothing") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DataEntryForm()),
+                            );
                           }
                         },
                         child: Column(
@@ -86,7 +102,6 @@ class _ViolationScreenState extends State<ViolationScreen> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black.withOpacity(0.7),
-                                
                               ),
                             ),
                           ],
@@ -103,4 +118,3 @@ class _ViolationScreenState extends State<ViolationScreen> {
     );
   }
 }
-

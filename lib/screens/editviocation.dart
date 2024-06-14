@@ -5,8 +5,7 @@ import 'package:image_picker/image_picker.dart';
 class Editviocation extends StatefulWidget {
   final Map<String, String> violationData;
 
-  const Editviocation({Key? key, required this.violationData})
-      : super(key: key);
+  const Editviocation({super.key, required this.violationData});
 
   @override
   _EditviocationState createState() => _EditviocationState();

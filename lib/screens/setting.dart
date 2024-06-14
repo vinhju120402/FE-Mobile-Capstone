@@ -1,5 +1,4 @@
 import 'package:eduappui/screens/faq.dart';
-import 'package:eduappui/screens/home_screen.dart';
 import 'package:eduappui/screens/login.dart';
 import 'package:eduappui/screens/main_screen.dart';
 import 'package:eduappui/screens/privacy.dart';
