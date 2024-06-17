@@ -1,5 +1,9 @@
-import 'package:eduappui/screens/table.dart';
+import 'package:eduappui/violation/orther.dart';
+import 'package:eduappui/violation/table.dart';
 import 'package:flutter/material.dart';
+
+import 'orther.dart';
+import 'table.dart';
 
 class ViolationScreen extends StatefulWidget {
   const ViolationScreen({super.key});
@@ -72,7 +76,7 @@ class _ViolationScreenState extends State<ViolationScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => DataEntryForm()),
+                                  builder: (context) => OrtherViolation()),
                             );
                           } else if (catNames[index] == "Clothing") {
                             Navigator.push(
