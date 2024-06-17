@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 class DataEntryForm extends StatefulWidget {
   const DataEntryForm({Key? key}) : super(key: key);
 
@@ -22,6 +23,12 @@ class _DataEntryFormState extends State<DataEntryForm> {
     'Vô lễ với giáo viên',
     'Không tham gia hoạt động giáo dục',
   ];
+  @override
+  void initState() {
+    super.initState();
+    // Gọi hàm để đặt thời gian hiện tại vào ô nhập liệu
+    _getCurrentTime();
+  }
 
   String selectedViolation = '';
   File? imageFile;
@@ -46,6 +53,13 @@ class _DataEntryFormState extends State<DataEntryForm> {
         imageFile = File(pickedImage.path);
       });
     }
+  }
+
+  void _getCurrentTime() {
+    DateTime now = DateTime.now();
+    String formattedTime =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    timeController.text = formattedTime;
   }
 
   @override
@@ -94,6 +108,8 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 SizedBox(height: 20.0),
                 TextFormField(
                   controller: timeController,
+                  readOnly:
+                      true, // Đặt readOnly để ngăn người dùng chỉnh sửa trực tiếp
                   decoration: InputDecoration(
                     labelText: 'Thời Gian',
                     border: OutlineInputBorder(
