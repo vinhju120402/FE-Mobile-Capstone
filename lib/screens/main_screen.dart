@@ -7,7 +7,7 @@ import 'package:eduappui/screens/notifications.dart';
 import 'package:eduappui/screens/profile.dart';
 import 'package:eduappui/screens/rule.dart';
 import 'package:eduappui/screens/setting.dart';
-import 'package:eduappui/screens/viocation.dart';
+import 'package:eduappui/screens/table.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -250,7 +250,7 @@ class _MainScreenState extends State<MainScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ViolationScreen()),
+                                    builder: (context) => DataEntryForm()),
                               );
                             } else if (catNames[index] == "Contact") {
                               Navigator.push(
@@ -308,7 +308,7 @@ class _MainScreenState extends State<MainScreen> {
                   ],
                 ),
               ),
-             Padding(
+              Padding(
                 padding: const EdgeInsets.all(1.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

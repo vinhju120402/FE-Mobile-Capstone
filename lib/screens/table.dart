@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class DataEntryForm extends StatefulWidget {
@@ -13,8 +14,10 @@ class _DataEntryFormState extends State<DataEntryForm> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController classController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
-  final TextEditingController violateController = TextEditingController();
-  final TextEditingController noteController = TextEditingController();
+  final TextEditingController violateGroupController = TextEditingController();
+  final TextEditingController violateTypeController = TextEditingController();
+  final TextEditingController codeController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
 
   final List<String> predefinedViolations = [
     'Nghỉ học không phép',
@@ -23,6 +26,12 @@ class _DataEntryFormState extends State<DataEntryForm> {
     'Vô lễ với giáo viên',
     'Không tham gia hoạt động giáo dục',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentTime();
+  }
 
   String selectedViolation = '';
   File? imageFile;
@@ -49,11 +58,49 @@ class _DataEntryFormState extends State<DataEntryForm> {
     }
   }
 
+  void _getCurrentTime() {
+    DateTime now = DateTime.now();
+    String formattedTime =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    timeController.text = formattedTime;
+  }
+
+  Future<void> _selectDateTime() async {
+    DateTime? selectedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (selectedDate != null) {
+      TimeOfDay? selectedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (selectedTime != null) {
+        setState(() {
+          DateTime fullDateTime = DateTime(
+            selectedDate.year,
+            selectedDate.month,
+            selectedDate.day,
+            selectedTime.hour,
+            selectedTime.minute,
+          );
+          String formattedDateTime =
+              "${fullDateTime.year}-${fullDateTime.month.toString().padLeft(2, '0')}-${fullDateTime.day.toString().padLeft(2, '0')} ${fullDateTime.hour.toString().padLeft(2, '0')}:${fullDateTime.minute.toString().padLeft(2, '0')}:${fullDateTime.second.toString().padLeft(2, '0')}";
+          timeController.text = formattedDateTime;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Appearence'),
+        title: Text('Create Violation'),
         backgroundColor:
             Color.fromARGB(189, 7, 206, 43), // Thay đổi màu nền của app bar
       ),
@@ -68,7 +115,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 TextFormField(
                   controller: nameController,
                   decoration: InputDecoration(
-                    labelText: 'Họ và Tên',
+                    labelText: 'Student name',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -82,7 +129,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 TextFormField(
                   controller: classController,
                   decoration: InputDecoration(
-                    labelText: 'Lớp',
+                    labelText: 'Class',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -95,8 +142,10 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 SizedBox(height: 20.0),
                 TextFormField(
                   controller: timeController,
+                  readOnly: true,
+                  onTap: _selectDateTime,
                   decoration: InputDecoration(
-                    labelText: 'Thời Gian',
+                    labelText: 'Time',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -108,12 +157,12 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 ),
                 SizedBox(height: 20.0),
                 TextFormField(
-                  controller: violateController,
+                  controller: violateGroupController,
                   onTap: () {
-                    _showPredefinedViolations(context);
+                    _showPredefinedViolations(context, 'violationGroup');
                   },
                   decoration: InputDecoration(
-                    labelText: 'Vi Phạm',
+                    labelText: 'Violation group',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -123,7 +172,61 @@ class _DataEntryFormState extends State<DataEntryForm> {
                     ),
                   ),
                 ),
-
+                SizedBox(height: 20.0),
+                TextFormField(
+                  controller: violateTypeController,
+                  onTap: () {
+                    _showPredefinedViolations(context, 'violationType');
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Violation type',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.0),
+                TextFormField(
+                  controller: codeController,
+                  decoration: InputDecoration(
+                    labelText: 'Code',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.0),
+                TextFormField(
+                  controller: descriptionController,
+                  maxLines: null, // Cho phép nhiều dòng khi cần thiết
+                  maxLength: 300, // Giới hạn tối đa 300 ký tự
+                  maxLengthEnforcement:
+                      MaxLengthEnforcement.enforced, // Bắt buộc giới hạn ký tự
+                  onChanged: (value) {
+                    setState(
+                        () {}); // Đảm bảo cập nhật giao diện khi thay đổi nội dung
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    counterText:
+                        '${descriptionController.text.length}/300', // Hiển thị số lượng ký tự đã nhập
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                ),
                 SizedBox(height: 20.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -133,14 +236,14 @@ class _DataEntryFormState extends State<DataEntryForm> {
                       icon: Icon(Icons.camera_alt),
                       label: Text('Chụp ảnh'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange, // Thay đổi màu nút
+                        backgroundColor: Colors.orange,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              10.0), // Thay đổi hình dạng nút
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
                         padding: EdgeInsets.symmetric(
-                            vertical: 15.0,
-                            horizontal: 20.0), // Thay đổi padding của nút
+                          vertical: 15.0,
+                          horizontal: 20.0,
+                        ),
                       ),
                     ),
                     ElevatedButton.icon(
@@ -148,84 +251,78 @@ class _DataEntryFormState extends State<DataEntryForm> {
                       icon: Icon(Icons.photo_library),
                       label: Text('Chọn ảnh'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue, // Thay đổi màu nút
+                        backgroundColor: Colors.blue,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              10.0), // Thay đổi hình dạng nút
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
                         padding: EdgeInsets.symmetric(
-                            vertical: 15.0,
-                            horizontal: 20.0), // Thay đổi padding của nút
+                          vertical: 15.0,
+                          horizontal: 20.0,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 20.0),
-                // Trong phần build() của lớp _DataEntryFormState
+                SizedBox(height: 1.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Các TextFormField đã có
                     SizedBox(height: 10.0),
-                    // Hiển thị ảnh nếu đã chọn hoặc chụp
                     if (imageFile != null)
                       Container(
-                        width: 120.0, // Đặt chiều rộng của container thành 90
-                        height: 120.0, // Đặt chiều cao của container thành 90
+                        width: 120.0,
+                        height: 120.0,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10.0),
                           image: DecorationImage(
-                            image: FileImage(
-                                imageFile!), // Sử dụng FileImage để hiển thị ảnh từ File
-                            fit: BoxFit
-                                .contain, // Thay đổi fit thành BoxFit.contain
+                            image: FileImage(imageFile!),
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ),
                     SizedBox(height: 20.0),
-                    // Các nút và ElevatedButton đã có
                   ],
                 ),
-
                 ElevatedButton(
                   onPressed: () {
-                    // Xử lý dữ liệu ở đây (ví dụ: lưu vào cơ sở dữ liệu, thực hiện hành động khác)
-                    // Ví dụ:
                     final name = nameController.text;
                     final className = classController.text;
                     final time = timeController.text;
-                    final violate = violateController.text;
+                    final violateGroup = violateGroupController.text;
+                    final violateType = violateTypeController.text;
+                    final code = codeController.text;
+                    final description = descriptionController.text;
                     final image = imageFile;
-                    final note = noteController;
 
-                    // In thông tin vừa nhập
-                    print('Họ và Tên: $name');
-                    print('Lớp: $className');
-                    print('Thời Gian: $time');
-                    print('Vi Phạm: $violate');
+                    print('Tên học sinh: $name');
+                    print('Lớp học: $className');
+                    print('Thời gian: $time');
+                    print('Nhóm vi phạm: $violateGroup');
+                    print('Loại vi phạm: $violateType');
+                    print('Mã vi phạm: $code');
+                    print('Mô tả: $description');
                     print('Ảnh: $image');
 
-                    // Xóa dữ liệu sau khi đã nhập
+                    // Xóa nội dung của các trường và tệp ảnh
                     nameController.clear();
                     classController.clear();
                     timeController.clear();
-                    violateController.clear();
-                    noteController.clear();
+                    violateGroupController.clear();
+                    violateTypeController.clear();
+                    codeController.clear();
+                    descriptionController.clear();
                     setState(() {
                       imageFile = null;
                     });
                   },
-                  child: Text('Submit'),
+                  child: Text('Gửi'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue, // Thay đổi màu nút
-                    textStyle: TextStyle(
-                        fontSize: 18), // Thay đổi font size của văn bản nút
+                    backgroundColor: Colors.blue,
+                    textStyle: TextStyle(fontSize: 18),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Thay đổi hình dạng nút
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    padding: EdgeInsets.symmetric(
-                        vertical: 15.0), // Thay đổi padding của nút
+                    padding: EdgeInsets.symmetric(vertical: 15.0),
                   ),
                 ),
                 SizedBox(
@@ -239,9 +336,22 @@ class _DataEntryFormState extends State<DataEntryForm> {
     );
   }
 
-  void _showPredefinedViolations(BuildContext context) {
+  void _showPredefinedViolations(BuildContext context, String field) {
     List<String> filteredViolations = List.from(predefinedViolations);
     TextEditingController searchController = TextEditingController();
+
+    TextEditingController selectedController;
+    String dialogTitle;
+
+    if (field == 'violationGroup') {
+      selectedController = violateGroupController;
+      dialogTitle = 'Nhóm vi phạm';
+    } else if (field == 'violationType') {
+      selectedController = violateTypeController;
+      dialogTitle = 'Loại vi phạm';
+    } else {
+      return; // Xử lý giá trị trường không mong muốn
+    }
 
     showModalBottomSheet(
       context: context,
@@ -253,7 +363,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
               child: TextField(
                 controller: searchController,
                 decoration: InputDecoration(
-                  hintText: 'Search',
+                  hintText: 'Tìm kiếm',
                   prefixIcon: Icon(Icons.search),
                 ),
                 onChanged: (value) {
@@ -274,11 +384,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                   return ListTile(
                     title: Text(filteredViolations[index]),
                     onTap: () {
-                      setState(() {
-                        selectedViolation = filteredViolations[index];
-                        violateController.text = selectedViolation;
-                      });
-                      Navigator.pop(context);
+                      Navigator.pop(context, filteredViolations[index]);
                     },
                   );
                 },
@@ -287,6 +393,12 @@ class _DataEntryFormState extends State<DataEntryForm> {
           ],
         );
       },
-    );
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          selectedController.text = value;
+        });
+      }
+    });
   }
 }

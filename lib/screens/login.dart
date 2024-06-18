@@ -1,6 +1,5 @@
 import 'package:eduappui/screens/main_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:eduappui/screens/home_screen.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
 class LoginPage extends StatefulWidget {

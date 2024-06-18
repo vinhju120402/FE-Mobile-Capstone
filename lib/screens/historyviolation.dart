@@ -1,5 +1,4 @@
 import 'package:eduappui/screens/editviocation.dart';
-import 'package:eduappui/screens/table.dart';
 import 'package:flutter/material.dart'; // Import the DataEntryForm screen
 
 class HistoryScreen extends StatelessWidget {
@@ -69,8 +68,8 @@ class HistoryScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => Editviocation(
-                          violationData: violations[index],
-                        ),
+                            // violationData: violations[index],
+                            ),
                       ),
                     );
                   },
