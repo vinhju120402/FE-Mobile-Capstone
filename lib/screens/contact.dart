@@ -2,6 +2,8 @@ import 'package:eduappui/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 
 class ContactScreen extends StatelessWidget {
+  const ContactScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +46,7 @@ class ContactScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment:
                     CrossAxisAlignment.center, // Căn giữa nội dung
-                children: [
+                children: const [
                   Text(
                     'School Services',
                     style: TextStyle(
