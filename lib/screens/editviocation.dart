@@ -4,13 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Editviocation extends StatefulWidget {
-  const Editviocation({Key? key}) : super(key: key);
+  const Editviocation({super.key, required this.id});
+  final int id;
 
   @override
-  _EditviocationState createState() => _EditviocationState();
+  EditviocationState createState() => EditviocationState();
 }
 
-class _EditviocationState extends State<Editviocation> {
+class EditviocationState extends State<Editviocation> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController classController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
@@ -37,7 +38,7 @@ class _EditviocationState extends State<Editviocation> {
   @override
   void initState() {
     super.initState();
-    _getCurrentTime();
+    print(widget.id);
   }
 
   String selectedViolation = '';
@@ -63,13 +64,6 @@ class _EditviocationState extends State<Editviocation> {
         imageFile = File(pickedImage.path);
       });
     }
-  }
-
-  void _getCurrentTime() {
-    DateTime now = DateTime.now();
-    String formattedTime =
-        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
-    timeController.text = formattedTime;
   }
 
   Future<void> _selectDateTime() async {
@@ -342,17 +336,13 @@ class _EditviocationState extends State<Editviocation> {
     TextEditingController searchController = TextEditingController();
 
     TextEditingController selectedController;
-    String dialogTitle;
 
     if (field == 'violationGroup') {
       selectedController = violateGroupController;
-      dialogTitle = 'Nhóm vi phạm';
     } else if (field == 'violationType') {
       selectedController = violateTypeController;
-      dialogTitle = 'Loại vi phạm';
     } else if (field == 'violationclass') {
       selectedController = classController;
-      dialogTitle = 'Lớp học';
       filteredItems = List.from(predefinedClasses);
     } else {
       return;
@@ -375,15 +365,11 @@ class _EditviocationState extends State<Editviocation> {
                   setState(() {
                     if (field == 'violationclass') {
                       filteredItems = predefinedClasses
-                          .where((className) => className
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
+                          .where((className) => className.toLowerCase().contains(value.toLowerCase()))
                           .toList();
                     } else {
                       filteredItems = predefinedViolations
-                          .where((violation) => violation
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
+                          .where((violation) => violation.toLowerCase().contains(value.toLowerCase()))
                           .toList();
                     }
                   });

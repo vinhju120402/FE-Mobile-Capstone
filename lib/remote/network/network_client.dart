@@ -1,12 +1,9 @@
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:eduappui/remote/errors/exceptions.dart';
 
 class NetworkClient {
-  final Dio dio;
-
-  NetworkClient({required this.dio});
+  final Dio dio = Dio();
 
   Future<Response> invoke(String url, RequestType requestType,
       {Map<String, String>? queryParameters, dynamic requestBody}) async {
@@ -20,37 +17,31 @@ class NetworkClient {
       switch (requestType) {
         case RequestType.get:
           response = await dio.get(url,
-              queryParameters: queryParameters,
-              options:
-                  Options(responseType: ResponseType.json, headers: headers));
+              queryParameters: queryParameters, options: Options(responseType: ResponseType.json, headers: headers));
           break;
         case RequestType.post:
           response = await dio.post(url,
               queryParameters: queryParameters,
               data: requestBody,
-              options:
-                  Options(responseType: ResponseType.json, headers: headers));
+              options: Options(responseType: ResponseType.json, headers: headers));
           break;
         case RequestType.put:
           response = await dio.put(url,
               queryParameters: queryParameters,
               data: requestBody,
-              options:
-                  Options(responseType: ResponseType.json, headers: headers));
+              options: Options(responseType: ResponseType.json, headers: headers));
           break;
         case RequestType.delete:
           response = await dio.delete(url,
               queryParameters: queryParameters,
               data: requestBody,
-              options:
-                  Options(responseType: ResponseType.json, headers: headers));
+              options: Options(responseType: ResponseType.json, headers: headers));
           break;
         case RequestType.patch:
           response = await dio.patch(url,
               queryParameters: queryParameters,
               data: requestBody,
-              options:
-                  Options(responseType: ResponseType.json, headers: headers));
+              options: Options(responseType: ResponseType.json, headers: headers));
           break;
       }
       return response;

@@ -1,17 +1,36 @@
-import 'package:eduappui/screens/editviocation.dart';
-import 'package:flutter/material.dart'; // Import the DataEntryForm screen
+import 'package:eduappui/remote/model/response/violation_response.dart';
+import 'package:eduappui/remote/service/repository/violation_repository.dart';
+import 'package:eduappui/routers/screen_route.dart';
+import 'package:eduappui/widget/history_violation_item.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class HistoryScreen extends StatelessWidget {
-  final List<Map<String, String>> violations = [
-    {'name': 'Nguyen Van A', 'type': 'Lỗi vi phạm 1', 'date': '6/5/2024'},
-    {'name': 'Tran Thi B', 'type': 'Lỗi vi phạm 2', 'date': '6/5/2024'},
-    {'name': 'Le Van C', 'type': 'Lỗi vi phạm 3', 'date': '6/5/2024'},
-    {'name': 'Pham Thi D', 'type': 'Lỗi vi phạm 4', 'date': '6/5/2024'},
-    {'name': 'Hoang Van E', 'type': 'Lỗi vi phạm 5', 'date': '6/5/2024'},
-    {'name': 'Ngo Thi F', 'type': 'Lỗi vi phạm 6', 'date': '6/5/2024'},
-    {'name': 'Bui Van G', 'type': 'Lỗi vi phạm 7', 'date': '6/5/2024'},
-    {'name': 'Doan Thi H', 'type': 'Lỗi vi phạm 8', 'date': '6/5/2024'},
-  ];
+class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({super.key});
+
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  final historyViolationRepositoryImpl = ViolationRepositoryImpl();
+
+  int numberResult = 0;
+  List<ViolationResponse> historyViolationResponse = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getHistoryViolation();
+  }
+
+  void getHistoryViolation() async {
+    var response = await historyViolationRepositoryImpl.getViolation();
+    historyViolationResponse = response;
+    numberResult = historyViolationResponse.length;
+    historyViolationResponse = response;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +47,7 @@ class HistoryScreen extends StatelessWidget {
         ),
         title: Center(
           child: Text(
-            'History Viocation',
+            'History Violation',
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -49,7 +68,7 @@ class HistoryScreen extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'Showing ${violations.length} results',
+                  'Showing $numberResult results',
                   style: TextStyle(
                     color: Colors.brown[600],
                     fontSize: 16.0,
@@ -59,59 +78,25 @@ class HistoryScreen extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: violations.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Editviocation(
-                            // violationData: violations[index],
-                            ),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: Container(
-                      color: Color.fromARGB(188, 85, 239, 126),
-                      padding: EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Họ và Tên: ${violations[index]['name']}',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                          SizedBox(height: 8.0),
-                          Text(
-                            'Loại Vi Phạm: ${violations[index]['type']}',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                          SizedBox(height: 8.0),
-                          Text(
-                            'Date: ${violations[index]['date']}',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+            child: historyViolationResponse.isEmpty
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : ListView.builder(
+                    itemCount: historyViolationResponse.length,
+                    itemBuilder: (context, index) {
+                      return HistoryViolationItem(
+                        date: historyViolationResponse[index].date ?? '',
+                        name: historyViolationResponse[index].violationName ?? '',
+                        violationName: historyViolationResponse[index].violationName ?? '',
+                        ontapFunction: () {
+                          context.push(ScreenRoute.violationEditScreen, extra: {
+                            'id': historyViolationResponse[index].violationId,
+                          });
+                        },
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),
