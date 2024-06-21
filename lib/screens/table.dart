@@ -26,6 +26,13 @@ class _DataEntryFormState extends State<DataEntryForm> {
     'Vô lễ với giáo viên',
     'Không tham gia hoạt động giáo dục',
   ];
+  final List<String> predefinedClasses = [
+    'Class A',
+    'Class B',
+    'Class C',
+    'Class D',
+    'Class E',
+  ];
 
   @override
   void initState() {
@@ -101,8 +108,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Create Violation'),
-        backgroundColor:
-            Color.fromARGB(189, 7, 206, 43), // Thay đổi màu nền của app bar
+        backgroundColor: Color.fromARGB(189, 7, 206, 43),
       ),
       body: Container(
         color: Color.fromARGB(226, 134, 253, 237),
@@ -128,6 +134,10 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 SizedBox(height: 20.0),
                 TextFormField(
                   controller: classController,
+                  onTap: () {
+                    _showPredefinedViolations(context, 'violationclass');
+                  },
+                  readOnly: true, // Prevent keyboard from appearing on tap
                   decoration: InputDecoration(
                     labelText: 'Class',
                     border: OutlineInputBorder(
@@ -161,6 +171,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                   onTap: () {
                     _showPredefinedViolations(context, 'violationGroup');
                   },
+                  readOnly: true, // Prevent keyboard from appearing on tap
                   decoration: InputDecoration(
                     labelText: 'Violation group',
                     border: OutlineInputBorder(
@@ -178,6 +189,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                   onTap: () {
                     _showPredefinedViolations(context, 'violationType');
                   },
+                  readOnly: true, // Prevent keyboard from appearing on tap
                   decoration: InputDecoration(
                     labelText: 'Violation type',
                     border: OutlineInputBorder(
@@ -206,18 +218,15 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 SizedBox(height: 20.0),
                 TextFormField(
                   controller: descriptionController,
-                  maxLines: null, // Cho phép nhiều dòng khi cần thiết
-                  maxLength: 300, // Giới hạn tối đa 300 ký tự
-                  maxLengthEnforcement:
-                      MaxLengthEnforcement.enforced, // Bắt buộc giới hạn ký tự
+                  maxLines: null,
+                  maxLength: 300,
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
                   onChanged: (value) {
-                    setState(
-                        () {}); // Đảm bảo cập nhật giao diện khi thay đổi nội dung
+                    setState(() {});
                   },
                   decoration: InputDecoration(
                     labelText: 'Description',
-                    counterText:
-                        '${descriptionController.text.length}/300', // Hiển thị số lượng ký tự đã nhập
+                    counterText: '${descriptionController.text.length}/300',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -263,26 +272,20 @@ class _DataEntryFormState extends State<DataEntryForm> {
                     ),
                   ],
                 ),
-                SizedBox(height: 1.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: 10.0),
-                    if (imageFile != null)
-                      Container(
-                        width: 120.0,
-                        height: 120.0,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          image: DecorationImage(
-                            image: FileImage(imageFile!),
-                            fit: BoxFit.contain,
-                          ),
-                        ),
+                SizedBox(height: 10.0),
+                if (imageFile != null)
+                  Container(
+                    width: 120.0,
+                    height: 120.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      image: DecorationImage(
+                        image: FileImage(imageFile!),
+                        fit: BoxFit.cover,
                       ),
-                    SizedBox(height: 20.0),
-                  ],
-                ),
+                    ),
+                  ),
+                SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () {
                     final name = nameController.text;
@@ -303,7 +306,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                     print('Mô tả: $description');
                     print('Ảnh: $image');
 
-                    // Xóa nội dung của các trường và tệp ảnh
+                    // Reset text controllers and image file state
                     nameController.clear();
                     classController.clear();
                     timeController.clear();
@@ -325,9 +328,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                     padding: EdgeInsets.symmetric(vertical: 15.0),
                   ),
                 ),
-                SizedBox(
-                  height: 300,
-                )
+                SizedBox(height: 20.0),
               ],
             ),
           ),
@@ -337,7 +338,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
   }
 
   void _showPredefinedViolations(BuildContext context, String field) {
-    List<String> filteredViolations = List.from(predefinedViolations);
+    List<String> filteredItems = List.from(predefinedViolations);
     TextEditingController searchController = TextEditingController();
 
     TextEditingController selectedController;
@@ -349,8 +350,12 @@ class _DataEntryFormState extends State<DataEntryForm> {
     } else if (field == 'violationType') {
       selectedController = violateTypeController;
       dialogTitle = 'Loại vi phạm';
+    } else if (field == 'violationclass') {
+      selectedController = classController;
+      dialogTitle = 'Lớp học';
+      filteredItems = List.from(predefinedClasses);
     } else {
-      return; // Xử lý giá trị trường không mong muốn
+      return;
     }
 
     showModalBottomSheet(
@@ -368,23 +373,31 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    filteredViolations = predefinedViolations
-                        .where((violation) => violation
-                            .toLowerCase()
-                            .contains(value.toLowerCase()))
-                        .toList();
+                    if (field == 'violationclass') {
+                      filteredItems = predefinedClasses
+                          .where((className) => className
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
+                          .toList();
+                    } else {
+                      filteredItems = predefinedViolations
+                          .where((violation) => violation
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
+                          .toList();
+                    }
                   });
                 },
               ),
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: filteredViolations.length,
+                itemCount: filteredItems.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(filteredViolations[index]),
+                    title: Text(filteredItems[index]),
                     onTap: () {
-                      Navigator.pop(context, filteredViolations[index]);
+                      Navigator.pop(context, filteredItems[index]);
                     },
                   );
                 },
