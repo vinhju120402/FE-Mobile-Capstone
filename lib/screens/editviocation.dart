@@ -115,7 +115,9 @@ class EditviocationState extends State<Editviocation> {
   void getViolationById(int id) async {
     try {
       final violation = await violationRepository.getViolationById(id);
-      print('Violation: $violation');
+      if (kDebugMode) {
+        print('Violation: $violation');
+      }
       if (violation.violationId != null) {
         nameController.text = violation.studentName ?? '';
         classController.text = violation.classId.toString();
@@ -146,7 +148,9 @@ class EditviocationState extends State<Editviocation> {
       isLoading = false;
       setState(() {});
     } on PlatformException catch (e) {
-      print('Error: ${e.message}');
+      if (kDebugMode) {
+        print('Error: ${e.message}');
+      }
     }
   }
 

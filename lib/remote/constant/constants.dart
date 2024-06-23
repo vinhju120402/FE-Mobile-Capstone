@@ -7,4 +7,10 @@ class Constants {
   static String api_base_url = '${dotenv.env['API_BASE_URL']}';
 
   static String history_violation = '$api_base_url/violations';
+
+  static String violation_group = '$api_base_url/violation-groups';
+
+  static String violation_type = '$api_base_url/violation-types/search';
+
+  static String class_list = '$api_base_url/classes';
 }

@@ -6,7 +6,7 @@ class NetworkClient {
   final Dio dio = Dio();
 
   Future<Response> invoke(String url, RequestType requestType,
-      {Map<String, String>? queryParameters, dynamic requestBody}) async {
+      {Map<String, dynamic>? queryParameters, dynamic requestBody}) async {
     // String accessToken = await secureStorageImpl.getAccessToken() ?? '';
     Response response;
     Map<String, String>? headers = {

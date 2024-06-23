@@ -1,16 +1,24 @@
 import 'dart:io';
+import 'package:eduappui/remote/model/response/class_reponse.dart';
+import 'package:eduappui/remote/model/response/violation_group_response.dart';
+import 'package:eduappui/remote/model/response/violation_type_response.dart';
+import 'package:eduappui/remote/service/repository/class_repository.dart';
+import 'package:eduappui/remote/service/repository/violation_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class DataEntryForm extends StatefulWidget {
-  const DataEntryForm({Key? key}) : super(key: key);
+  const DataEntryForm({super.key});
 
   @override
-  _DataEntryFormState createState() => _DataEntryFormState();
+  DataEntryFormState createState() => DataEntryFormState();
 }
 
-class _DataEntryFormState extends State<DataEntryForm> {
+class DataEntryFormState extends State<DataEntryForm> {
+  final ViolationRepositoryImpl violationRepository = ViolationRepositoryImpl();
+  final ClassRepositoryImpl classRepository = ClassRepositoryImpl();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController classController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
@@ -18,21 +26,11 @@ class _DataEntryFormState extends State<DataEntryForm> {
   final TextEditingController violateTypeController = TextEditingController();
   final TextEditingController codeController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  List<ViolationGroupResponse> violationGroup = [];
+  List<ViolationTypeResponse> violationType = [];
+  List<ClassResponse> classList = [];
+  bool isSelectedViolationGroup = false;
 
-  final List<String> predefinedViolations = [
-    'Nghỉ học không phép',
-    'Quấy rối trong lớp học',
-    'Vi phạm nội quy trường học',
-    'Vô lễ với giáo viên',
-    'Không tham gia hoạt động giáo dục',
-  ];
-  final List<String> predefinedClasses = [
-    'Class A',
-    'Class B',
-    'Class C',
-    'Class D',
-    'Class E',
-  ];
   final List<String> predefinedName = [
     'Nguyen Van A',
     'Nguyen Van B',
@@ -45,6 +43,8 @@ class _DataEntryFormState extends State<DataEntryForm> {
   void initState() {
     super.initState();
     _getCurrentTime();
+    getViolationGroup();
+    getClassList();
   }
 
   String selectedViolation = '';
@@ -110,11 +110,44 @@ class _DataEntryFormState extends State<DataEntryForm> {
     }
   }
 
+  void createViolation() async {
+    // List<File>? listImage = [];
+    // listImage.add(imageFile ?? File(''));
+    // ViolationRequest violationRequest = ViolationRequest(
+    //   // studentInClassId: nameController.text, //TODO: lấy ID student in class
+    //   // classId: classController.text, //TODO: lấy ID
+    //   date: DateTime.parse(timeController.text),
+    //   // violationTypeId: violateTypeController.text., //TODO: lấy ID
+    //   code: codeController.text,
+    //   description: descriptionController.text,
+    //   images: listImage,
+    // );
+    // violationRepository.createViolation(violationRequest);
+  }
+
+  void getViolationGroup() async {
+    var response = await violationRepository.getViolationGroup();
+    violationGroup = response;
+    setState(() {});
+  }
+
+  void getViolationTypeByGroup(int groupId) async {
+    var response = await violationRepository.getListViolationTypeByGroup(groupId);
+    violationType = response;
+    setState(() {});
+  }
+
+  void getClassList() async {
+    var response = await classRepository.getListClass();
+    classList = response;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Violation'),
+        title: Text('Create Violation'),
         backgroundColor: Color.fromARGB(189, 7, 206, 43),
       ),
       body: Container(
@@ -126,13 +159,13 @@ class _DataEntryFormState extends State<DataEntryForm> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextFormField(
-                  controller: nameController,
+                  controller: classController,
                   onTap: () {
-                    _showPredefinedViolations(context, 'studentName');
+                    _buildClassBottomSheet(context);
                   },
                   readOnly: true, // Prevent keyboard from appearing on tap
                   decoration: InputDecoration(
-                    labelText: 'Student name',
+                    labelText: 'Class',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -144,13 +177,13 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 ),
                 SizedBox(height: 20.0),
                 TextFormField(
-                  controller: classController,
+                  controller: nameController,
                   onTap: () {
-                    _showPredefinedViolations(context, 'violationclass');
+                    // _showPredefinedViolations(context, 'studentName');
                   },
                   readOnly: true, // Prevent keyboard from appearing on tap
                   decoration: InputDecoration(
-                    labelText: 'Class',
+                    labelText: 'Student name',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -180,7 +213,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 TextFormField(
                   controller: violateGroupController,
                   onTap: () {
-                    _showPredefinedViolations(context, 'violationGroup');
+                    _buildViolationGroupBottomSheet(context);
                   },
                   readOnly: true, // Prevent keyboard from appearing on tap
                   decoration: InputDecoration(
@@ -198,7 +231,12 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 TextFormField(
                   controller: violateTypeController,
                   onTap: () {
-                    _showPredefinedViolations(context, 'violationType');
+                    if (!isSelectedViolationGroup || violateGroupController.text.isEmpty) {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text('Please select violation group first.')));
+                    } else {
+                      _buildViolationTypeBottomSheet(context);
+                    }
                   },
                   readOnly: true, // Prevent keyboard from appearing on tap
                   decoration: InputDecoration(
@@ -299,35 +337,35 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () {
-                    final name = nameController.text;
-                    final className = classController.text;
-                    final time = timeController.text;
-                    final violateGroup = violateGroupController.text;
-                    final violateType = violateTypeController.text;
-                    final code = codeController.text;
-                    final description = descriptionController.text;
-                    final image = imageFile;
+                    // final name = nameController.text;
+                    // final className = classController.text;
+                    // final time = timeController.text;
+                    // final violateGroup = violateGroupController.text;
+                    // final violateType = violateTypeController.text;
+                    // final code = codeController.text;
+                    // final description = descriptionController.text;
+                    // final image = imageFile;
 
-                    print('Tên học sinh: $name');
-                    print('Lớp học: $className');
-                    print('Thời gian: $time');
-                    print('Nhóm vi phạm: $violateGroup');
-                    print('Loại vi phạm: $violateType');
-                    print('Mã vi phạm: $code');
-                    print('Mô tả: $description');
-                    print('Ảnh: $image');
+                    // print('Tên học sinh: $name');
+                    // print('Lớp học: $className');
+                    // print('Thời gian: $time');
+                    // print('Nhóm vi phạm: $violateGroup');
+                    // print('Loại vi phạm: $violateType');
+                    // print('Mã vi phạm: $code');
+                    // print('Mô tả: $description');
+                    // print('Ảnh: $image');
 
-                    // Reset text controllers and image file state
-                    nameController.clear();
-                    classController.clear();
-                    timeController.clear();
-                    violateGroupController.clear();
-                    violateTypeController.clear();
-                    codeController.clear();
-                    descriptionController.clear();
-                    setState(() {
-                      imageFile = null;
-                    });
+                    // // Reset text controllers and image file state
+                    // nameController.clear();
+                    // classController.clear();
+                    // timeController.clear();
+                    // violateGroupController.clear();
+                    // violateTypeController.clear();
+                    // codeController.clear();
+                    // descriptionController.clear();
+                    // setState(() {
+                    //   imageFile = null;
+                    // });
                   },
                   child: Text('Gửi'),
                   style: ElevatedButton.styleFrom(
@@ -348,89 +386,178 @@ class _DataEntryFormState extends State<DataEntryForm> {
     );
   }
 
-  void _showPredefinedViolations(BuildContext context, String field) {
-    List<String> filteredItems = List.from(predefinedViolations);
+  void _buildViolationGroupBottomSheet(BuildContext context) {
     TextEditingController searchController = TextEditingController();
-
-    TextEditingController selectedController;
-    String dialogTitle;
-
-    if (field == 'violationGroup') {
-      selectedController = violateGroupController;
-      dialogTitle = 'Nhóm vi phạm';
-    } else if (field == 'violationType') {
-      selectedController = violateTypeController;
-      dialogTitle = 'Loại vi phạm';
-    } else if (field == 'violationclass') {
-      selectedController = classController;
-      dialogTitle = 'Lớp học';
-      filteredItems = List.from(predefinedClasses);
-    } else if (field == 'studentName') {
-      selectedController = nameController;
-      dialogTitle = 'Tên học sinh';
-      filteredItems = List.from(predefinedName);
-    } else {
-      return;
-    }
+    List filteredViolationGroup = List.from(violationGroup);
 
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: searchController,
-                decoration: InputDecoration(
-                  hintText: 'Tìm kiếm',
-                  prefixIcon: Icon(Icons.search),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    if (field == 'violationclass') {
-                      filteredItems = predefinedClasses
-                          .where((className) => className
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
-                          .toList();
-                    } else if (field == 'studentName') {
-                      filteredItems = predefinedName
-                          .where((name) =>
-                              name.toLowerCase().contains(value.toLowerCase()))
-                          .toList();
-                    } else {
-                      filteredItems = predefinedViolations
-                          .where((violation) => violation
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
-                          .toList();
-                    }
-                  });
-                },
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredItems.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(filteredItems[index]),
-                    onTap: () {
-                      Navigator.pop(context, filteredItems[index]);
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Tìm kiếm',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        filteredViolationGroup = violationGroup.where((group) {
+                          return group.vioGroupName?.toLowerCase().contains(value.toLowerCase()) ?? false;
+                        }).toList();
+                      });
                     },
-                  );
-                },
-              ),
-            ),
-          ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredViolationGroup.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(filteredViolationGroup[index].vioGroupName ?? ''),
+                        onTap: () {
+                          violateTypeController.clear();
+                          violateGroupController.text = filteredViolationGroup[index].vioGroupName ?? '';
+                          if (kDebugMode) {
+                            print('ID nhóm vi phạm: ${filteredViolationGroup[index].violationGroupId}');
+                          }
+                          isSelectedViolationGroup = true;
+                          getViolationTypeByGroup(filteredViolationGroup[index].violationGroupId ?? 0);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     ).then((value) {
       if (value != null) {
-        setState(() {
-          selectedController.text = value;
-        });
+        setState(() {});
+      }
+    });
+  }
+
+  void _buildViolationTypeBottomSheet(BuildContext context) {
+    TextEditingController searchController = TextEditingController();
+    List filteredViolationType = List.from(violationType);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Tìm kiếm',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        filteredViolationType = violationType.where((type) {
+                          return type.vioTypeName?.toLowerCase().contains(value.toLowerCase()) ?? false;
+                        }).toList();
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredViolationType.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(filteredViolationType[index].vioTypeName ?? ''),
+                        onTap: () {
+                          violateTypeController.text = filteredViolationType[index].vioTypeName ?? '';
+                          if (kDebugMode) {
+                            print('ID loại vi phạm: ${filteredViolationType[index].violationTypeId}');
+                          }
+                          Navigator.pop(context);
+                          setState(() {});
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {});
+      }
+    });
+  }
+
+  void _buildClassBottomSheet(BuildContext context) {
+    TextEditingController searchController = TextEditingController();
+    List filteredClassList = List.from(classList);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Tìm kiếm',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        filteredClassList = classList.where((classItem) {
+                          return classItem.name?.toLowerCase().contains(value.toLowerCase()) ?? false;
+                        }).toList();
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredClassList.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(filteredClassList[index].name ?? ''),
+                        onTap: () {
+                          classController.text = filteredClassList[index].name ?? '';
+                          if (kDebugMode) {
+                            print('ID lớp: ${filteredClassList[index].classId}');
+                          }
+                          Navigator.pop(context);
+                          setState(() {});
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {});
       }
     });
   }
