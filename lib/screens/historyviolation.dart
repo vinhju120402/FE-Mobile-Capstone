@@ -25,7 +25,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void getHistoryViolation() async {
-    var response = await historyViolationRepositoryImpl.getViolation();
+    var response = await historyViolationRepositoryImpl.getListViolation();
     historyViolationResponse = response;
     numberResult = historyViolationResponse.length;
     historyViolationResponse = response;
@@ -87,7 +87,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     itemBuilder: (context, index) {
                       return HistoryViolationItem(
                         date: historyViolationResponse[index].date ?? '',
-                        name: historyViolationResponse[index].violationName ?? '',
+                        name: historyViolationResponse[index].studentName ?? '',
                         violationName: historyViolationResponse[index].violationName ?? '',
                         ontapFunction: () {
                           context.push(ScreenRoute.violationEditScreen, extra: {

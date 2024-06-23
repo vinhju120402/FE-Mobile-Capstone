@@ -1,6 +1,7 @@
 class ViolationResponse {
   int? violationId;
   int? classId;
+  String? studentName;
   int? violationTypeId;
   int? teacherId;
   String? code;
@@ -15,6 +16,7 @@ class ViolationResponse {
   ViolationResponse(
       {this.violationId,
       this.classId,
+      this.studentName,
       this.violationTypeId,
       this.teacherId,
       this.code,
@@ -29,6 +31,7 @@ class ViolationResponse {
   ViolationResponse.fromJson(Map<String, dynamic> json) {
     violationId = json['violationId'];
     classId = json['classId'];
+    studentName = json['studentName'];
     violationTypeId = json['violationTypeId'];
     teacherId = json['teacherId'];
     code = json['code'];
@@ -45,6 +48,7 @@ class ViolationResponse {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['violationId'] = violationId;
     data['classId'] = classId;
+    data['studentName'] = studentName;
     data['violationTypeId'] = violationTypeId;
     data['teacherId'] = teacherId;
     data['code'] = code;
@@ -61,6 +65,6 @@ class ViolationResponse {
   //defined to string
   @override
   String toString() {
-    return 'HistoryViolation{violationId: $violationId, classId: $classId, violationTypeId: $violationTypeId, teacherId: $teacherId, code: $code, violationName: $violationName, description: $description, date: $date, createdAt: $createdAt, createdBy: $createdBy, updatedAt: $updatedAt, updatedBy: $updatedBy}';
+    return 'HistoryViolation{violationId: $violationId, classId: $classId, studentName: $studentName ,violationTypeId: $violationTypeId, teacherId: $teacherId, code: $code, violationName: $violationName, description: $description, date: $date, createdAt: $createdAt, createdBy: $createdBy, updatedAt: $updatedAt, updatedBy: $updatedBy}';
   }
 }
