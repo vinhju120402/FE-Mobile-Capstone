@@ -39,6 +39,13 @@ class EditviocationState extends State<Editviocation> {
     'Class D',
     'Class E',
   ];
+  final List<String> predefinedName = [
+    'Nguyen Van A',
+    'Nguyen Van B',
+    'Nguyen Van C',
+    'Nguyen Van D',
+    'Nguyen Van E',
+  ];
 
   @override
   void initState() {
@@ -392,6 +399,10 @@ class EditviocationState extends State<Editviocation> {
     } else if (field == 'violationclass') {
       selectedController = classController;
       filteredItems = List.from(predefinedClasses);
+    } else if (field == 'studentName') {
+      selectedController = nameController;
+      // dialogTitle = 'Tên học sinh';
+      filteredItems = List.from(predefinedName);
     } else {
       return;
     }
@@ -415,6 +426,9 @@ class EditviocationState extends State<Editviocation> {
                       filteredItems = predefinedClasses
                           .where((className) => className.toLowerCase().contains(value.toLowerCase()))
                           .toList();
+                    } else if (field == 'studentName') {
+                      filteredItems =
+                          predefinedName.where((name) => name.toLowerCase().contains(value.toLowerCase())).toList();
                     } else {
                       filteredItems = predefinedViolations
                           .where((violation) => violation.toLowerCase().contains(value.toLowerCase()))
