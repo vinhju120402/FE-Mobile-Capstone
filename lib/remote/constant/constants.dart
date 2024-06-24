@@ -17,4 +17,6 @@ class Constants {
   static String class_list = '$api_base_url/classes';
 
   static String student_in_class = '$api_base_url/student-in-classes/search';
+
+  static String create_student_violation = '$api_base_url/violations/student';
 }

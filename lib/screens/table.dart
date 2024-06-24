@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:eduappui/remote/model/request/violation_request.dart';
 import 'package:eduappui/remote/model/response/class_reponse.dart';
 import 'package:eduappui/remote/model/response/student_in_class_response.dart';
 import 'package:eduappui/remote/model/response/violation_group_response.dart';
@@ -9,7 +10,9 @@ import 'package:eduappui/remote/service/repository/violation_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sn_progress_dialog/progress_dialog.dart';
 
 class DataEntryForm extends StatefulWidget {
   const DataEntryForm({super.key});
@@ -34,6 +37,10 @@ class DataEntryFormState extends State<DataEntryForm> {
   List<StudentInClassResponse> studentInClass = [];
   List<ClassResponse> classList = [];
   bool isSelectedViolationGroup = false;
+  int? classId;
+  int? studentInClassId;
+  int? violationTypeId;
+  ProgressDialog? _progressDialog;
 
   @override
   void initState() {
@@ -107,18 +114,34 @@ class DataEntryFormState extends State<DataEntryForm> {
   }
 
   void createViolation() async {
-    // List<File>? listImage = [];
-    // listImage.add(imageFile ?? File(''));
-    // ViolationRequest violationRequest = ViolationRequest(
-    //   // studentInClassId: nameController.text, //TODO: lấy ID student in class
-    //   // classId: classController.text, //TODO: lấy ID
-    //   date: DateTime.parse(timeController.text),
-    //   // violationTypeId: violateTypeController.text., //TODO: lấy ID
-    //   code: codeController.text,
-    //   description: descriptionController.text,
-    //   images: listImage,
-    // );
-    // violationRepository.createViolation(violationRequest);
+    List<File>? listImage = [];
+    listImage.add(imageFile ?? File(''));
+    ViolationRequest violationRequest = ViolationRequest(
+      studentInClassId: studentInClassId ?? 0,
+      classId: classId ?? 0,
+      date: DateTime.parse(timeController.text),
+      violationTypeId: violationTypeId ?? 0,
+      violationName: violateTypeController.text,
+      code: codeController.text,
+      description: descriptionController.text,
+      images: listImage,
+    );
+    try {
+      var res = await violationRepository.createViolation(violationRequest);
+      if (res == 201) {
+        if (mounted) {
+          context.pop();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Create violation success.')));
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Create violation failed.')));
+      }
+    }
   }
 
   void getViolationGroup() async {
@@ -143,6 +166,15 @@ class DataEntryFormState extends State<DataEntryForm> {
     var response = await studentInClassRepository.getListStudent(classId: classId);
     studentInClass = response;
     setState(() {});
+  }
+
+  void showProgress() {
+    _progressDialog = ProgressDialog(context: context);
+    _progressDialog!.show(
+      max: 100,
+      msg: 'please wait ..',
+      progressBgColor: Colors.red,
+    );
   }
 
   @override
@@ -339,37 +371,8 @@ class DataEntryFormState extends State<DataEntryForm> {
                 SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () {
-                    // final name = nameController.text;
-                    // final className = classController.text;
-                    // final time = timeController.text;
-                    // final violateGroup = violateGroupController.text;
-                    // final violateType = violateTypeController.text;
-                    // final code = codeController.text;
-                    // final description = descriptionController.text;
-                    // final image = imageFile;
-
-                    // print('Tên học sinh: $name');
-                    // print('Lớp học: $className');
-                    // print('Thời gian: $time');
-                    // print('Nhóm vi phạm: $violateGroup');
-                    // print('Loại vi phạm: $violateType');
-                    // print('Mã vi phạm: $code');
-                    // print('Mô tả: $description');
-                    // print('Ảnh: $image');
-
-                    // // Reset text controllers and image file state
-                    // nameController.clear();
-                    // classController.clear();
-                    // timeController.clear();
-                    // violateGroupController.clear();
-                    // violateTypeController.clear();
-                    // codeController.clear();
-                    // descriptionController.clear();
-                    // setState(() {
-                    //   imageFile = null;
-                    // });
+                    createViolation();
                   },
-                  child: Text('Gửi'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     textStyle: TextStyle(fontSize: 18),
@@ -378,6 +381,7 @@ class DataEntryFormState extends State<DataEntryForm> {
                     ),
                     padding: EdgeInsets.symmetric(vertical: 15.0),
                   ),
+                  child: const Text('Gửi'),
                 ),
                 SizedBox(height: 20.0),
               ],
@@ -487,6 +491,7 @@ class DataEntryFormState extends State<DataEntryForm> {
                           if (kDebugMode) {
                             print('ID loại vi phạm: ${filteredViolationType[index].violationTypeId}');
                           }
+                          violationTypeId = filteredViolationType[index].violationTypeId;
                           Navigator.pop(context);
                           setState(() {});
                         },
@@ -546,6 +551,7 @@ class DataEntryFormState extends State<DataEntryForm> {
                           if (kDebugMode) {
                             print('ID lớp: ${filteredClassList[index].classId}');
                           }
+                          classId = filteredClassList[index].classId;
                           getSutdentInClass(filteredClassList[index].classId);
                           Navigator.pop(context);
                           setState(() {});
@@ -605,6 +611,7 @@ class DataEntryFormState extends State<DataEntryForm> {
                           if (kDebugMode) {
                             print('ID học sinh: ${filteredStudentInClass[index].studentId}');
                           }
+                          studentInClassId = filteredStudentInClass[index].studentInClassId;
                           Navigator.pop(context);
                           setState(() {});
                         },

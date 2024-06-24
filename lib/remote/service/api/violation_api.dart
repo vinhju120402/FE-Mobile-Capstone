@@ -42,6 +42,15 @@ class ViolationAPI {
   }
 
   Future createViolation(ViolationRequest violationRequest) async {
+    List<MultipartFile> imageFiles = [];
+
+    if (violationRequest.images != null && violationRequest.images!.isNotEmpty) {
+      imageFiles = violationRequest.images!
+          .where((file) => file.path.isNotEmpty)
+          .map((file) => MultipartFile.fromFileSync(file.path))
+          .toList();
+    }
+
     FormData formData = FormData.fromMap({
       'classId': violationRequest.classId,
       'studentInClassId': violationRequest.studentInClassId,
@@ -51,19 +60,17 @@ class ViolationAPI {
       'violationName': violationRequest.violationName,
       'description': violationRequest.description,
       'date': violationRequest.date?.toIso8601String(),
-      'images': violationRequest.images != null
-          ? violationRequest.images!.map((file) => MultipartFile.fromFileSync(file.path)).toList()
-          : [],
+      'images': imageFiles,
     });
 
     final response = await networkClient.invoke(
-      Constants.history_violation,
+      Constants.create_student_violation,
       RequestType.post,
       requestBody: formData,
     );
 
-    if (response.statusCode == 201) {
-      return response.data;
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return 201;
     } else {
       throw ServerException.withException(
         dioError: DioException(

@@ -30,7 +30,8 @@ class ViolationRepositoryImpl extends ViolationRepository {
 
   @override
   Future createViolation(ViolationRequest violation) {
-    return historyViolationAPI.createViolation(violation);
+    var response = historyViolationAPI.createViolation(violation);
+    return response;
   }
 
   @override
