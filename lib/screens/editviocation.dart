@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:eduappui/remote/model/request/violation_request.dart';
 import 'package:eduappui/remote/model/response/class_reponse.dart';
 import 'package:eduappui/remote/model/response/student_in_class_response.dart';
 import 'package:eduappui/remote/model/response/violation_group_response.dart';
@@ -9,6 +10,7 @@ import 'package:eduappui/remote/service/repository/violation_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -36,6 +38,10 @@ class EditviocationState extends State<Editviocation> {
   List<ClassResponse> classList = [];
   List<ViolationTypeResponse> violationType = [];
   List<StudentInClassResponse> studentInClass = [];
+  int? classId;
+  int? studentInClassId;
+  int? violationTypeId;
+  String violationName = '';
 
   @override
   void initState() {
@@ -43,9 +49,9 @@ class EditviocationState extends State<Editviocation> {
     if (kDebugMode) {
       print('ID: ${widget.id}');
     }
-    getViolationGroup();
-    getClassList();
-    getViolationById(widget.id);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initializeData();
+    });
   }
 
   String selectedViolation = '';
@@ -104,18 +110,29 @@ class EditviocationState extends State<Editviocation> {
     }
   }
 
-  void getViolationById(int id) async {
+  Future<void> getViolationById(int id) async {
     try {
       final violation = await violationRepository.getViolationById(id);
       if (kDebugMode) {
         print('Violation: $violation');
       }
       if (violation.violationId != null) {
+        classController.text = classList.firstWhere((element) => element.classId == violation.classId).name ?? '';
+        classId = violation.classId;
+        await getSutdentInClass(violation.classId);
         nameController.text = violation.studentName ?? '';
-        classController.text = violation.classId.toString();
+        studentInClassId = violation.studentInClassId;
         timeController.text = DateFormat.yMd().format(DateTime.parse(violation.date ?? ''));
-        violateGroupController.text = violation.violationTypeId.toString();
-        violateTypeController.text = violation.violationTypeId.toString();
+        violateGroupController.text = violationGroup
+                .firstWhere((element) => element.violationGroupId == violation.violationGroupId)
+                .vioGroupName ??
+            '';
+        await getViolationTypeByGroup(violation.violationGroupId ?? 0);
+        violateTypeController.text =
+            violationType.firstWhere((element) => element.violationTypeId == violation.violationTypeId).vioTypeName ??
+                '';
+        violationTypeId = violation.violationTypeId;
+        violationName = violation.violationName ?? '';
         codeController.text = violation.code ?? '';
         descriptionController.text = violation.description ?? '';
       } else {
@@ -146,16 +163,63 @@ class EditviocationState extends State<Editviocation> {
     }
   }
 
-  void getViolationGroup() async {
+  Future<void> getViolationGroup() async {
     var response = await violationRepository.getViolationGroup();
     violationGroup = response;
-    setState(() {});
   }
 
-  void getClassList() async {
+  Future<void> getClassList() async {
     var response = await classRepository.getListClass();
     classList = response;
-    setState(() {});
+  }
+
+  Future<void> initializeData() async {
+    await getClassList();
+    await getViolationGroup();
+    await getViolationById(widget.id);
+  }
+
+  Future<void> getViolationTypeByGroup(int groupId) async {
+    var response = await violationRepository.getListViolationTypeByGroup(groupId);
+    violationType = response;
+  }
+
+  Future<void> editViolation(int id) async {
+    List<File>? listImage = [];
+    listImage.add(imageFile ?? File(''));
+    ViolationRequest violationRequest = ViolationRequest(
+      classId: classId ?? 0,
+      studentInClassId: studentInClassId ?? 0,
+      violationTypeId: violationTypeId ?? 0,
+      teacherId: null,
+      code: codeController.text,
+      violationName: violateTypeController.text,
+      description: descriptionController.text,
+      date: DateFormat('M/d/yyyy').parse(timeController.text),
+      images: listImage,
+    );
+
+    try {
+      var response = await violationRepository.editViolation(id, violationRequest);
+      if (response == 200) {
+        if (mounted) {
+          context.pop();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Edit violation success.')));
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Edit violation failed.')));
+      }
+    }
+  }
+
+  Future<void> getSutdentInClass(int? classId) async {
+    var response = await studentInClassRepository.getListStudent(classId: classId);
+    studentInClass = response;
   }
 
   @override
@@ -350,37 +414,8 @@ class EditviocationState extends State<Editviocation> {
                     SizedBox(height: 20.0),
                     ElevatedButton(
                       onPressed: () {
-                        final name = nameController.text;
-                        final className = classController.text;
-                        final time = timeController.text;
-                        final violateGroup = violateGroupController.text;
-                        final violateType = violateTypeController.text;
-                        final code = codeController.text;
-                        final description = descriptionController.text;
-                        final image = imageFile;
-
-                        print('Tên học sinh: $name');
-                        print('Lớp học: $className');
-                        print('Thời gian: $time');
-                        print('Nhóm vi phạm: $violateGroup');
-                        print('Loại vi phạm: $violateType');
-                        print('Mã vi phạm: $code');
-                        print('Mô tả: $description');
-                        print('Ảnh: $image');
-
-                        // Reset text controllers and image file state
-                        nameController.clear();
-                        classController.clear();
-                        timeController.clear();
-                        violateGroupController.clear();
-                        violateTypeController.clear();
-                        codeController.clear();
-                        descriptionController.clear();
-                        setState(() {
-                          imageFile = null;
-                        });
+                        editViolation(widget.id);
                       },
-                      child: Text('Gửi'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         textStyle: TextStyle(fontSize: 18),
@@ -389,6 +424,7 @@ class EditviocationState extends State<Editviocation> {
                         ),
                         padding: EdgeInsets.symmetric(vertical: 15.0),
                       ),
+                      child: Text('Gửi'),
                     ),
                     SizedBox(height: 20.0),
                   ],
@@ -497,6 +533,7 @@ class EditviocationState extends State<Editviocation> {
                           if (kDebugMode) {
                             print('ID loại vi phạm: ${filteredViolationType[index].violationTypeId}');
                           }
+                          violationTypeId = filteredViolationType[index].violationTypeId;
                           Navigator.pop(context);
                           setState(() {});
                         },
@@ -550,13 +587,14 @@ class EditviocationState extends State<Editviocation> {
                     itemBuilder: (context, index) {
                       return ListTile(
                         title: Text(filteredClassList[index].name ?? ''),
-                        onTap: () {
+                        onTap: () async {
                           nameController.clear();
                           classController.text = filteredClassList[index].name ?? '';
                           if (kDebugMode) {
                             print('ID lớp: ${filteredClassList[index].classId}');
                           }
-                          // getSutdentInClass(filteredClassList[index].classId);
+                          classId = filteredClassList[index].classId;
+                          getSutdentInClass(filteredClassList[index].classId);
                           Navigator.pop(context);
                           setState(() {});
                         },
@@ -597,9 +635,9 @@ class EditviocationState extends State<Editviocation> {
                     ),
                     onChanged: (value) {
                       setState(() {
-                        // filteredStudentInClass = studentInClass.where((student) {
-                        //   return student.studentId?.(value.toLowerCase()) ?? false;
-                        // }).toList();
+                        filteredStudentInClass = studentInClass.where((student) {
+                          return student.studentName?.contains(value.toLowerCase()) ?? false;
+                        }).toList();
                       });
                     },
                   ),
@@ -609,12 +647,13 @@ class EditviocationState extends State<Editviocation> {
                     itemCount: filteredStudentInClass.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(filteredStudentInClass[index].studentId.toString()),
+                        title: Text(filteredStudentInClass[index].studentName.toString()),
                         onTap: () {
-                          nameController.text = filteredStudentInClass[index].studentId.toString();
+                          nameController.text = filteredStudentInClass[index].studentName.toString();
                           if (kDebugMode) {
                             print('ID học sinh: ${filteredStudentInClass[index].studentId}');
                           }
+                          studentInClassId = filteredStudentInClass[index].studentInClassId;
                           Navigator.pop(context);
                           setState(() {});
                         },

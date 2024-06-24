@@ -50,6 +50,11 @@ class DataEntryFormState extends State<DataEntryForm> {
     getClassList();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   String selectedViolation = '';
   File? imageFile;
 
@@ -147,25 +152,21 @@ class DataEntryFormState extends State<DataEntryForm> {
   void getViolationGroup() async {
     var response = await violationRepository.getViolationGroup();
     violationGroup = response;
-    setState(() {});
   }
 
   void getViolationTypeByGroup(int groupId) async {
     var response = await violationRepository.getListViolationTypeByGroup(groupId);
     violationType = response;
-    setState(() {});
   }
 
   void getClassList() async {
     var response = await classRepository.getListClass();
     classList = response;
-    setState(() {});
   }
 
   void getSutdentInClass(int? classId) async {
     var response = await studentInClassRepository.getListStudent(classId: classId);
     studentInClass = response;
-    setState(() {});
   }
 
   void showProgress() {

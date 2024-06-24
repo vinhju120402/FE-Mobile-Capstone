@@ -50,4 +50,8 @@ class ViolationRepositoryImpl extends ViolationRepository {
     List<ViolationTypeResponse> responseList = dynamicList.map((item) => ViolationTypeResponse.fromJson(item)).toList();
     return responseList;
   }
+
+  Future editViolation(int id, ViolationRequest violation) {
+    return historyViolationAPI.editViolation(id, violation);
+  }
 }

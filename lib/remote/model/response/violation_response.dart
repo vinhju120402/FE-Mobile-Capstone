@@ -1,8 +1,12 @@
 class ViolationResponse {
   int? violationId;
   int? classId;
+  int? studentInClassId;
   String? studentName;
   int? violationTypeId;
+  String? violationTypeName;
+  int? violationGroupId;
+  String? violationGroupName;
   int? teacherId;
   String? code;
   String? violationName;
@@ -16,8 +20,12 @@ class ViolationResponse {
   ViolationResponse(
       {this.violationId,
       this.classId,
+      this.studentInClassId,
       this.studentName,
       this.violationTypeId,
+      this.violationTypeName,
+      this.violationGroupId,
+      this.violationGroupName,
       this.teacherId,
       this.code,
       this.violationName,
@@ -31,8 +39,12 @@ class ViolationResponse {
   ViolationResponse.fromJson(Map<String, dynamic> json) {
     violationId = json['violationId'];
     classId = json['classId'];
+    studentInClassId = json['studentInClassId'];
     studentName = json['studentName'];
     violationTypeId = json['violationTypeId'];
+    violationTypeName = json['violationTypeName'];
+    violationGroupId = json['violationGroupId'];
+    violationGroupName = json['violationGroupName'];
     teacherId = json['teacherId'];
     code = json['code'];
     violationName = json['violationName'];
@@ -48,8 +60,12 @@ class ViolationResponse {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['violationId'] = violationId;
     data['classId'] = classId;
+    data['studentInClassId'] = studentInClassId;
     data['studentName'] = studentName;
     data['violationTypeId'] = violationTypeId;
+    data['violationTypeName'] = violationTypeName;
+    data['violationGroupId'] = violationGroupId;
+    data['violationGroupName'] = violationGroupName;
     data['teacherId'] = teacherId;
     data['code'] = code;
     data['violationName'] = violationName;
@@ -60,11 +76,5 @@ class ViolationResponse {
     data['updatedAt'] = updatedAt;
     data['updatedBy'] = updatedBy;
     return data;
-  }
-
-  //defined to string
-  @override
-  String toString() {
-    return 'HistoryViolation{violationId: $violationId, classId: $classId, studentName: $studentName ,violationTypeId: $violationTypeId, teacherId: $teacherId, code: $code, violationName: $violationName, description: $description, date: $date, createdAt: $createdAt, createdBy: $createdBy, updatedAt: $updatedAt, updatedBy: $updatedBy}';
   }
 }

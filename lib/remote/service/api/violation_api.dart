@@ -109,4 +109,44 @@ class ViolationAPI {
       ));
     }
   }
+
+  Future editViolation(int id, ViolationRequest violationRequest) async {
+    List<MultipartFile> imageFiles = [];
+
+    if (violationRequest.images != null && violationRequest.images!.isNotEmpty) {
+      imageFiles = violationRequest.images!
+          .where((file) => file.path.isNotEmpty)
+          .map((file) => MultipartFile.fromFileSync(file.path))
+          .toList();
+    }
+
+    FormData formData = FormData.fromMap({
+      'classId': violationRequest.classId,
+      'studentInClassId': violationRequest.studentInClassId,
+      'violationTypeId': violationRequest.violationTypeId,
+      'teacherId': violationRequest.teacherId,
+      'code': violationRequest.code,
+      'violationName': violationRequest.violationName,
+      'description': violationRequest.description,
+      'date': violationRequest.date?.toIso8601String(),
+      'images': imageFiles,
+    });
+
+    final response = await networkClient.invoke(
+      '${Constants.edit_violation_history}/$id',
+      RequestType.put,
+      requestBody: formData,
+    );
+
+    if (response.statusCode == 200) {
+      return 200;
+    } else {
+      throw ServerException.withException(
+        dioError: DioException(
+          response: response,
+          requestOptions: response.requestOptions,
+        ),
+      );
+    }
+  }
 }
