@@ -6,6 +6,8 @@ class Constants {
   // App API Endpoints
   static String api_base_url = '${dotenv.env['API_BASE_URL']}';
 
+  static String login = '$api_base_url/auths/login';
+
   static String history_violation = '$api_base_url/violations';
 
   static String violation_group = '$api_base_url/violation-groups';
@@ -13,4 +15,6 @@ class Constants {
   static String violation_type = '$api_base_url/violation-types/search';
 
   static String class_list = '$api_base_url/classes';
+
+  static String student_in_class = '$api_base_url/student-in-classes/search';
 }

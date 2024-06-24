@@ -13,7 +13,11 @@ class ViolationAPI {
         await networkClient.invoke(Constants.history_violation, RequestType.get, queryParameters: sortOrders);
 
     if (response.statusCode == 200) {
-      return response.data['data'];
+      if (response.data['data'] == null) {
+        return [];
+      } else {
+        return response.data['data'];
+      }
     } else {
       throw ServerException.withException(
           dioError: DioException(

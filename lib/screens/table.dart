@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:eduappui/remote/model/response/class_reponse.dart';
+import 'package:eduappui/remote/model/response/student_in_class_response.dart';
 import 'package:eduappui/remote/model/response/violation_group_response.dart';
 import 'package:eduappui/remote/model/response/violation_type_response.dart';
 import 'package:eduappui/remote/service/repository/class_repository.dart';
+import 'package:eduappui/remote/service/repository/student_in_class_repository.dart';
 import 'package:eduappui/remote/service/repository/violation_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,7 @@ class DataEntryForm extends StatefulWidget {
 class DataEntryFormState extends State<DataEntryForm> {
   final ViolationRepositoryImpl violationRepository = ViolationRepositoryImpl();
   final ClassRepositoryImpl classRepository = ClassRepositoryImpl();
+  final StudentInClassRepositoryImpl studentInClassRepository = StudentInClassRepositoryImpl();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController classController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
@@ -28,16 +31,9 @@ class DataEntryFormState extends State<DataEntryForm> {
   final TextEditingController descriptionController = TextEditingController();
   List<ViolationGroupResponse> violationGroup = [];
   List<ViolationTypeResponse> violationType = [];
+  List<StudentInClassResponse> studentInClass = [];
   List<ClassResponse> classList = [];
   bool isSelectedViolationGroup = false;
-
-  final List<String> predefinedName = [
-    'Nguyen Van A',
-    'Nguyen Van B',
-    'Nguyen Van C',
-    'Nguyen Van D',
-    'Nguyen Van E',
-  ];
 
   @override
   void initState() {
@@ -143,6 +139,12 @@ class DataEntryFormState extends State<DataEntryForm> {
     setState(() {});
   }
 
+  void getSutdentInClass(int? classId) async {
+    var response = await studentInClassRepository.getListStudent(classId: classId);
+    studentInClass = response;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,7 +181,7 @@ class DataEntryFormState extends State<DataEntryForm> {
                 TextFormField(
                   controller: nameController,
                   onTap: () {
-                    // _showPredefinedViolations(context, 'studentName');
+                    _buildStudentInClassList(context);
                   },
                   readOnly: true, // Prevent keyboard from appearing on tap
                   decoration: InputDecoration(
@@ -539,9 +541,69 @@ class DataEntryFormState extends State<DataEntryForm> {
                       return ListTile(
                         title: Text(filteredClassList[index].name ?? ''),
                         onTap: () {
+                          nameController.clear();
                           classController.text = filteredClassList[index].name ?? '';
                           if (kDebugMode) {
                             print('ID lớp: ${filteredClassList[index].classId}');
+                          }
+                          getSutdentInClass(filteredClassList[index].classId);
+                          Navigator.pop(context);
+                          setState(() {});
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {});
+      }
+    });
+  }
+
+  void _buildStudentInClassList(BuildContext context) {
+    TextEditingController searchController = TextEditingController();
+    List filteredStudentInClass = List.from(studentInClass);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Tìm kiếm',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        filteredStudentInClass = studentInClass.where((student) {
+                          return student.studentName?.contains(value.toLowerCase()) ?? false;
+                        }).toList();
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredStudentInClass.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(filteredStudentInClass[index].studentName.toString()),
+                        onTap: () {
+                          nameController.text = filteredStudentInClass[index].studentName.toString();
+                          if (kDebugMode) {
+                            print('ID học sinh: ${filteredStudentInClass[index].studentId}');
                           }
                           Navigator.pop(context);
                           setState(() {});

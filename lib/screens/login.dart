@@ -1,19 +1,22 @@
+import 'package:eduappui/remote/model/request/login_request.dart';
+import 'package:eduappui/remote/service/repository/login_repository.dart';
 import 'package:eduappui/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   ProgressDialog? _progressDialog;
+  LoginRepositoryImpl loginRepository = LoginRepositoryImpl();
 
   void showProgress() {
     _progressDialog = ProgressDialog(context: context);
@@ -24,39 +27,46 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _signIn() {
+  Future<void> _signIn() async {
     // Lấy dữ liệu từ ô nhập liệu
-    String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
-
-    // Kiểm tra thông tin đăng nhập
-    if (email == 'admin@gmail.com' && password == '123456') {
-      // Nếu thông tin đúng, hiển thị tiến trình
+    String phoneNumber = phoneNumberController.text;
+    String password = passwordController.text;
+    try {
+      if (phoneNumber.isEmpty || password.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(' Please enter your phone number and password!')));
+          return;
+        }
+      }
+      var response = await loginRepository.login(LoginRequest(phoneNumber: phoneNumber, password: password));
       showProgress();
-      // Sau đó chuyển hướng đến màn hình HomeScreen
-      Future.delayed(Duration(seconds: 2), () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
+      if (response.token != null) {
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreen()),
+          );
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Login Failed'),
+            content: Text('Please check your phone number and password'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          ),
         );
-      });
-    } else {
-      // Nếu thông tin không đúng, hiển thị thông báo lỗi
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Login Failed'),
-          content: Text('Incorrect email or password. Please try again.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+      }
     }
   }
 
@@ -87,20 +97,18 @@ class _LoginPageState extends State<LoginPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(
-                height: 20), // Khoảng cách giữa dòng chữ và ô nhập liệu
+            const SizedBox(height: 20), // Khoảng cách giữa dòng chữ và ô nhập liệu
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: TextField(
-                controller: _emailController,
+                controller: phoneNumberController,
                 decoration: InputDecoration(
-                  hintText: 'Email',
+                  hintText: 'Phone Number',
                   filled: true, // Đặt filled thành true
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide:
-                        const BorderSide(color: Colors.white), // Bo góc tròn
+                    borderSide: const BorderSide(color: Colors.white), // Bo góc tròn
                   ),
                 ),
               ),
@@ -109,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: TextField(
-                controller: _passwordController,
+                controller: passwordController,
                 obscureText: _obscureText, // Ẩn/mở mật khẩu
                 decoration: InputDecoration(
                   hintText: 'Password',
@@ -117,8 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide:
-                        const BorderSide(color: Colors.white), // Bo góc tròn
+                    borderSide: const BorderSide(color: Colors.white), // Bo góc tròn
                   ),
                   suffixIcon: IconButton(
                     onPressed: () {
