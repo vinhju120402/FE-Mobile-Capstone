@@ -1,21 +1,45 @@
+import 'package:eduappui/remote/model/response/schedule_response.dart';
+import 'package:eduappui/remote/service/repository/schedule_repository.dart';
+import 'package:eduappui/widget/schedule_item.dart';
 import 'package:flutter/material.dart';
 
-class DutyScheduleScreen extends StatelessWidget {
+class DutyScheduleScreen extends StatefulWidget {
+  const DutyScheduleScreen({super.key});
+
+  @override
+  State<DutyScheduleScreen> createState() => _DutyScheduleScreenState();
+}
+
+class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
+  ScheduleRepositoryImpl scheduleRepository = ScheduleRepositoryImpl();
+  List<ScheduleResponse> scheduleList = [];
+  @override
+  void initState() {
+    super.initState();
+    getSchedule();
+  }
+
+  getSchedule() async {
+    var schedule = await scheduleRepository.getDutySchedule();
+    scheduleList = schedule;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Duty Schedule'),
-        backgroundColor: Color.fromARGB(189, 7, 206, 43),
+        title: const Text('Duty Schedule'),
+        backgroundColor: const Color.fromARGB(189, 7, 206, 43),
       ),
       body: Container(
-        color: Color.fromARGB(226, 134, 253, 237),
+        color: const Color.fromARGB(226, 134, 253, 237),
         child: Column(
           children: [
             Container(
-              color: Color.fromARGB(189, 7, 206, 43),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
+              color: const Color.fromARGB(189, 7, 206, 43),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Icon(Icons.arrow_back, color: Colors.white),
@@ -28,113 +52,21 @@ class DutyScheduleScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ListView(
-                children: [
-                  ScheduleItem(
-                    date: 'Thu 2\n1/2/2024',
-                    time: 'Thời gian: 7h-8h',
-                    name: 'Họ và Tên: Nguyễn Văn A',
-                    className: 'Lớp',
-                  ),
-                  ScheduleItem(
-                    date: 'Thu 3\n2/2/2024',
-                    time: 'Thời gian: 7h-8h',
-                    name: 'Họ và Tên: Nguyễn Văn A',
-                    className: 'Lớp',
-                  ),
-                  ScheduleItem(
-                    date: 'Thu 4\n3/2/2024',
-                    time: 'Thời gian: 7h-8h',
-                    name: 'Họ và Tên: Nguyễn Văn A',
-                    className: 'Lớp',
-                  ),
-                  ScheduleItem(
-                    date: 'Thu 5\n4/2/2024',
-                    time: 'Thời gian: 7h-8h',
-                    name: 'Họ và Tên: Nguyễn Văn A',
-                    className: 'Lớp',
-                  ),
-                  ScheduleItem(
-                    date: 'Thu 6\n5/2/2024',
-                    time: 'Thời gian: 7h-8h',
-                    name: 'Họ và Tên: Nguyễn Văn A',
-                    className: 'Lớp',
-                  ),
-                  ScheduleItem(
-                    date: 'Thu 7\n6/2/2024',
-                    time: 'Thời gian: 7h-8h',
-                    name: 'Họ và Tên: Nguyễn Văn A',
-                    className: 'Lớp',
-                  ),
-                  ScheduleItem(
-                    date: 'Chu Nhat\n7/2/2024',
-                    time: 'Thời gian: 7h-8h',
-                    name: 'Họ và Tên: Nguyễn Văn A',
-                    className: 'Lớp',
-                  ),
-                ],
+              child: ListView.builder(
+                itemCount: scheduleList.length,
+                itemBuilder: (context, index) {
+                  return ScheduleItem(
+                    className: scheduleList[index].classId.toString(),
+                    supervisorName: scheduleList[index].supervisorName ?? '',
+                    date: scheduleList[index].from.toString(),
+                    time: scheduleList[index].to.toString(),
+                    teacherName: scheduleList[index].teacherName ?? '',
+                  );
+                },
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class ScheduleItem extends StatelessWidget {
-  final String date;
-  final String time;
-  final String name;
-  final String className;
-
-  ScheduleItem({
-    required this.date,
-    required this.time,
-    required this.name,
-    required this.className,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      margin: EdgeInsets.all(8),
-      padding: EdgeInsets.all(16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              date,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            height: 50, // Adjust height as needed
-            width: 2, // Thickness of the line
-            color: Colors.grey, // Color of the line
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(time),
-                Text(name),
-                Text(className),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
