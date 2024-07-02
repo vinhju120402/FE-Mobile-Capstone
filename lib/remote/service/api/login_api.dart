@@ -10,10 +10,12 @@ class LoginAPI {
 
   Future<LoginResponse> login(LoginRequest request) async {
     var response = await networkClient.invoke(
-      Constants.login,
+      '${Constants.login}?isAdmin=false',
       RequestType.post,
       requestBody: {"phone": request.phoneNumber, "password": request.password},
     );
+    print(request.phoneNumber);
+    print(request.password);
     if (response.statusCode == 200) {
       return LoginResponse.fromJson(response.data);
     } else if (response.statusCode == 401) {
