@@ -133,7 +133,7 @@ class ViolationAPI {
     });
 
     final response = await networkClient.invoke(
-      '${Constants.edit_violation_history}/$id',
+      '${Constants.edit_violation_history}?id=$id',
       RequestType.put,
       requestBody: formData,
     );
