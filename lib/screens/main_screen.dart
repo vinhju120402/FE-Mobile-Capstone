@@ -13,7 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  final bool? isAdmin;
+  const MainScreen({super.key, this.isAdmin = false});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -50,7 +51,6 @@ class _MainScreenState extends State<MainScreen> {
     Icon(Icons.schedule_outlined, color: Colors.white, size: 30),
     Icon(Icons.person_2_outlined, color: Colors.white, size: 30),
   ];
-  int _selectedIndex = 0;
   final List<String> imageList = [
     'images/pho1.jpg',
     'images/pho2.jpg',
@@ -79,6 +79,14 @@ class _MainScreenState extends State<MainScreen> {
         curve: Curves.easeIn,
       );
     });
+    if (widget.isAdmin == false) {
+      //remove duty schedule from list catNames
+      catNames.remove('Duty schedule');
+      //remove item in catColors
+      catColors.removeAt(4);
+      //remove item in catIcons
+      catIcons.removeAt(4);
+    }
   }
 
   @override
@@ -90,17 +98,18 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (kDebugMode) {
+      print('Main Screen is Admin: ${widget.isAdmin}');
+    }
     return Scaffold(
       extendBody: true,
       body: Container(
-        color: Color.fromARGB(
-            226, 134, 253, 237), // Change background color to blue
+        color: Color.fromARGB(226, 134, 253, 237), // Change background color to blue
         child: SingleChildScrollView(
           child: Column(
             children: [
               Container(
-                padding:
-                    EdgeInsets.only(top: 35, right: 15, left: 15, bottom: 10),
+                padding: EdgeInsets.only(top: 35, right: 15, left: 15, bottom: 10),
                 decoration: BoxDecoration(
                   color: Color.fromARGB(189, 7, 206, 43),
                   borderRadius: BorderRadius.only(
@@ -120,9 +129,7 @@ class _MainScreenState extends State<MainScreen> {
                               radius: 25, // Adjust the radius as needed
                               backgroundImage: AssetImage("images/logo.jpg"),
                             ),
-                            SizedBox(
-                                width:
-                                    5), // Reduced space between the avatar and the text
+                            SizedBox(width: 5), // Reduced space between the avatar and the text
                             Text(
                               'Hello Student',
                               style: TextStyle(
@@ -140,9 +147,7 @@ class _MainScreenState extends State<MainScreen> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          NotificationScreen()),
+                                  MaterialPageRoute(builder: (context) => NotificationScreen()),
                                 );
                               },
                               child: Icon(
@@ -156,8 +161,7 @@ class _MainScreenState extends State<MainScreen> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SettingsScreen()),
+                                  MaterialPageRoute(builder: (context) => SettingsScreen()),
                                 );
                               },
                               child: Icon(
@@ -171,15 +175,14 @@ class _MainScreenState extends State<MainScreen> {
                       ],
                     ),
                     SizedBox(height: 20),
-                    Container(
+                    SizedBox(
                       height: 180, // Height for the PageView
                       child: PageView.builder(
                         controller: _pageController,
                         itemCount: imageList.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 5.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 5.0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: Image.asset(
@@ -243,38 +246,32 @@ class _MainScreenState extends State<MainScreen> {
                             if (catNames[index] == "Rule") {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => RuleScreen()),
+                                MaterialPageRoute(builder: (context) => RuleScreen()),
                               );
                             } else if (catNames[index] == "Violation") {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => DataEntryForm()),
+                                MaterialPageRoute(builder: (context) => DataEntryForm()),
                               );
                             } else if (catNames[index] == "Contact") {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => ContactScreen()),
+                                MaterialPageRoute(builder: (context) => ContactScreen()),
                               );
                             } else if (catNames[index] == "Profile") {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => ProfileScreen()),
+                                MaterialPageRoute(builder: (context) => ProfileScreen()),
                               );
                             } else if (catNames[index] == "HistoryViolation") {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => HistoryScreen()),
+                                MaterialPageRoute(builder: (context) => HistoryScreen()),
                               );
                             } else if (catNames[index] == "Duty schedule") {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => DutyScheduleScreen()),
+                                MaterialPageRoute(builder: (context) => DutyScheduleScreen()),
                               );
                             }
                           },
@@ -329,8 +326,7 @@ class _MainScreenState extends State<MainScreen> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => OfficersScreen()),
+                          MaterialPageRoute(builder: (context) => OfficersScreen()),
                         );
                       },
                       child: Text(
@@ -353,15 +349,11 @@ class _MainScreenState extends State<MainScreen> {
                       Container(
                         width: 60, // Width of the rectangular frame
                         height: 80, // Height of the rectangular frame
-                        padding: EdgeInsets.all(
-                            5), // Space between frame and circular image
+                        padding: EdgeInsets.all(5), // Space between frame and circular image
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(240, 0, 247,
-                              255), // Background color of the frame
-                          border: Border.all(
-                              color: Colors.grey), // Border color of the frame
-                          borderRadius: BorderRadius.circular(
-                              8), // Rounded corners for the frame
+                          color: Color.fromARGB(240, 0, 247, 255), // Background color of the frame
+                          border: Border.all(color: Colors.grey), // Border color of the frame
+                          borderRadius: BorderRadius.circular(8), // Rounded corners for the frame
                         ),
                         child: ClipOval(
                           child: Image.asset(

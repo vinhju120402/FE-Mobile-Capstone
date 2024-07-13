@@ -10,7 +10,7 @@ class LoginAPI {
 
   Future<LoginResponse> login(LoginRequest request) async {
     var response = await networkClient.invoke(
-      '${Constants.login}?isAdmin=false',
+      Constants.login,
       RequestType.post,
       requestBody: {"phone": request.phoneNumber, "password": request.password},
     );

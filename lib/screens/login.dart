@@ -1,7 +1,9 @@
 import 'package:eduappui/remote/model/request/login_request.dart';
 import 'package:eduappui/remote/service/repository/login_repository.dart';
 import 'package:eduappui/screens/main_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
 class LoginPage extends StatefulWidget {
@@ -42,12 +44,30 @@ class LoginPageState extends State<LoginPage> {
       var response = await loginRepository.login(LoginRequest(phoneNumber: phoneNumber, password: password));
       showProgress();
       if (response.token != null) {
-        Future.delayed(Duration(seconds: 2), () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => MainScreen()),
-          );
-        });
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(response.token!);
+        if (decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] == 'STUDENT_SUPERVISOR') {
+          if (kDebugMode) {
+            print(
+                'is admin -- false , Role:  ${decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']}');
+          }
+          Future.delayed(Duration(seconds: 2), () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MainScreen(isAdmin: false)),
+            );
+          });
+        } else {
+          if (kDebugMode) {
+            print(
+                'is admin -- true , Role: ${decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']}');
+          }
+          Future.delayed(Duration(seconds: 2), () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MainScreen(isAdmin: true)),
+            );
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
