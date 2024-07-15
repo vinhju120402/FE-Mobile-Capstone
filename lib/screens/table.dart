@@ -135,7 +135,7 @@ class DataEntryFormState extends State<DataEntryForm> {
 
   void createViolation() async {
     List<File>? listImage = [];
-    listImage.add(imageFile ?? File(''));
+    listImage.addAll(imageFiles);
     ViolationRequest violationRequest = ViolationRequest(
       studentInClassId: studentInClassId ?? 0,
       classId: classId ?? 0,
