@@ -24,7 +24,8 @@ class DataEntryForm extends StatefulWidget {
 class DataEntryFormState extends State<DataEntryForm> {
   final ViolationRepositoryImpl violationRepository = ViolationRepositoryImpl();
   final ClassRepositoryImpl classRepository = ClassRepositoryImpl();
-  final StudentInClassRepositoryImpl studentInClassRepository = StudentInClassRepositoryImpl();
+  final StudentInClassRepositoryImpl studentInClassRepository =
+      StudentInClassRepositoryImpl();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController classController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
@@ -56,27 +57,41 @@ class DataEntryFormState extends State<DataEntryForm> {
   }
 
   String selectedViolation = '';
-  File? imageFile;
+  List<File> imageFiles = [];
 
   Future<void> _takePicture() async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedImage != null) {
-      setState(() {
-        imageFile = File(pickedImage.path);
-      });
+      if (imageFiles.length < 2) {
+        setState(() {
+          imageFiles.add(File(pickedImage.path));
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('You can only select up to 2 images.')),
+        );
+      }
     }
   }
 
   Future<void> _selectPicture() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    final pickedImages = await picker.pickMultiImage();
 
-    if (pickedImage != null) {
-      setState(() {
-        imageFile = File(pickedImage.path);
-      });
+    if (pickedImages != null) {
+      if (imageFiles.length + pickedImages.length <= 2) {
+        setState(() {
+          imageFiles.addAll(pickedImages
+              .map((pickedImage) => File(pickedImage.path))
+              .toList());
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('You can only select up to 2 images.')),
+        );
+      }
     }
   }
 
@@ -136,7 +151,8 @@ class DataEntryFormState extends State<DataEntryForm> {
       if (res == 201) {
         if (mounted) {
           context.pop();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Create violation success.')));
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Create violation success.')));
         }
       }
     } catch (e) {
@@ -144,7 +160,8 @@ class DataEntryFormState extends State<DataEntryForm> {
         print(e);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Create violation failed.')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Create violation failed.')));
       }
     }
   }
@@ -155,7 +172,8 @@ class DataEntryFormState extends State<DataEntryForm> {
   }
 
   void getViolationTypeByGroup(int groupId) async {
-    var response = await violationRepository.getListViolationTypeByGroup(groupId);
+    var response =
+        await violationRepository.getListViolationTypeByGroup(groupId);
     violationType = response;
   }
 
@@ -165,7 +183,8 @@ class DataEntryFormState extends State<DataEntryForm> {
   }
 
   void getSutdentInClass(int? classId) async {
-    var response = await studentInClassRepository.getListStudent(classId: classId);
+    var response =
+        await studentInClassRepository.getListStudent(classId: classId);
     studentInClass = response;
   }
 
@@ -266,9 +285,11 @@ class DataEntryFormState extends State<DataEntryForm> {
                 TextFormField(
                   controller: violateTypeController,
                   onTap: () {
-                    if (!isSelectedViolationGroup || violateGroupController.text.isEmpty) {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text('Please select violation group first.')));
+                    if (!isSelectedViolationGroup ||
+                        violateGroupController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content:
+                              Text('Please select violation group first.')));
                     } else {
                       _buildViolationTypeBottomSheet(context);
                     }
@@ -357,17 +378,19 @@ class DataEntryFormState extends State<DataEntryForm> {
                   ],
                 ),
                 SizedBox(height: 10.0),
-                if (imageFile != null)
-                  Container(
-                    width: 120.0,
-                    height: 120.0,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      image: DecorationImage(
-                        image: FileImage(imageFile!),
-                        fit: BoxFit.cover,
-                      ),
+                if (imageFiles.isNotEmpty)
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
                     ),
+                    itemCount: imageFiles.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Image.file(imageFiles[index]);
+                    },
                   ),
                 SizedBox(height: 20.0),
                 ElevatedButton(
@@ -415,7 +438,10 @@ class DataEntryFormState extends State<DataEntryForm> {
                     onChanged: (value) {
                       setState(() {
                         filteredViolationGroup = violationGroup.where((group) {
-                          return group.vioGroupName?.toLowerCase().contains(value.toLowerCase()) ?? false;
+                          return group.vioGroupName
+                                  ?.toLowerCase()
+                                  .contains(value.toLowerCase()) ??
+                              false;
                         }).toList();
                       });
                     },
@@ -426,15 +452,20 @@ class DataEntryFormState extends State<DataEntryForm> {
                     itemCount: filteredViolationGroup.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(filteredViolationGroup[index].vioGroupName ?? ''),
+                        title: Text(
+                            filteredViolationGroup[index].vioGroupName ?? ''),
                         onTap: () {
                           violateTypeController.clear();
-                          violateGroupController.text = filteredViolationGroup[index].vioGroupName ?? '';
+                          violateGroupController.text =
+                              filteredViolationGroup[index].vioGroupName ?? '';
                           if (kDebugMode) {
-                            print('ID nhóm vi phạm: ${filteredViolationGroup[index].violationGroupId}');
+                            print(
+                                'ID nhóm vi phạm: ${filteredViolationGroup[index].violationGroupId}');
                           }
                           isSelectedViolationGroup = true;
-                          getViolationTypeByGroup(filteredViolationGroup[index].violationGroupId ?? 0);
+                          getViolationTypeByGroup(
+                              filteredViolationGroup[index].violationGroupId ??
+                                  0);
                           Navigator.pop(context);
                         },
                       );
@@ -475,7 +506,10 @@ class DataEntryFormState extends State<DataEntryForm> {
                     onChanged: (value) {
                       setState(() {
                         filteredViolationType = violationType.where((type) {
-                          return type.vioTypeName?.toLowerCase().contains(value.toLowerCase()) ?? false;
+                          return type.vioTypeName
+                                  ?.toLowerCase()
+                                  .contains(value.toLowerCase()) ??
+                              false;
                         }).toList();
                       });
                     },
@@ -486,13 +520,17 @@ class DataEntryFormState extends State<DataEntryForm> {
                     itemCount: filteredViolationType.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(filteredViolationType[index].vioTypeName ?? ''),
+                        title: Text(
+                            filteredViolationType[index].vioTypeName ?? ''),
                         onTap: () {
-                          violateTypeController.text = filteredViolationType[index].vioTypeName ?? '';
+                          violateTypeController.text =
+                              filteredViolationType[index].vioTypeName ?? '';
                           if (kDebugMode) {
-                            print('ID loại vi phạm: ${filteredViolationType[index].violationTypeId}');
+                            print(
+                                'ID loại vi phạm: ${filteredViolationType[index].violationTypeId}');
                           }
-                          violationTypeId = filteredViolationType[index].violationTypeId;
+                          violationTypeId =
+                              filteredViolationType[index].violationTypeId;
                           Navigator.pop(context);
                           setState(() {});
                         },
@@ -534,7 +572,10 @@ class DataEntryFormState extends State<DataEntryForm> {
                     onChanged: (value) {
                       setState(() {
                         filteredClassList = classList.where((classItem) {
-                          return classItem.name?.toLowerCase().contains(value.toLowerCase()) ?? false;
+                          return classItem.name
+                                  ?.toLowerCase()
+                                  .contains(value.toLowerCase()) ??
+                              false;
                         }).toList();
                       });
                     },
@@ -548,9 +589,11 @@ class DataEntryFormState extends State<DataEntryForm> {
                         title: Text(filteredClassList[index].name ?? ''),
                         onTap: () {
                           nameController.clear();
-                          classController.text = filteredClassList[index].name ?? '';
+                          classController.text =
+                              filteredClassList[index].name ?? '';
                           if (kDebugMode) {
-                            print('ID lớp: ${filteredClassList[index].classId}');
+                            print(
+                                'ID lớp: ${filteredClassList[index].classId}');
                           }
                           classId = filteredClassList[index].classId;
                           getSutdentInClass(filteredClassList[index].classId);
@@ -594,8 +637,11 @@ class DataEntryFormState extends State<DataEntryForm> {
                     ),
                     onChanged: (value) {
                       setState(() {
-                        filteredStudentInClass = studentInClass.where((student) {
-                          return student.studentName?.contains(value.toLowerCase()) ?? false;
+                        filteredStudentInClass =
+                            studentInClass.where((student) {
+                          return student.studentName
+                                  ?.contains(value.toLowerCase()) ??
+                              false;
                         }).toList();
                       });
                     },
@@ -606,13 +652,19 @@ class DataEntryFormState extends State<DataEntryForm> {
                     itemCount: filteredStudentInClass.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(filteredStudentInClass[index].studentName.toString()),
+                        title: Text(filteredStudentInClass[index]
+                            .studentName
+                            .toString()),
                         onTap: () {
-                          nameController.text = filteredStudentInClass[index].studentName.toString();
+                          nameController.text = filteredStudentInClass[index]
+                              .studentName
+                              .toString();
                           if (kDebugMode) {
-                            print('ID học sinh: ${filteredStudentInClass[index].studentId}');
+                            print(
+                                'ID học sinh: ${filteredStudentInClass[index].studentId}');
                           }
-                          studentInClassId = filteredStudentInClass[index].studentInClassId;
+                          studentInClassId =
+                              filteredStudentInClass[index].studentInClassId;
                           Navigator.pop(context);
                           setState(() {});
                         },
