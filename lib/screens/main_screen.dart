@@ -79,7 +79,7 @@ class _MainScreenState extends State<MainScreen> {
         curve: Curves.easeIn,
       );
     });
-    if (widget.isAdmin == false) {
+    if (widget.isAdmin == true) {
       //remove duty schedule from list catNames
       catNames.remove('Duty schedule');
       //remove item in catColors
