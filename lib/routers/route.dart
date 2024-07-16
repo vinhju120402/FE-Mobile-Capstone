@@ -3,13 +3,18 @@ import 'package:eduappui/screens/editviocation.dart';
 import 'package:eduappui/screens/historyviolation.dart';
 import 'package:eduappui/screens/login.dart';
 import 'package:eduappui/screens/main_screen.dart';
+import 'package:eduappui/screens/splash.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
   static final GoRouter _router = GoRouter(
-    initialLocation: ScreenRoute.loginScreen,
+    initialLocation: ScreenRoute.splash,
     debugLogDiagnostics: true,
     routes: [
+      GoRoute(
+        path: ScreenRoute.splash,
+        builder: (context, state) => Splash(),
+      ),
       GoRoute(
         path: ScreenRoute.loginScreen,
         builder: (context, state) => LoginPage(),
