@@ -13,17 +13,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(),
+    return SafeArea(
+      child: MaterialApp.router(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+          textTheme: GoogleFonts.poppinsTextTheme(),
+        ),
+        debugShowCheckedModeBanner: false, // Ẩn chữ "DEBUG"
+        routeInformationProvider: AppRouter.router.routeInformationProvider,
+        routerDelegate: AppRouter.router.routerDelegate,
+        routeInformationParser: AppRouter.router.routeInformationParser,
       ),
-      debugShowCheckedModeBanner: false, // Ẩn chữ "DEBUG"
-      routeInformationProvider: AppRouter.router.routeInformationProvider,
-      routerDelegate: AppRouter.router.routerDelegate,
-      routeInformationParser: AppRouter.router.routeInformationParser,
     );
   }
 }

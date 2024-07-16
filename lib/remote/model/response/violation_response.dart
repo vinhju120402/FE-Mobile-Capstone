@@ -13,7 +13,7 @@ class ViolationResponse {
   String? description;
   String? date;
   String? createdAt;
-  String? createdBy;
+  int? createdBy;
   String? updatedAt;
   String? updatedBy;
 

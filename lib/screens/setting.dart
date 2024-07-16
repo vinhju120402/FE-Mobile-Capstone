@@ -5,22 +5,22 @@ import 'package:eduappui/screens/privacy.dart';
 import 'package:eduappui/screens/review.dart';
 import 'package:eduappui/screens/term.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
   @override
-  _SettingsScreenState createState() => _SettingsScreenState();
+  SettingsScreenState createState() => SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class SettingsScreenState extends State<SettingsScreen> {
   bool notificationsEnabled = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(
-            child: Text('Setting', style: TextStyle(color: Colors.black))),
+        title: Center(child: Text('Setting', style: TextStyle(color: Colors.black))),
         backgroundColor: Color.fromARGB(189, 7, 206, 43),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -56,10 +56,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               color: Color.fromARGB(188, 85, 239, 126),
               child: SwitchListTile(
-                secondary:
-                    Icon(Icons.notifications_none, color: Colors.grey[600]),
-                title: Text('Notifications',
-                    style: TextStyle(color: Colors.black)),
+                secondary: Icon(Icons.notifications_none, color: Colors.grey[600]),
+                title: Text('Notifications', style: TextStyle(color: Colors.black)),
                 value: notificationsEnabled,
                 activeColor: Colors.green,
                 onChanged: (value) {
@@ -84,8 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
                 child: ListTile(
                   leading: Icon(Icons.description, color: Colors.grey[600]),
-                  title: Text('Term & Conditions',
-                      style: TextStyle(color: Colors.black)),
+                  title: Text('Term & Conditions', style: TextStyle(color: Colors.black)),
                   trailing: Icon(Icons.arrow_drop_down, color: Colors.black54),
                 ),
               ),
@@ -111,8 +108,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: Color.fromARGB(188, 85, 239, 126),
               child: ListTile(
                 leading: Icon(Icons.help, color: Colors.grey[600]),
-                title: Text('Help & Support',
-                    style: TextStyle(color: Colors.black)),
+                title: Text('Help & Support', style: TextStyle(color: Colors.black)),
                 trailing: Icon(Icons.arrow_drop_down, color: Colors.black54),
               ),
             ),
@@ -126,14 +122,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => RatingReviewScreen()),
+                    MaterialPageRoute(builder: (context) => RatingReviewScreen()),
                   );
                 },
                 child: ListTile(
                   leading: Icon(Icons.rate_review, color: Colors.grey[600]),
-                  title: Text('Rate the Mypass app',
-                      style: TextStyle(color: Colors.black)),
+                  title: Text('Rate the Mypass app', style: TextStyle(color: Colors.black)),
                   trailing: Icon(Icons.arrow_drop_down, color: Colors.black54),
                 ),
               ),
@@ -161,8 +155,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           'Are you sure you want to logout',
                           style: TextStyle(fontSize: 16.0),
                         ),
-                        contentPadding:
-                            EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+                        contentPadding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -177,8 +170,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => LoginPage()),
+                                MaterialPageRoute(builder: (context) => LoginPage()),
                               );
                             },
                             child: Text(
@@ -223,14 +215,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => PrivacyPolicyScreen()),
+                    MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()),
                   );
                 },
                 child: ListTile(
                   leading: Icon(Icons.privacy_tip, color: Colors.grey[600]),
-                  title: Text('Privacy Policy',
-                      style: TextStyle(color: Colors.black)),
+                  title: Text('Privacy Policy', style: TextStyle(color: Colors.black)),
                   trailing: Icon(Icons.arrow_drop_down, color: Colors.black54),
                 ),
               ),

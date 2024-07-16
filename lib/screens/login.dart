@@ -1,9 +1,12 @@
+import 'package:eduappui/remote/local/local_client.dart';
+import 'package:eduappui/remote/local/secure_storage.dart';
 import 'package:eduappui/remote/model/request/login_request.dart';
 import 'package:eduappui/remote/service/repository/login_repository.dart';
-import 'package:eduappui/screens/main_screen.dart';
+import 'package:eduappui/routers/screen_route.dart';
 import 'package:eduappui/widget/TextField/common_text_field.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
@@ -19,13 +22,15 @@ class LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
   ProgressDialog? _progressDialog;
   LoginRepositoryImpl loginRepository = LoginRepositoryImpl();
+  SecureStorageImpl secureStorageImpl = SecureStorageImpl();
+  LocalClientImpl localClientImpl = LocalClientImpl();
 
   void showProgress() {
     _progressDialog = ProgressDialog(context: context);
     _progressDialog!.show(
       max: 100,
       msg: 'please wait ..',
-      progressBgColor: Colors.red,
+      barrierColor: Colors.transparent,
     );
   }
 
@@ -44,28 +49,25 @@ class LoginPageState extends State<LoginPage> {
       var response = await loginRepository.login(LoginRequest(phoneNumber: phoneNumber, password: password));
       showProgress();
       if (response.token != null) {
+        secureStorageImpl.saveAccessToken(response.token);
         Map<String, dynamic> decodedToken = JwtDecoder.decode(response.token!);
         if (decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] == 'STUDENT_SUPERVISOR') {
           if (kDebugMode) {
             print(
                 'is admin -- false , Role:  ${decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']}');
           }
+          localClientImpl.saveData('isAdmin', false);
           Future.delayed(const Duration(seconds: 2), () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MainScreen(isAdmin: false)),
-            );
+            context.pushReplacement(ScreenRoute.homeScreen, extra: {'isAdmin': false});
           });
         } else {
           if (kDebugMode) {
             print(
                 'is admin -- true , Role: ${decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']}');
           }
+          localClientImpl.saveData('isAdmin', true);
           Future.delayed(const Duration(seconds: 2), () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MainScreen(isAdmin: true)),
-            );
+            context.pushReplacement(ScreenRoute.homeScreen, extra: {'isAdmin': true});
           });
         }
       }

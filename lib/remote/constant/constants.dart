@@ -23,4 +23,7 @@ class Constants {
   static String edit_violation_history = '$api_base_url/violations';
 
   static String get_duty_schedule = '$api_base_url/patrol-schedules';
+
+  // Constant String
+  static const String access_token = 'access_token';
 }

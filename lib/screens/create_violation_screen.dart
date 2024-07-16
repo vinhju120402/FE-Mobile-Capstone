@@ -14,14 +14,14 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
-class DataEntryForm extends StatefulWidget {
-  const DataEntryForm({super.key});
+class CreateViolationScreen extends StatefulWidget {
+  const CreateViolationScreen({super.key});
 
   @override
-  DataEntryFormState createState() => DataEntryFormState();
+  CreateViolationScreenState createState() => CreateViolationScreenState();
 }
 
-class DataEntryFormState extends State<DataEntryForm> {
+class CreateViolationScreenState extends State<CreateViolationScreen> {
   final ViolationRepositoryImpl violationRepository = ViolationRepositoryImpl();
   final ClassRepositoryImpl classRepository = ClassRepositoryImpl();
   final StudentInClassRepositoryImpl studentInClassRepository = StudentInClassRepositoryImpl();
@@ -68,9 +68,11 @@ class DataEntryFormState extends State<DataEntryForm> {
           imageFiles.add(File(pickedImage.path));
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('You can only select up to 2 images.')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('You can only select up to 2 images.')),
+          );
+        }
       }
     }
   }
@@ -84,9 +86,11 @@ class DataEntryFormState extends State<DataEntryForm> {
         imageFiles.addAll(pickedImages.map((pickedImage) => File(pickedImage.path)).toList());
       });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You can only select up to 2 images.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('You can only select up to 2 images.')),
+        );
+      }
     }
   }
 
@@ -106,24 +110,26 @@ class DataEntryFormState extends State<DataEntryForm> {
     );
 
     if (selectedDate != null) {
-      TimeOfDay? selectedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
-      );
+      if (mounted) {
+        TimeOfDay? selectedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+        );
 
-      if (selectedTime != null) {
-        setState(() {
-          DateTime fullDateTime = DateTime(
-            selectedDate.year,
-            selectedDate.month,
-            selectedDate.day,
-            selectedTime.hour,
-            selectedTime.minute,
-          );
-          String formattedDateTime =
-              "${fullDateTime.year}-${fullDateTime.month.toString().padLeft(2, '0')}-${fullDateTime.day.toString().padLeft(2, '0')} ${fullDateTime.hour.toString().padLeft(2, '0')}:${fullDateTime.minute.toString().padLeft(2, '0')}:${fullDateTime.second.toString().padLeft(2, '0')}";
-          timeController.text = formattedDateTime;
-        });
+        if (selectedTime != null) {
+          setState(() {
+            DateTime fullDateTime = DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+              selectedTime.hour,
+              selectedTime.minute,
+            );
+            String formattedDateTime =
+                "${fullDateTime.year}-${fullDateTime.month.toString().padLeft(2, '0')}-${fullDateTime.day.toString().padLeft(2, '0')} ${fullDateTime.hour.toString().padLeft(2, '0')}:${fullDateTime.minute.toString().padLeft(2, '0')}:${fullDateTime.second.toString().padLeft(2, '0')}";
+            timeController.text = formattedDateTime;
+          });
+        }
       }
     }
   }

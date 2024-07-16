@@ -4,7 +4,7 @@ class StudentInClassResponse {
   int? studentId;
   String? studentName;
   String? enrollDate;
-  String? isSupervisor;
+  bool? isSupervisor;
   String? status;
 
   StudentInClassResponse(

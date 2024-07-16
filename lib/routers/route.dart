@@ -3,6 +3,8 @@ import 'package:eduappui/screens/editviocation.dart';
 import 'package:eduappui/screens/historyviolation.dart';
 import 'package:eduappui/screens/login.dart';
 import 'package:eduappui/screens/main_screen.dart';
+import 'package:eduappui/screens/notifications.dart';
+import 'package:eduappui/screens/setting.dart';
 import 'package:eduappui/screens/splash.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,6 +36,14 @@ class AppRouter {
           final id = (args as Map<String, dynamic>)['id'];
           return Editviocation(id: id);
         },
+      ),
+      GoRoute(
+        path: ScreenRoute.notificationPage,
+        builder: (context, state) => NotificationScreen(),
+      ),
+      GoRoute(
+        path: ScreenRoute.settingsScreen,
+        builder: (context, state) => SettingsScreen(),
       ),
     ],
   );

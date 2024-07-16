@@ -1,17 +1,19 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:eduappui/remote/errors/exceptions.dart';
+import 'package:eduappui/remote/local/secure_storage.dart';
 
 class NetworkClient {
   final Dio dio = Dio();
+  final SecureStorageImpl secureStorageImpl = SecureStorageImpl();
 
   Future<Response> invoke(String url, RequestType requestType,
       {Map<String, dynamic>? queryParameters, dynamic requestBody}) async {
-    // String accessToken = await secureStorageImpl.getAccessToken() ?? '';
+    String accessToken = await secureStorageImpl.getAccessToken() ?? '';
     Response response;
     Map<String, String>? headers = {
       'Content-Type': 'application/json',
-      // 'Authorization': 'Bearer $accessToken',
+      'Authorization': 'Bearer $accessToken',
     };
     try {
       switch (requestType) {
