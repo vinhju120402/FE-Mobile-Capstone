@@ -1,13 +1,7 @@
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:eduappui/remote/local/local_client.dart';
+import 'package:eduappui/remote/local/secure_storage.dart';
 import 'package:eduappui/routers/screen_route.dart';
-import 'package:eduappui/screens/contact.dart';
-import 'package:eduappui/screens/create_violation_screen.dart';
-import 'package:eduappui/screens/duty.dart';
-import 'package:eduappui/screens/historyviolation.dart';
-import 'package:eduappui/screens/profile.dart';
-import 'package:eduappui/screens/rule.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -20,11 +14,10 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
-  int _activeIndex = 0;
   Map<String, Map<String, dynamic>>? categories;
   List<IconData>? iconList;
-  List<Widget>? _pages;
   LocalClientImpl localClientImpl = LocalClientImpl();
+  SecureStorageImpl secureStorageImpl = SecureStorageImpl();
   bool isAdmin = false;
 
   @override
@@ -32,21 +25,20 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     super.initState();
 
     categories = {
+      "Create Violation": {
+        "icon": const Icon(Icons.add, color: Colors.white, size: 30),
+      },
       "Rule": {
-        "color": const Color(0xff1d74f6),
         "icon": const Icon(Icons.rule, color: Colors.white, size: 30),
       },
-      "Contact": {
-        "color": const Color(0xff1d74f6),
-        "icon": const Icon(Icons.contact_emergency, color: Colors.white, size: 30),
-      },
-      "HistoryViolation": {
-        "color": const Color(0xff1d74f6),
+      "History Violation": {
         "icon": const Icon(Icons.history_edu, color: Colors.white, size: 30),
       },
-      "Duty schedule": {
-        "color": const Color(0xff1d74f6),
-        "icon": const Icon(Icons.schedule_outlined, color: Colors.white, size: 30),
+      "Profile": {
+        "icon": const Icon(Icons.person, color: Colors.white, size: 30),
+      },
+      "Contact": {
+        "icon": const Icon(Icons.contact_emergency, color: Colors.white, size: 30),
       },
     };
 
@@ -55,21 +47,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       Icons.class_,
       Icons.person,
     ];
-
-    _pages = [
-      MainScreenContent(categories: categories),
-      const CreateViolationScreen(),
-      ProfileScreen(),
-    ];
-    isAdmin = localClientImpl.readData('isAdmin');
-    if (isAdmin == false) {
+    Future.delayed(const Duration(seconds: 1), () {
+      isAdmin = localClientImpl.readData('isAdmin');
+    });
+    if (isAdmin == true) {
       categories!.remove("Duty schedule");
     }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -78,46 +61,82 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       print('Main Screen is Admin: $isAdmin');
     }
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: IndexedStack(
-        index: _activeIndex,
-        children: _pages!,
-      ),
-      bottomNavigationBar: AnimatedBottomNavigationBar(
-        inactiveColor: Colors.white,
-        backgroundColor: Colors.blue,
-        activeColor: const Color(0xFF032E66),
-        height: 75,
-        gapLocation: GapLocation.none,
-        icons: iconList!,
-        activeIndex: _activeIndex,
-        leftCornerRadius: 40,
-        rightCornerRadius: 40,
-        onTap: (index) => setState(() => _activeIndex = index),
+      backgroundColor: const Color(0xFFF8F9FD),
+      body: MainScreenContent(
+        isAdmin: isAdmin,
+        categories: categories,
+        localClientImpl: localClientImpl,
+        secureStorageImpl: secureStorageImpl,
       ),
     );
   }
 }
 
 class MainScreenContent extends StatelessWidget {
+  final bool isAdmin;
   final Map<String, Map<String, dynamic>>? categories;
-  const MainScreenContent({super.key, this.categories});
+  final LocalClientImpl localClientImpl;
+  final SecureStorageImpl secureStorageImpl;
+  const MainScreenContent(
+      {super.key,
+      this.categories,
+      required this.localClientImpl,
+      required this.secureStorageImpl,
+      required this.isAdmin});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
-          _buildHeaderContent(context),
-          _buildUpcomingSchedule(),
-          _buildOther(categories),
+          Stack(
+            children: [
+              SizedBox(
+                height: 80,
+                child: Row(
+                  children: [
+                    Expanded(child: Container(color: Colors.white)),
+                    Expanded(child: Container(color: Colors.blue)),
+                  ],
+                ),
+              ),
+              _buildHeaderContent(context, localClientImpl, secureStorageImpl)
+            ],
+          ),
+          Stack(
+            children: [
+              Container(
+                height: 50,
+                color: Colors.blue,
+              ),
+              Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    Visibility(
+                      visible: isAdmin == false,
+                      child: _buildUpcomingSchedule(context),
+                    ),
+                    _buildOther(categories),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 50)
         ],
       ),
     );
   }
 }
 
-Widget _buildUpcomingSchedule() {
+Widget _buildUpcomingSchedule(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
     child: Column(
@@ -130,7 +149,7 @@ Widget _buildUpcomingSchedule() {
               'Upcoming Schedule',
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.black,
+                color: Color(0xFF55B5F3),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -138,46 +157,60 @@ Widget _buildUpcomingSchedule() {
         ),
         const SizedBox(height: 20),
         Card(
-          color: Colors.grey[200],
+          color: Colors.white,
           elevation: 3,
           child: SizedBox(
             width: double.infinity,
             height: 100,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Expanded(
-                    flex: 2,
-                    child: Center(
-                      child: Text(
-                        '1/2/2024',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Expanded(
+                  child: Center(
+                    child: Text(
+                      '1/2/2024',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 130,
+                  width: 1,
+                  color: Colors.black,
+                ),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Thời gian: 7h-8h', style: TextStyle(fontSize: 12)),
+                      SizedBox(height: 10),
+                      Text('Lớp: 12A1', style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
+                Expanded(
+                    child: InkWell(
+                  onTap: () => context.push(ScreenRoute.dutyScheduleScreen),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Go to details',
+                        style: TextStyle(fontSize: 9, color: Colors.lightBlue),
                       ),
-                    ),
+                      Icon(
+                        Icons.navigate_next_outlined,
+                        size: 20,
+                        color: Colors.lightBlue,
+                      ),
+                    ],
                   ),
-                  Container(
-                    height: 130,
-                    width: 1,
-                    color: Colors.black,
-                  ),
-                  const SizedBox(width: 16),
-                  const Expanded(
-                    flex: 3,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Thời gian: 7h-8h', style: TextStyle(fontSize: 12)),
-                        SizedBox(height: 10),
-                        Text('Lớp: 12A1', style: TextStyle(fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ))
+              ],
             ),
           ),
         )
@@ -186,97 +219,65 @@ Widget _buildUpcomingSchedule() {
   );
 }
 
-Widget _buildHeaderContent(BuildContext context) {
+Widget _buildHeaderContent(BuildContext context, LocalClientImpl localClient, SecureStorageImpl secureStorageImpl) {
   return Container(
-    color: Colors.blue,
     height: 80,
+    decoration: const BoxDecoration(
+      color: Colors.blue,
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(20),
+        bottomRight: Radius.circular(20),
+      ),
+    ),
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Text(
-                'Hello ',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
+              Container(
+                width: 30,
+                height: 30,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage('images/pho1.jpg'),
+                  ),
                 ),
               ),
-              Text(
-                'Leonel Messi',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
-                ),
+              const SizedBox(width: 10),
+              const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Leonel Messi',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'Teacher',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          Container(
-            width: 105,
-            height: 30,
-            decoration: ShapeDecoration(
-              color: const Color(0xFF032E66),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-              shadows: const [
-                BoxShadow(
-                  color: Color(0x3F000000),
-                  blurRadius: 4,
-                  offset: Offset(0, 4),
-                  spreadRadius: 0,
-                )
-              ],
-            ),
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
             child: DropdownButtonHideUnderline(
               child: DropdownButton2(
-                customButton: Stack(
-                  children: [
-                    const Positioned(
-                      left: 10,
-                      top: 8,
-                      child: Text(
-                        'Lenoel Messi',
-                        style: TextStyle(
-                          fontSize: 9,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        width: 32.61,
-                        height: 31,
-                        decoration: const ShapeDecoration(
-                          shape: OvalBorder(
-                            side: BorderSide(width: 1, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: 4,
-                      top: 4,
-                      child: Container(
-                        width: 24.46,
-                        height: 21.14,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: AssetImage('images/pho1.jpg'),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                customButton: const Icon(
+                  Icons.density_medium_sharp,
+                  color: Colors.white,
                 ),
                 items: [
                   ...MenuItems.item.map(
@@ -287,14 +288,14 @@ Widget _buildHeaderContent(BuildContext context) {
                   ),
                 ],
                 onChanged: (value) {
-                  MenuItems.onChanged(context, value!);
+                  onChanged(context, value!, localClient, secureStorageImpl);
                 },
                 dropdownStyleData: DropdownStyleData(
                   width: 110,
                   padding: const EdgeInsets.symmetric(vertical: 6),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(4),
-                    color: const Color(0xFF032E66),
+                    color: Colors.white,
                   ),
                   offset: const Offset(0, -3),
                 ),
@@ -326,7 +327,7 @@ Widget _buildOther(Map<String, Map<String, dynamic>>? categories) {
               'Category',
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.black,
+                color: Color(0xFF55B5F3),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -338,75 +339,14 @@ Widget _buildOther(Map<String, Map<String, dynamic>>? categories) {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
+            crossAxisCount: 2,
             childAspectRatio: 1.1,
           ),
           itemBuilder: (context, index) {
             String categoryName = categories.keys.elementAt(index);
             Map<String, dynamic> categoryData = categories[categoryName]!;
-            Color categoryColor = categoryData["color"];
             Icon categoryIcon = categoryData["icon"];
-
-            return GestureDetector(
-              onTap: () {
-                // Navigate to the respective screen based on the tapped category
-                if (categoryName == "Rule") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RuleScreen()),
-                  );
-                } else if (categoryName == "Violation") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const CreateViolationScreen()),
-                  );
-                } else if (categoryName == "Contact") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ContactScreen()),
-                  );
-                } else if (categoryName == "Profile") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfileScreen()),
-                  );
-                } else if (categoryName == "HistoryViolation") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HistoryScreen()),
-                  );
-                } else if (categoryName == "Duty schedule") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const DutyScheduleScreen()),
-                  );
-                }
-              },
-              child: Column(
-                children: [
-                  Container(
-                    height: 70,
-                    width: 70,
-                    decoration: BoxDecoration(
-                      color: categoryColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Center(
-                      child: categoryIcon,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    categoryName,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black.withOpacity(0.7),
-                    ),
-                  )
-                ],
-              ),
-            );
+            return _buildCardCategoryItem(categoryIcon, categoryName, context);
           },
         )
       ],
@@ -424,17 +364,16 @@ class MenuItem {
   final IconData icon;
 }
 
-abstract class MenuItems {
-  static const List<MenuItem> item = [notifications, settings, logout];
-
+class MenuItems {
+  static const List<MenuItem> item = [notifications, settings, logoutIcon];
   static const settings = MenuItem(text: 'Settings', icon: Icons.settings);
   static const notifications = MenuItem(text: 'Notifications', icon: Icons.notifications);
-  static const logout = MenuItem(text: 'Log Out', icon: Icons.logout);
+  static const logoutIcon = MenuItem(text: 'Log Out', icon: Icons.logout);
 
   static Widget buildItem(MenuItem item) {
     return Row(
       children: [
-        Icon(item.icon, color: Colors.white, size: 9),
+        Icon(item.icon, color: Colors.black, size: 9),
         const SizedBox(
           width: 10,
         ),
@@ -443,25 +382,75 @@ abstract class MenuItems {
             item.text,
             style: const TextStyle(
               fontSize: 9,
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
         ),
       ],
     );
   }
+}
 
-  static void onChanged(BuildContext context, MenuItem item) {
-    switch (item) {
-      case MenuItems.notifications:
-        context.push(ScreenRoute.notificationPage);
-        break;
-      case MenuItems.settings:
-        context.push(ScreenRoute.settingsScreen);
-        break;
-      case MenuItems.logout:
-        context.push(ScreenRoute.loginScreen);
-        break;
-    }
+Future<void> onChanged(
+    BuildContext context, MenuItem item, LocalClientImpl localClientImpl, SecureStorageImpl secureStorage) async {
+  switch (item) {
+    case MenuItems.notifications:
+      context.push(ScreenRoute.notificationPage);
+      break;
+    case MenuItems.settings:
+      context.push(ScreenRoute.settingsScreen);
+      break;
+    case MenuItems.logoutIcon:
+      logout(localClientImpl, context, secureStorage);
+      break;
   }
+}
+
+logout(LocalClientImpl localClientImpl, BuildContext context, SecureStorageImpl secureStorageImpl) {
+  localClientImpl.removeAll();
+  secureStorageImpl.removeAll();
+  context.pushReplacement(ScreenRoute.loginScreen);
+}
+
+Widget _buildCardCategoryItem(
+  Icon categoryIcon,
+  String categoryName,
+  BuildContext context,
+) {
+  return GestureDetector(
+    onTap: () {
+      // Navigate to the respective screen based on the tapped category
+      if (categoryName == "Rule") {
+        context.push(ScreenRoute.ruleScreen);
+      } else if (categoryName == "Violation") {
+        context.push(ScreenRoute.createViolationScreen);
+      } else if (categoryName == "Contact") {
+        context.push(ScreenRoute.contactScreen);
+      } else if (categoryName == "Profile") {
+        context.push(ScreenRoute.profileScreen);
+      } else if (categoryName == "HistoryViolation") {
+        context.push(ScreenRoute.violationHistoryScreen);
+      } else if (categoryName == "Duty schedule") {
+        context.push(ScreenRoute.dutyScheduleScreen);
+      }
+    },
+    child: Card(
+      elevation: 3,
+      color: Colors.white,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            categoryIcon.icon,
+            color: const Color(0XFF55B5F3),
+            size: 30,
+          ),
+          Text(
+            categoryName,
+            style: const TextStyle(fontSize: 12),
+          ),
+        ],
+      ),
+    ),
+  );
 }

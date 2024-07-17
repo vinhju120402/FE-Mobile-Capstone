@@ -56,7 +56,7 @@ class LoginPageState extends State<LoginPage> {
             print(
                 'is admin -- false , Role:  ${decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']}');
           }
-          localClientImpl.saveData('isAdmin', false);
+          await localClientImpl.saveData('isAdmin', false);
           Future.delayed(const Duration(seconds: 2), () {
             context.pushReplacement(ScreenRoute.homeScreen, extra: {'isAdmin': false});
           });
@@ -65,7 +65,7 @@ class LoginPageState extends State<LoginPage> {
             print(
                 'is admin -- true , Role: ${decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']}');
           }
-          localClientImpl.saveData('isAdmin', true);
+          await localClientImpl.saveData('isAdmin', true);
           Future.delayed(const Duration(seconds: 2), () {
             context.pushReplacement(ScreenRoute.homeScreen, extra: {'isAdmin': true});
           });
