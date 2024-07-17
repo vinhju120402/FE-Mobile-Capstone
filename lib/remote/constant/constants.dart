@@ -24,6 +24,8 @@ class Constants {
 
   static String get_duty_schedule = '$api_base_url/patrol-schedules';
 
+  static String get_violation_config = '$api_base_url/violation-configs';
+
   // Constant String
   static const String access_token = 'access_token';
 }

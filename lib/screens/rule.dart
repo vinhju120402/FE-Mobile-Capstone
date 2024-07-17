@@ -1,16 +1,29 @@
+import 'package:eduappui/remote/model/response/violation_config_response.dart';
+import 'package:eduappui/remote/service/repository/rule_repository.dart';
 import 'package:flutter/material.dart';
 
-class RuleScreen extends StatelessWidget {
-  final List<String> notifications = [
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-  ];
+class RuleScreen extends StatefulWidget {
+  const RuleScreen({super.key});
+
+  @override
+  State<RuleScreen> createState() => _RuleScreenState();
+}
+
+class _RuleScreenState extends State<RuleScreen> {
+  final RuleRepositoryImpl ruleRepositoryImpl = RuleRepositoryImpl();
+  List<ViolationConfigResponse> ruleResponse = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getRule();
+  }
+
+  void getRule() async {
+    var response = await ruleRepositoryImpl.getRule();
+    ruleResponse = response;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +61,7 @@ class RuleScreen extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'Showing ${notifications.length} results',
+                  'Showing ${ruleResponse.length} results',
                   style: TextStyle(
                     color: Colors.brown[600],
                     fontSize: 16.0,
@@ -59,11 +72,10 @@ class RuleScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: notifications.length,
+              itemCount: ruleResponse.length,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Color.fromARGB(188, 85, 239, 126),
@@ -75,7 +87,7 @@ class RuleScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          notifications[index],
+                          ruleResponse[index].violationTypeName ?? '',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16.0,
@@ -83,7 +95,7 @@ class RuleScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8.0),
                         Text(
-                          'Date: 6/5/2024',
+                          ruleResponse[index].description ?? '',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 14.0,
