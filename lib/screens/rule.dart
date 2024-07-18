@@ -1,6 +1,10 @@
 import 'package:eduappui/remote/model/response/violation_config_response.dart';
 import 'package:eduappui/remote/service/repository/rule_repository.dart';
+import 'package:eduappui/widget/TextField/common_text_field.dart';
+import 'package:eduappui/widget/app_bar.dart';
+import 'package:eduappui/widget/base_main_content.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class RuleScreen extends StatefulWidget {
   const RuleScreen({super.key});
@@ -28,46 +32,32 @@ class _RuleScreenState extends State<RuleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(226, 134, 253, 237),
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(189, 7, 206, 43),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Center(
-          child: Text(
-            'Rule',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {},
-          ),
-        ],
+      appBar: CustomAppbar(
+        onBack: () => context.pop(),
+        title: 'Rule',
       ),
-      body: Column(
+      body: BaseMainContent(
         children: [
           Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
             child: Row(
               children: [
                 Text(
                   'Showing ${ruleResponse.length} results',
                   style: TextStyle(
-                    color: Colors.brown[600],
                     fontSize: 16.0,
                   ),
                 ),
               ],
+            ),
+          ),
+          //Defined Search bar
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: CommonTextField(
+              border: 20.0,
+              hintText: 'Search',
+              onChanged: (value) {},
             ),
           ),
           Expanded(
@@ -76,33 +66,50 @@ class _RuleScreenState extends State<RuleScreen> {
               itemBuilder: (context, index) {
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(188, 85, 239, 126),
-                      borderRadius: BorderRadius.circular(30.0),
-                      border: Border.all(color: Colors.black, width: 1.0),
-                    ),
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          ruleResponse[index].violationTypeName ?? '',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16.0,
-                          ),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.only(
+                          top: 10,
+                          left: 10,
+                          right: 18,
+                          bottom: 10,
                         ),
-                        SizedBox(height: 8.0),
-                        Text(
-                          ruleResponse[index].description ?? '',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14.0,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border(
+                            left: BorderSide(color: Colors.blue, width: 5.0),
                           ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x33716464),
+                              blurRadius: 8,
+                              offset: Offset(0, 0),
+                              spreadRadius: 0,
+                            )
+                          ],
                         ),
-                      ],
-                    ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              ruleResponse[index].violationTypeName ?? '',
+                              style: TextStyle(color: Colors.black, fontSize: 12.0, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              ruleResponse[index].description ?? '',
+                              style: TextStyle(color: Colors.black, fontSize: 9.0, fontStyle: FontStyle.italic),
+                            ),
+                            Text(
+                              'Minus point: -${ruleResponse[index].minusPoints ?? ''}',
+                              style: TextStyle(color: Colors.red, fontSize: 9.0, fontStyle: FontStyle.italic),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },

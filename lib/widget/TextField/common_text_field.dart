@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class CommonTextField extends StatelessWidget {
+class CommonTextField extends StatefulWidget {
   final String? label;
   final TextEditingController? inputController;
   final bool? isDisable;
@@ -19,6 +19,7 @@ class CommonTextField extends StatelessWidget {
   final String? hintText;
   final TextStyle? hintStyle;
   final String? errorText;
+  final double? border;
 
   const CommonTextField({
     super.key,
@@ -26,7 +27,7 @@ class CommonTextField extends StatelessWidget {
     this.inputController,
     this.isDisable,
     this.textFieldColor,
-    this.isPassword,
+    this.isPassword = false,
     this.keyboardType,
     this.textInputAction,
     this.onEditingComplete,
@@ -39,7 +40,20 @@ class CommonTextField extends StatelessWidget {
     this.hintStyle,
     this.errorText,
     this.textColor,
+    this.border = 10,
   });
+
+  @override
+  State<CommonTextField> createState() => _CommonTextFieldState();
+}
+
+class _CommonTextFieldState extends State<CommonTextField> {
+  bool? passwordVisible = true;
+  @override
+  void initState() {
+    super.initState();
+    passwordVisible = widget.isPassword;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,52 +62,72 @@ class CommonTextField extends StatelessWidget {
         Stack(
           children: [
             IgnorePointer(
-              ignoring: isDisable ?? false,
+              ignoring: widget.isDisable ?? false,
               child: Column(
                 children: [
                   TextFormField(
                     style: TextStyle(
-                      color: textColor ?? Colors.black,
+                      color: widget.textColor ?? Colors.black,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
-                    keyboardType: (keyboardType != null && keyboardType != '') ? keyboardType : TextInputType.multiline,
-                    textInputAction: textInputAction ?? TextInputAction.newline,
-                    onEditingComplete: onEditingComplete ??
+                    keyboardType: (widget.keyboardType != null && widget.keyboardType != '')
+                        ? widget.keyboardType
+                        : TextInputType.multiline,
+                    textInputAction: widget.textInputAction ?? TextInputAction.newline,
+                    onEditingComplete: widget.onEditingComplete ??
                         () {
                           FocusScope.of(context).nextFocus();
                         },
-                    inputFormatters: inputFormatters,
-                    obscureText: isPassword ?? false,
-                    enableInteractiveSelection: isDisable == true ? false : true,
-                    readOnly: isDisable ?? false,
-                    controller: inputController,
-                    onChanged: onChanged,
-                    maxLength: maxLength,
-                    maxLines: maxLines,
-                    textAlign: (textAlign != null && textAlign != "") ? textAlign! : TextAlign.start,
+                    inputFormatters: widget.inputFormatters,
+                    obscureText: passwordVisible!,
+                    enableInteractiveSelection: widget.isDisable == true ? false : true,
+                    readOnly: widget.isDisable ?? false,
+                    controller: widget.inputController,
+                    onChanged: widget.onChanged,
+                    maxLength: widget.maxLength,
+                    maxLines: widget.maxLines,
+                    textAlign:
+                        (widget.textAlign != null && widget.textAlign != "") ? widget.textAlign! : TextAlign.start,
                     decoration: InputDecoration(
-                      labelText: label,
+                      labelText: widget.label,
                       labelStyle: TextStyle(
-                        color: errorText == null ? Color(0xFF337EEE) : Color(0xFFD60000),
+                        color: widget.errorText == null ? Color(0xFF337EEE) : Color(0xFFD60000),
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(width: 1, color: Color(0xFFEBF2FD)),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(widget.border!),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(width: 2, color: Color(0xFFEBF2FD)),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(widget.border!),
                       ),
                       filled: true,
-                      fillColor: (errorText != null && errorText != "") ? Color(0xFFFFE7E7) : Colors.white,
-                      hintText: (hintText != null && hintText != "") ? hintText : '',
-                      hintStyle: (hintStyle != null && hintStyle != "") ? hintStyle : null,
+                      fillColor:
+                          (widget.errorText != null && widget.errorText != "") ? Color(0xFFFFE7E7) : Colors.white,
+                      hintText: (widget.hintText != null && widget.hintText != "") ? widget.hintText : '',
+                      hintStyle: (widget.hintStyle != null && widget.hintStyle != "") ? widget.hintStyle : null,
+                      suffixIcon: widget.isPassword!
+                          ? IconButton(
+                              icon: Icon(
+                                // Based on passwordVisible state choose the icon
+                                passwordVisible! ? Icons.visibility : Icons.visibility_off,
+                                color: Theme.of(context).primaryColorDark,
+                              ),
+                              onPressed: () {
+                                passwordVisible = !passwordVisible!;
+                                setState(() {
+                                  if (passwordVisible == true) {
+                                  } else {}
+                                });
+                              },
+                            )
+                          : null,
                     ),
                   ),
-                  (errorText != null && errorText != "")
+                  (widget.errorText != null && widget.errorText != "")
                       ? Padding(
                           padding: EdgeInsets.only(top: 4),
                           child: Row(
@@ -109,7 +143,7 @@ class CommonTextField extends StatelessWidget {
                               ),
                               Expanded(
                                 child: Text(
-                                  errorText ?? "",
+                                  widget.errorText ?? "",
                                   style: TextStyle(color: Color(0xFFD60000), fontSize: 12, fontWeight: FontWeight.w500),
                                 ),
                               ),

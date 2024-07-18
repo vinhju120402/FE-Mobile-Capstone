@@ -2,7 +2,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/local/secure_storage.dart';
 import 'package:eduappui/routers/screen_route.dart';
-import 'package:flutter/foundation.dart';
+import 'package:eduappui/widget/base_main_content.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,17 +13,17 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
+class _MainScreenState extends State<MainScreen> {
   Map<String, Map<String, dynamic>>? categories;
   List<IconData>? iconList;
   LocalClientImpl localClientImpl = LocalClientImpl();
   SecureStorageImpl secureStorageImpl = SecureStorageImpl();
-  bool isAdmin = false;
+  bool? isAdmin;
 
   @override
   void initState() {
     super.initState();
-
+    isAdmin = localClientImpl.readData('isAdmin');
     categories = {
       "Create Violation": {
         "icon": const Icon(Icons.add, color: Colors.white, size: 30),
@@ -47,23 +47,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       Icons.class_,
       Icons.person,
     ];
-    Future.delayed(const Duration(seconds: 1), () {
-      isAdmin = localClientImpl.readData('isAdmin');
-    });
+
     if (isAdmin == true) {
       categories!.remove("Duty schedule");
     }
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    if (kDebugMode) {
-      print('Main Screen is Admin: $isAdmin');
-    }
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
       body: MainScreenContent(
-        isAdmin: isAdmin,
+        isAdmin: isAdmin ?? false,
         categories: categories,
         localClientImpl: localClientImpl,
         secureStorageImpl: secureStorageImpl,
@@ -100,33 +95,16 @@ class MainScreenContent extends StatelessWidget {
                   ],
                 ),
               ),
-              _buildHeaderContent(context, localClientImpl, secureStorageImpl)
+              _buildHeaderContent(context, localClientImpl, secureStorageImpl, isAdmin),
             ],
           ),
-          Stack(
+          BaseMainContent(
             children: [
-              Container(
-                height: 50,
-                color: Colors.blue,
+              Visibility(
+                visible: isAdmin == false,
+                child: _buildUpcomingSchedule(context),
               ),
-              Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(20),
-                  ),
-                ),
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Visibility(
-                      visible: isAdmin == false,
-                      child: _buildUpcomingSchedule(context),
-                    ),
-                    _buildOther(categories),
-                  ],
-                ),
-              ),
+              _buildOther(categories),
             ],
           ),
           const SizedBox(height: 50)
@@ -219,7 +197,8 @@ Widget _buildUpcomingSchedule(BuildContext context) {
   );
 }
 
-Widget _buildHeaderContent(BuildContext context, LocalClientImpl localClient, SecureStorageImpl secureStorageImpl) {
+Widget _buildHeaderContent(
+    BuildContext context, LocalClientImpl localClient, SecureStorageImpl secureStorageImpl, bool isAdmin) {
   return Container(
     height: 80,
     decoration: const BoxDecoration(
@@ -247,7 +226,7 @@ Widget _buildHeaderContent(BuildContext context, LocalClientImpl localClient, Se
                 ),
               ),
               const SizedBox(width: 10),
-              const Column(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -260,7 +239,7 @@ Widget _buildHeaderContent(BuildContext context, LocalClientImpl localClient, Se
                     ),
                   ),
                   Text(
-                    'Teacher',
+                    isAdmin ? 'Teacher' : 'Student',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.normal,
@@ -373,7 +352,7 @@ class MenuItems {
   static Widget buildItem(MenuItem item) {
     return Row(
       children: [
-        Icon(item.icon, color: Colors.black, size: 9),
+        Icon(item.icon, color: Color(0xFF55B5F3), size: 9),
         const SizedBox(
           width: 10,
         ),
@@ -422,13 +401,13 @@ Widget _buildCardCategoryItem(
       // Navigate to the respective screen based on the tapped category
       if (categoryName == "Rule") {
         context.push(ScreenRoute.ruleScreen);
-      } else if (categoryName == "Violation") {
+      } else if (categoryName == "Create Violation") {
         context.push(ScreenRoute.createViolationScreen);
       } else if (categoryName == "Contact") {
         context.push(ScreenRoute.contactScreen);
       } else if (categoryName == "Profile") {
         context.push(ScreenRoute.profileScreen);
-      } else if (categoryName == "HistoryViolation") {
+      } else if (categoryName == "History Violation") {
         context.push(ScreenRoute.violationHistoryScreen);
       } else if (categoryName == "Duty schedule") {
         context.push(ScreenRoute.dutyScheduleScreen);
