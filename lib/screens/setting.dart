@@ -121,9 +121,9 @@ class SettingsScreenState extends State<SettingsScreen> {
                       ),
                       SizedBox(height: 20),
                       _buildSettingItem(
-                        Icons.help,
-                        'Help & Support',
-                        onTap: () => context.push(ScreenRoute.termScreen),
+                        Icons.privacy_tip,
+                        'Privacy Policy',
+                        onTap: () => context.push(ScreenRoute.privacyScreen),
                       ),
                       SizedBox(height: 20),
                       _buildSettingItem(
@@ -132,7 +132,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                         onTap: _rateReviewOntap,
                       ),
                       SizedBox(height: 20),
-                      _buildSettingItem(Icons.question_answer, 'FAQ?'),
+                      _buildSettingItem(
+                        Icons.question_answer,
+                        'FAQ?',
+                        onTap: () => context.push(ScreenRoute.faqScreen),
+                      ),
                       SizedBox(height: 20),
                       _buildSettingItem(Icons.info, 'About app'),
                       SizedBox(height: 20),

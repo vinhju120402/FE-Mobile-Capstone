@@ -1,4 +1,7 @@
+import 'package:eduappui/widget/app_bar.dart';
+import 'package:eduappui/widget/base_main_content.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class FaqScreen extends StatelessWidget {
   final List<String> questions = [
@@ -19,39 +22,36 @@ class FaqScreen extends StatelessWidget {
     '',
   ];
 
+  FaqScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text('Faq?')),
-        backgroundColor: Color.fromARGB(189, 7, 206, 43),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+      appBar: CustomAppbar(
+        onBack: () => context.pop(),
+        title: 'FAQ',
       ),
-      body: Container(
-        color: Color.fromARGB(226, 134, 253, 237),
-        child: ListView.builder(
+      body: BaseMainContent(
+        children: ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
           itemCount: questions.length,
           itemBuilder: (context, index) {
             return Card(
+              elevation: 3,
               margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0),
               ),
-              color: Color.fromARGB(226, 134, 253, 237), // Set card color
+              color: Colors.white, // Set card color
               child: ExpansionTile(
                 tilePadding: EdgeInsets.zero,
                 childrenPadding: EdgeInsets.zero,
-                backgroundColor: Color.fromARGB(188, 85, 239, 126),
-                collapsedBackgroundColor: Color.fromARGB(188, 85, 239, 126),
+                backgroundColor: Colors.white,
+                collapsedBackgroundColor: Colors.white,
                 title: ListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
-                  tileColor:
-                      Color.fromARGB(188, 85, 239, 126), // Set tile color
+                  tileColor: Colors.white,
                   title: Text(
                     questions[index],
                     style: TextStyle(fontSize: 16.0, color: Colors.black),
@@ -59,8 +59,7 @@ class FaqScreen extends StatelessWidget {
                 ),
                 children: [
                   Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     child: Text(
                       answers[index],
                       style: TextStyle(fontSize: 14.0, color: Colors.black),

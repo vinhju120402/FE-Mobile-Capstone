@@ -4,10 +4,12 @@ import 'package:eduappui/screens/contact.dart';
 import 'package:eduappui/screens/create_violation_screen.dart';
 import 'package:eduappui/screens/duty.dart';
 import 'package:eduappui/screens/editviocation.dart';
+import 'package:eduappui/screens/faq.dart';
 import 'package:eduappui/screens/historyviolation.dart';
 import 'package:eduappui/screens/login.dart';
 import 'package:eduappui/screens/main_screen.dart';
 import 'package:eduappui/screens/notifications.dart';
+import 'package:eduappui/screens/privacy.dart';
 import 'package:eduappui/screens/profile.dart';
 import 'package:eduappui/screens/rule.dart';
 import 'package:eduappui/screens/setting.dart';
@@ -88,6 +90,14 @@ class AppRouter {
       GoRoute(
         path: ScreenRoute.termScreen,
         builder: (context, state) => TermsScreen(),
+      ),
+      GoRoute(
+        path: ScreenRoute.privacyScreen,
+        builder: (context, state) => PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: ScreenRoute.faqScreen,
+        builder: (context, state) => FaqScreen(),
       ),
     ],
   );
