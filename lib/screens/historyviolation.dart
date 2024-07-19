@@ -1,6 +1,9 @@
 import 'package:eduappui/remote/model/response/violation_response.dart';
 import 'package:eduappui/remote/service/repository/violation_repository.dart';
 import 'package:eduappui/routers/screen_route.dart';
+import 'package:eduappui/widget/TextField/common_text_field.dart';
+import 'package:eduappui/widget/app_bar.dart';
+import 'package:eduappui/widget/base_main_content.dart';
 import 'package:eduappui/widget/history_violation_item.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,6 +19,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   final historyViolationRepositoryImpl = ViolationRepositoryImpl();
 
   int numberResult = 0;
+  bool historyViolationLoading = true;
   List<ViolationResponse> historyViolationResponse = [];
 
   @override
@@ -24,80 +28,78 @@ class _HistoryScreenState extends State<HistoryScreen> {
     getHistoryViolation();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void getHistoryViolation() async {
     var response = await historyViolationRepositoryImpl.getListViolation();
     historyViolationResponse = response;
     numberResult = historyViolationResponse.length;
     historyViolationResponse = response;
+    historyViolationLoading = false;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(226, 134, 253, 237),
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(189, 7, 206, 43),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Center(
-          child: Text(
-            'History Violation',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {},
-          ),
-        ],
+      appBar: CustomAppbar(
+        onBack: () => context.pop(),
+        title: 'History Violation',
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Row(
+          BaseMainContent(
+            children: Column(
               children: [
-                Text(
-                  'Showing $numberResult results',
-                  style: TextStyle(
-                    color: Colors.brown[600],
-                    fontSize: 16.0,
+                Padding(
+                  padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Showing $numberResult results',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CommonTextField(
+                    border: 20.0,
+                    hintText: 'Search',
+                    onChanged: (value) {},
+                  ),
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: historyViolationResponse.length,
+                  itemBuilder: (context, index) {
+                    return HistoryViolationItem(
+                      date: historyViolationResponse[index].date ?? '',
+                      name: historyViolationResponse[index].studentName ?? '',
+                      violationName: historyViolationResponse[index].violationName ?? '',
+                      ontapFunction: () {
+                        context.push(ScreenRoute.violationEditScreen, extra: {
+                          'id': historyViolationResponse[index].violationId,
+                        });
+                      },
+                    );
+                  },
                 ),
               ],
             ),
           ),
-          Expanded(
-            child: historyViolationResponse.isEmpty
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : ListView.builder(
-                    itemCount: historyViolationResponse.length,
-                    itemBuilder: (context, index) {
-                      return HistoryViolationItem(
-                        date: historyViolationResponse[index].date ?? '',
-                        name: historyViolationResponse[index].studentName ?? '',
-                        violationName: historyViolationResponse[index].violationName ?? '',
-                        ontapFunction: () {
-                          context.push(ScreenRoute.violationEditScreen, extra: {
-                            'id': historyViolationResponse[index].violationId,
-                          });
-                        },
-                      );
-                    },
-                  ),
-          ),
+          historyViolationLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SizedBox()
         ],
       ),
     );

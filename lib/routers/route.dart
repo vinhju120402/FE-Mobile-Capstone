@@ -12,6 +12,7 @@ import 'package:eduappui/screens/profile.dart';
 import 'package:eduappui/screens/rule.dart';
 import 'package:eduappui/screens/setting.dart';
 import 'package:eduappui/screens/splash.dart';
+import 'package:eduappui/screens/term.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
@@ -83,6 +84,10 @@ class AppRouter {
       GoRoute(
         path: ScreenRoute.dutyScheduleScreen,
         builder: (context, state) => DutyScheduleScreen(),
+      ),
+      GoRoute(
+        path: ScreenRoute.termScreen,
+        builder: (context, state) => TermsScreen(),
       ),
     ],
   );

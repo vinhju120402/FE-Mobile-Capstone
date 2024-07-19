@@ -1,7 +1,9 @@
-import 'package:eduappui/screens/main_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class TermsScreen extends StatelessWidget {
+  const TermsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,10 +15,7 @@ class TermsScreen extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => MainScreen()),
-            );
+            context.pop();
           },
         ),
       ),

@@ -24,6 +24,7 @@ class _MainScreenState extends State<MainScreen> {
   bool? isAdmin;
   int? userId;
   String? userName;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -64,18 +65,26 @@ class _MainScreenState extends State<MainScreen> {
     var response = await userRepositoryImpl.getUserbyId(userId ?? 0);
 
     userName = response.userName;
-    setState(() {});
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MainScreenContent(
-        userName: userName ?? '',
-        isAdmin: isAdmin ?? false,
-        categories: categories,
-        localClientImpl: localClientImpl,
-        secureStorageImpl: secureStorageImpl,
+      body: Stack(
+        children: [
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : MainScreenContent(
+                  userName: userName ?? '',
+                  isAdmin: isAdmin ?? false,
+                  categories: categories,
+                  localClientImpl: localClientImpl,
+                  secureStorageImpl: secureStorageImpl,
+                )
+        ],
       ),
     );
   }
@@ -287,7 +296,7 @@ Widget _buildHeaderContent(BuildContext context, LocalClientImpl localClient, Se
                   onChanged(context, value!, localClient, secureStorageImpl);
                 },
                 dropdownStyleData: DropdownStyleData(
-                  width: 110,
+                  width: 120,
                   padding: const EdgeInsets.symmetric(vertical: 6),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(4),
@@ -369,7 +378,7 @@ class MenuItems {
   static Widget buildItem(MenuItem item) {
     return Row(
       children: [
-        Icon(item.icon, color: Color(0xFF55B5F3), size: 9),
+        Icon(item.icon, color: Color(0xFF55B5F3), size: 12),
         const SizedBox(
           width: 10,
         ),
@@ -377,7 +386,7 @@ class MenuItems {
           child: Text(
             item.text,
             style: const TextStyle(
-              fontSize: 9,
+              fontSize: 10,
               color: Colors.black,
             ),
           ),

@@ -18,39 +18,87 @@ class HistoryViolationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: ontapFunction,
+      // child: Padding(
+      //   padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      //   child: Container(
+      //     color: Color.fromARGB(188, 85, 239, 126),
+      //     padding: EdgeInsets.all(16.0),
+      //     child: Column(
+      //       crossAxisAlignment: CrossAxisAlignment.start,
+      //       children: [
+      //         Text(
+      //           'Họ và Tên: $name',
+      //           style: TextStyle(
+      //             color: Colors.black,
+      //             fontSize: 16.0,
+      //           ),
+      //         ),
+      //         SizedBox(height: 8.0),
+      //         Text(
+      //           'Loại Vi Phạm: $violationName',
+      //           style: TextStyle(
+      //             color: Colors.black,
+      //             fontSize: 16.0,
+      //           ),
+      //         ),
+      //         SizedBox(height: 8.0),
+      //         Text(
+      //           'Date: ${DateFormat.yMd().format(DateTime.parse(date))} ',
+      //           style: TextStyle(
+      //             color: Colors.black,
+      //             fontSize: 14.0,
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Container(
-          color: Color.fromARGB(188, 85, 239, 126),
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Họ và Tên: $name',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16.0,
-                ),
+        child: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(
+                top: 10,
+                left: 10,
+                right: 18,
+                bottom: 10,
               ),
-              SizedBox(height: 8.0),
-              Text(
-                'Loại Vi Phạm: $violationName',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16.0,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border(
+                  left: BorderSide(color: Colors.blue, width: 5.0),
                 ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x33716464),
+                    blurRadius: 8,
+                    offset: Offset(0, 0),
+                    spreadRadius: 0,
+                  )
+                ],
               ),
-              SizedBox(height: 8.0),
-              Text(
-                'Date: ${DateFormat.yMd().format(DateTime.parse(date))} ',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 14.0,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Họ và Tên: $name',
+                    style: TextStyle(color: Colors.black, fontSize: 12.0, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Loại Vi Phạm: $violationName',
+                    style: TextStyle(color: Colors.black, fontSize: 9.0, fontStyle: FontStyle.italic),
+                  ),
+                  Text(
+                    'Date: ${DateFormat.yMd().format(DateTime.parse(date))} ',
+                    style: TextStyle(color: Colors.red, fontSize: 9.0, fontStyle: FontStyle.italic),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

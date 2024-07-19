@@ -16,6 +16,7 @@ class RuleScreen extends StatefulWidget {
 class _RuleScreenState extends State<RuleScreen> {
   final RuleRepositoryImpl ruleRepositoryImpl = RuleRepositoryImpl();
   List<ViolationConfigResponse> ruleResponse = [];
+  bool ruleLoading = true;
 
   @override
   void initState() {
@@ -23,9 +24,15 @@ class _RuleScreenState extends State<RuleScreen> {
     getRule();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void getRule() async {
     var response = await ruleRepositoryImpl.getRule();
     ruleResponse = response;
+    ruleLoading = false;
     setState(() {});
   }
 
@@ -36,88 +43,97 @@ class _RuleScreenState extends State<RuleScreen> {
         onBack: () => context.pop(),
         title: 'Rule',
       ),
-      body: BaseMainContent(
-        children: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-              child: Row(
-                children: [
-                  Text(
-                    'Showing ${ruleResponse.length} results',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            //Defined Search bar
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: CommonTextField(
-                border: 20.0,
-                hintText: 'Search',
-                onChanged: (value) {},
-              ),
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: ruleResponse.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Stack(
+      body: Stack(
+        children: [
+          BaseMainContent(
+            children: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                  child: Row(
                     children: [
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.only(
-                          top: 10,
-                          left: 10,
-                          right: 18,
-                          bottom: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border(
-                            left: BorderSide(color: Colors.blue, width: 5.0),
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x33716464),
-                              blurRadius: 8,
-                              offset: Offset(0, 0),
-                              spreadRadius: 0,
-                            )
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              ruleResponse[index].violationTypeName ?? '',
-                              style: TextStyle(color: Colors.black, fontSize: 12.0, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              ruleResponse[index].description ?? '',
-                              style: TextStyle(color: Colors.black, fontSize: 9.0, fontStyle: FontStyle.italic),
-                            ),
-                            Text(
-                              'Minus point: -${ruleResponse[index].minusPoints ?? ''}',
-                              style: TextStyle(color: Colors.red, fontSize: 9.0, fontStyle: FontStyle.italic),
-                            ),
-                          ],
+                      Text(
+                        'Showing ${ruleResponse.length} results',
+                        style: TextStyle(
+                          fontSize: 16.0,
                         ),
                       ),
                     ],
                   ),
-                );
-              },
+                ),
+                //Defined Search bar
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CommonTextField(
+                    border: 20.0,
+                    hintText: 'Search',
+                    onChanged: (value) {},
+                  ),
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: ruleResponse.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.only(
+                              top: 10,
+                              left: 10,
+                              right: 18,
+                              bottom: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border(
+                                left: BorderSide(color: Colors.blue, width: 5.0),
+                              ),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x33716464),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 0),
+                                  spreadRadius: 0,
+                                )
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  ruleResponse[index].violationTypeName ?? '',
+                                  style: TextStyle(color: Colors.black, fontSize: 12.0, fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  ruleResponse[index].description ?? '',
+                                  style: TextStyle(color: Colors.black, fontSize: 9.0, fontStyle: FontStyle.italic),
+                                ),
+                                Text(
+                                  'Minus point: -${ruleResponse[index].minusPoints ?? ''}',
+                                  style: TextStyle(color: Colors.red, fontSize: 9.0, fontStyle: FontStyle.italic),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          ruleLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SizedBox()
+        ],
       ),
     );
   }

@@ -49,6 +49,7 @@ dependencies:
   dropdown_button2: ^2.3.9
   flutter_secure_storage: ^9.2.2
   hive_flutter: ^1.1.0
+  rate_my_app: ^2.2.0
 
 dev_dependencies:
   flutter_test:
