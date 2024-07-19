@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BaseMainContent extends StatelessWidget {
-  final List<Widget>? children;
+  final Widget? children;
 
   const BaseMainContent({super.key, this.children});
   @override
@@ -14,15 +14,13 @@ class BaseMainContent extends StatelessWidget {
         ),
         Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: Color(0xFFF8F9FD),
             borderRadius: BorderRadius.only(
               topRight: Radius.circular(20),
             ),
           ),
           width: double.infinity,
-          child: Column(
-            children: children ?? [],
-          ),
+          child: SingleChildScrollView(child: children),
         ),
       ],
     );

@@ -37,31 +37,33 @@ class _RuleScreenState extends State<RuleScreen> {
         title: 'Rule',
       ),
       body: BaseMainContent(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-            child: Row(
-              children: [
-                Text(
-                  'Showing ${ruleResponse.length} results',
-                  style: TextStyle(
-                    fontSize: 16.0,
+        children: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+              child: Row(
+                children: [
+                  Text(
+                    'Showing ${ruleResponse.length} results',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          //Defined Search bar
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: CommonTextField(
-              border: 20.0,
-              hintText: 'Search',
-              onChanged: (value) {},
+            //Defined Search bar
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: CommonTextField(
+                border: 20.0,
+                hintText: 'Search',
+                onChanged: (value) {},
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               itemCount: ruleResponse.length,
               itemBuilder: (context, index) {
                 return Padding(
@@ -114,8 +116,8 @@ class _RuleScreenState extends State<RuleScreen> {
                 );
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

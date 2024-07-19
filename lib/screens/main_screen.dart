@@ -115,6 +115,7 @@ class MainScreenContent extends StatelessWidget {
             ],
           ),
           BaseMainContent(
+              children: Column(
             children: [
               Visibility(
                 visible: isAdmin == false,
@@ -122,7 +123,7 @@ class MainScreenContent extends StatelessWidget {
               ),
               _buildOther(categories),
             ],
-          ),
+          )),
           const SizedBox(height: 50)
         ],
       ),

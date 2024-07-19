@@ -27,7 +27,6 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
               bottomRight: Radius.circular(20),
             ),
           ),
-          height: 80,
           alignment: Alignment.center,
           width: MediaQuery.of(context).size.width,
           child: Stack(
@@ -41,7 +40,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                       icon: Icon(
                         Icons.arrow_back_ios_new_rounded,
                         size: 20,
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                       onPressed: onBack,
                     ),
@@ -54,6 +53,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
                 ),
               ),

@@ -1,132 +1,185 @@
-import 'package:eduappui/screens/main_screen.dart';
+import 'package:eduappui/remote/constant/constants.dart';
+import 'package:eduappui/remote/local/local_client.dart';
+import 'package:eduappui/remote/service/repository/user_repository.dart';
+import 'package:eduappui/widget/TextField/common_text_field.dart';
+import 'package:eduappui/widget/app_bar.dart';
+import 'package:eduappui/widget/base_main_content.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  int? userId;
+  LocalClientImpl localClientImpl = LocalClientImpl();
+  UserRepositoryImpl userRepositoryImpl = UserRepositoryImpl();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController addrress = TextEditingController();
+  TextEditingController phone = TextEditingController();
+
+  getCurrentUser() async {
+    userId = int.parse(await localClientImpl.readData(Constants.user_id));
+    var response = await userRepositoryImpl.getUserbyId(userId ?? 0);
+    nameController.text = response.userName ?? '';
+    addrress.text = response.address ?? '';
+    phone.text = response.phone ?? '';
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Center(
-            child: Text('Profile', style: TextStyle(color: Colors.black))),
-        backgroundColor: const Color.fromARGB(189, 7, 206, 43),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => MainScreen()),
-            );
-          },
-        ),
+      appBar: CustomAppbar(
+        title: 'Profile',
+        onBack: () => context.pop(),
       ),
-      body: Container(
-        color: Color.fromARGB(226, 134, 253, 237),
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: BaseMainContent(
+        children: Column(
           children: [
-            Center(
-              child: CircleAvatar(
-                radius: 50.0,
-                backgroundImage: AssetImage("images/book.jpg"),
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              children: [
-                Icon(Icons.person, color: Colors.grey[600]),
-                SizedBox(width: 8.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Full Name',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'John Smith',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Divider(
-              height: 30,
-              thickness: 2,
-              color: Colors.grey[400],
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              children: [
-                Icon(Icons.email, color: Colors.grey[600]),
-                SizedBox(width: 8.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Email: ',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'johnsmith@gmail.com',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Divider(
-              height: 30,
-              thickness: 2,
-              color: Colors.grey[400],
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              children: [
-                Icon(Icons.phone, color: Colors.grey[600]),
-                SizedBox(width: 8.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Mobile number',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '698698966',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Divider(
-              height: 30,
-              thickness: 2,
-              color: Colors.grey[400],
-            ),
+            const SizedBox(height: 16.0),
+            _buildAvatarSection('https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg'),
+            _buildPersonalInfoSection(nameController, addrress, phone),
           ],
         ),
       ),
     );
   }
+}
+
+Widget _buildAvatarSection(String image) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      GestureDetector(
+        onTap: () async {
+          // try {
+          //   String newImage = await PickImageUtil.pickImage();
+          // } catch (e) {
+          //   return;
+          // }
+        },
+        child: Stack(
+          alignment: Alignment.bottomRight,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              width: 130,
+              height: 130,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(width: 1, color: const Color(0xfff10275a)),
+                color: image.isEmpty ? Colors.grey : null,
+                image: image.isNotEmpty && image.startsWith('http')
+                    ? DecorationImage(
+                        image: NetworkImage(image),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: image.isEmpty
+                  ? const Icon(Icons.person, color: Colors.white)
+                  : image.isEmpty || image.startsWith('http')
+                      ? null
+                      : const Center(
+                          child: Text(
+                            'Local Image',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(right: 15, bottom: 5),
+              child: Icon(
+                Icons.camera_alt,
+                color: Color(0xfff10275a),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditingController addrressController,
+    TextEditingController phoneNumberController) {
+  return Padding(
+    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Name',
+          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+        ),
+        CommonTextField(
+          maxLines: 1,
+          inputController: nameController,
+        ),
+        SizedBox(height: 20),
+        Text(
+          'School Name',
+          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+        ),
+        CommonTextField(
+          maxLines: 1,
+        ),
+        SizedBox(height: 20),
+        Text(
+          'Address',
+          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+        ),
+        CommonTextField(
+          maxLines: 1,
+          inputController: addrressController,
+        ),
+        SizedBox(height: 20),
+        Text(
+          'Phone number',
+          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+        ),
+        CommonTextField(
+          maxLines: 1,
+          inputController: phoneNumberController,
+        ),
+        SizedBox(height: 30),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue, // Màu nền xanh cho nút Sign In
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20), // Bo góc tròn
+              ),
+            ),
+            child: Container(
+              width: double.infinity, // Tự động mở rộng chiều dài
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: const Center(
+                child: Text(
+                  'Edit Profile',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
