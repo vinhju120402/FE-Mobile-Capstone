@@ -1,4 +1,4 @@
-import 'package:get_storage/get_storage.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 abstract class LocalClient {
   Future<void> saveData(String key, dynamic value);
@@ -9,30 +9,30 @@ abstract class LocalClient {
 }
 
 class LocalClientImpl implements LocalClient {
-  final box = GetStorage();
+  final box = Hive.box('myBox');
 
   @override
   Future<void> saveData(String key, dynamic value) async {
-    return await box.write(key, value);
+    return await box.put(key, value);
   }
 
   @override
   Future<void> removeData(String key) async {
-    return await box.remove(key);
+    return await box.delete(key);
   }
 
   @override
   T readData<T>(String key) {
-    return box.read(key);
+    return box.get(key);
   }
 
   @override
   bool hasData<T>(String key) {
-    return box.hasData(key);
+    return box.containsKey(key);
   }
 
   @override
   Future<void> removeAll() {
-    return box.erase();
+    return box.clear();
   }
 }

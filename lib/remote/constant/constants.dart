@@ -26,6 +26,10 @@ class Constants {
 
   static String get_violation_config = '$api_base_url/violation-configs';
 
+  static String get_user = '$api_base_url/users';
+
   // Constant String
   static const String access_token = 'access_token';
+  static const String expired_at = 'expired_at';
+  static const String user_id = 'user_id';
 }

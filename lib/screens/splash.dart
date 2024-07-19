@@ -1,4 +1,6 @@
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
+import 'package:eduappui/remote/constant/constants.dart';
+import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/local/secure_storage.dart';
 import 'package:eduappui/routers/screen_route.dart';
 import 'package:flutter/material.dart';
@@ -14,14 +16,31 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   _handleEndSplash() async {
     debugPrint("On Splash End");
+
     final secureStorage = SecureStorageImpl();
+    final localClient = LocalClientImpl();
+
     final accessToken = await secureStorage.getAccessToken();
-    if (!mounted) return; // Check if the widget is still mounted
-    if (accessToken != null) {
-      context.pushReplacement(ScreenRoute.homeScreen);
-    } else {
-      context.pushReplacement(ScreenRoute.loginScreen);
+    final expiredAt = localClient.readData(Constants.expired_at);
+
+    if (expiredAt == null || DateTime.now().isAfter(convertTimestampToDate(expiredAt))) {
+      await secureStorage.removeAllAsync();
+      await localClient.removeAll();
+      if (mounted) {
+        context.pushReplacement(ScreenRoute.loginScreen);
+      }
+      return;
     }
+
+    if (mounted) {
+      final targetScreen = (accessToken != null) ? ScreenRoute.homeScreen : ScreenRoute.loginScreen;
+      context.pushReplacement(targetScreen);
+    }
+  }
+
+  DateTime convertTimestampToDate(String timestamp) {
+    // Convert the Unix timestamp (in seconds) to a DateTime object
+    return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp) * 1000);
   }
 
   @override

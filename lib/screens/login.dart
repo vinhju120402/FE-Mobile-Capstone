@@ -1,3 +1,4 @@
+import 'package:eduappui/remote/constant/constants.dart';
 import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/local/secure_storage.dart';
 import 'package:eduappui/remote/model/request/login_request.dart';
@@ -51,13 +52,15 @@ class LoginPageState extends State<LoginPage> {
       if (response.token != null) {
         secureStorageImpl.saveAccessToken(response.token);
         Map<String, dynamic> decodedToken = JwtDecoder.decode(response.token!);
+        await localClientImpl.saveData(Constants.expired_at, decodedToken['exp'].toString());
+        await localClientImpl.saveData(Constants.user_id, decodedToken['UserId']);
         if (decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] == 'STUDENT_SUPERVISOR') {
           if (kDebugMode) {
             print(
                 'is admin -- false , Role:  ${decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']}');
           }
           await localClientImpl.saveData('isAdmin', false);
-          Future.delayed(const Duration(seconds: 2), () {
+          await Future.delayed(const Duration(seconds: 2), () {
             context.pushReplacement(ScreenRoute.homeScreen, extra: {'isAdmin': false});
           });
         } else {
@@ -66,7 +69,7 @@ class LoginPageState extends State<LoginPage> {
                 'is admin -- true , Role: ${decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']}');
           }
           await localClientImpl.saveData('isAdmin', true);
-          Future.delayed(const Duration(seconds: 2), () {
+          await Future.delayed(const Duration(seconds: 2), () {
             context.pushReplacement(ScreenRoute.homeScreen, extra: {'isAdmin': true});
           });
         }

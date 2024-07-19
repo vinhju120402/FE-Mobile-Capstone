@@ -11,5 +11,5 @@ class ScreenRoute {
   static const createViolationScreen = '/createViolationScreen';
   static const contactScreen = '/contactScreen';
   static const dutyScheduleScreen = '/dutyScheduleScreen';
-  static const publicRoute = [loginScreen];
+  static const publicRoute = [splash, loginScreen];
 }

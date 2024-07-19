@@ -1,6 +1,8 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:eduappui/remote/constant/constants.dart';
 import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/local/secure_storage.dart';
+import 'package:eduappui/remote/service/repository/user_repository.dart';
 import 'package:eduappui/routers/screen_route.dart';
 import 'package:eduappui/widget/base_main_content.dart';
 import 'package:flutter/material.dart';
@@ -18,12 +20,14 @@ class _MainScreenState extends State<MainScreen> {
   List<IconData>? iconList;
   LocalClientImpl localClientImpl = LocalClientImpl();
   SecureStorageImpl secureStorageImpl = SecureStorageImpl();
+  UserRepositoryImpl userRepositoryImpl = UserRepositoryImpl();
   bool? isAdmin;
+  int? userId;
+  String? userName;
 
   @override
   void initState() {
     super.initState();
-    isAdmin = localClientImpl.readData('isAdmin');
     categories = {
       "Create Violation": {
         "icon": const Icon(Icons.add, color: Colors.white, size: 30),
@@ -51,6 +55,15 @@ class _MainScreenState extends State<MainScreen> {
     if (isAdmin == true) {
       categories!.remove("Duty schedule");
     }
+    getCurrentUser();
+  }
+
+  getCurrentUser() async {
+    isAdmin = await localClientImpl.readData('isAdmin');
+    userId = int.parse(await localClientImpl.readData(Constants.user_id));
+    var response = await userRepositoryImpl.getUserbyId(userId ?? 0);
+
+    userName = response.userName;
     setState(() {});
   }
 
@@ -58,6 +71,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: MainScreenContent(
+        userName: userName ?? '',
         isAdmin: isAdmin ?? false,
         categories: categories,
         localClientImpl: localClientImpl,
@@ -69,6 +83,7 @@ class _MainScreenState extends State<MainScreen> {
 
 class MainScreenContent extends StatelessWidget {
   final bool isAdmin;
+  final String userName;
   final Map<String, Map<String, dynamic>>? categories;
   final LocalClientImpl localClientImpl;
   final SecureStorageImpl secureStorageImpl;
@@ -77,7 +92,8 @@ class MainScreenContent extends StatelessWidget {
       this.categories,
       required this.localClientImpl,
       required this.secureStorageImpl,
-      required this.isAdmin});
+      required this.isAdmin,
+      required this.userName});
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +111,7 @@ class MainScreenContent extends StatelessWidget {
                   ],
                 ),
               ),
-              _buildHeaderContent(context, localClientImpl, secureStorageImpl, isAdmin),
+              _buildHeaderContent(context, localClientImpl, secureStorageImpl, isAdmin, userName),
             ],
           ),
           BaseMainContent(
@@ -197,8 +213,8 @@ Widget _buildUpcomingSchedule(BuildContext context) {
   );
 }
 
-Widget _buildHeaderContent(
-    BuildContext context, LocalClientImpl localClient, SecureStorageImpl secureStorageImpl, bool isAdmin) {
+Widget _buildHeaderContent(BuildContext context, LocalClientImpl localClient, SecureStorageImpl secureStorageImpl,
+    bool isAdmin, String userName) {
   return Container(
     height: 80,
     decoration: const BoxDecoration(
@@ -231,7 +247,7 @@ Widget _buildHeaderContent(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Leonel Messi',
+                    userName,
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w400,
