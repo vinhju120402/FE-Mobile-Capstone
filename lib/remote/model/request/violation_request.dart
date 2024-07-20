@@ -5,7 +5,6 @@ class ViolationRequest {
   int studentInClassId;
   int violationTypeId;
   int? teacherId;
-  String code;
   String violationName;
   String? description;
   DateTime? date;
@@ -16,7 +15,6 @@ class ViolationRequest {
     required this.studentInClassId,
     required this.violationTypeId,
     this.teacherId,
-    required this.code,
     required this.violationName,
     this.description,
     this.date,
@@ -29,7 +27,6 @@ class ViolationRequest {
       studentInClassId: json['StudentInClassId'],
       violationTypeId: json['ViolationTypeId'],
       teacherId: json['TeacherId'],
-      code: json['Code'],
       violationName: json['ViolationName'],
       description: json['Description'],
       date: json['Date'] != null ? DateTime.parse(json['Date']) : null,
@@ -43,7 +40,6 @@ class ViolationRequest {
       'StudentInClassId': studentInClassId,
       'ViolationTypeId': violationTypeId,
       'TeacherId': teacherId,
-      'Code': code,
       'ViolationName': violationName,
       'Description': description,
       'Date': date?.toIso8601String(),
@@ -53,6 +49,6 @@ class ViolationRequest {
 
   @override
   String toString() {
-    return 'ViolationRequest(classId: $classId, studentInClassId: $studentInClassId, violationTypeId: $violationTypeId, teacherId: $teacherId, code: $code, violationName: $violationName, description: $description, date: $date, images: $images)';
+    return 'ViolationRequest(classId: $classId, studentInClassId: $studentInClassId, violationTypeId: $violationTypeId, teacherId: $teacherId, violationName: $violationName, description: $description, date: $date, images: $images)';
   }
 }

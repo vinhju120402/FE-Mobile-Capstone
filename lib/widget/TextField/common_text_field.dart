@@ -5,6 +5,7 @@ class CommonTextField extends StatefulWidget {
   final String? label;
   final TextEditingController? inputController;
   final bool? isDisable;
+  final bool? isReadOnly;
   final bool? isPassword;
   final Color? textFieldColor;
   final Color? textColor;
@@ -20,6 +21,7 @@ class CommonTextField extends StatefulWidget {
   final TextStyle? hintStyle;
   final String? errorText;
   final double? border;
+  final void Function()? onTap;
 
   const CommonTextField({
     super.key,
@@ -41,6 +43,8 @@ class CommonTextField extends StatefulWidget {
     this.errorText,
     this.textColor,
     this.border = 10,
+    this.onTap,
+    this.isReadOnly,
   });
 
   @override
@@ -82,13 +86,14 @@ class _CommonTextFieldState extends State<CommonTextField> {
                     inputFormatters: widget.inputFormatters,
                     obscureText: passwordVisible!,
                     enableInteractiveSelection: widget.isDisable == true ? false : true,
-                    readOnly: widget.isDisable ?? false,
+                    readOnly: widget.isReadOnly ?? widget.isDisable ?? false,
                     controller: widget.inputController,
                     onChanged: widget.onChanged,
                     maxLength: widget.maxLength,
                     maxLines: widget.maxLines,
                     textAlign:
                         (widget.textAlign != null && widget.textAlign != "") ? widget.textAlign! : TextAlign.start,
+                    onTap: widget.onTap,
                     decoration: InputDecoration(
                       labelText: widget.label,
                       labelStyle: TextStyle(

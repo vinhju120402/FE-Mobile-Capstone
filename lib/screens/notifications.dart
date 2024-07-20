@@ -1,102 +1,111 @@
+import 'package:eduappui/widget/TextField/common_text_field.dart';
+import 'package:eduappui/widget/app_bar.dart';
+import 'package:eduappui/widget/base_main_content.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class NotificationScreen extends StatelessWidget {
-  final List<String> notifications = [
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
-    'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC',
+  final List<Map<String, String>> notifications = [
+    {'date': '20/07/2024', 'message': 'THÔNG BÁO GIA HẠN NỘP HỒ SƠ NHẬP HỌC'},
+    {'date': '19/07/2024', 'message': 'THÔNG BÁO VỀ VIỆC HOÀN THÀNH HỒ SƠ NHẬP HỌC'},
+    {'date': '18/07/2024', 'message': 'THÔNG BÁO LỊCH HỌC KỲ MỚI'},
+    {'date': '17/07/2024', 'message': 'THÔNG BÁO VỀ VIỆC ĐĂNG KÝ KHÓA HỌC MỚI'},
+    {'date': '16/07/2024', 'message': 'THÔNG BÁO VỀ VIỆC NGHỈ HỌC DO BÃO'},
+    {'date': '15/07/2024', 'message': 'THÔNG BÁO VỀ VIỆC ĐÓNG HỌC PHÍ'},
+    {'date': '14/07/2024', 'message': 'THÔNG BÁO LỊCH THI CUỐI KỲ'},
+    {'date': '13/07/2024', 'message': 'THÔNG BÁO VỀ VIỆC TỔ CHỨC HỌP PHỤ HUYNH'}
   ];
+
+  NotificationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(226, 134, 253, 237),
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(189, 7, 206, 43),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Center(
-          child: Text(
-            'Notifications',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {},
-          ),
-        ],
+      appBar: CustomAppbar(
+        title: 'Notifications',
+        onBack: () => context.pop(),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Text(
-                  'Showing ${notifications.length} results',
-                  style: TextStyle(
-                    color: Colors.brown[600],
-                    fontSize: 16.0,
+      body: BaseMainContent(
+        children: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+              child: Row(
+                children: [
+                  Text(
+                    'Showing ${notifications.length} results',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: CommonTextField(
+                border: 20.0,
+                hintText: 'Search',
+                onChanged: (value) {},
+              ),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               itemCount: notifications.length,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(188, 85, 239, 126),
-                      borderRadius: BorderRadius.circular(30.0),
-                      border: Border.all(color: Colors.black, width: 1.0),
-                    ),
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          notifications[index],
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16.0,
-                          ),
+                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.only(
+                          top: 10,
+                          left: 10,
+                          right: 18,
+                          bottom: 10,
                         ),
-                        SizedBox(height: 8.0),
-                        Text(
-                          'Date: 6/5/2024',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14.0,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border(
+                            left: BorderSide(color: Colors.blue, width: 5.0),
                           ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x33716464),
+                              blurRadius: 8,
+                              offset: Offset(0, 0),
+                              spreadRadius: 0,
+                            )
+                          ],
                         ),
-                      ],
-                    ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              notifications[index]['message']!,
+                              style: TextStyle(color: Colors.black, fontSize: 14.0, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              notifications[index]['date']!,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 9.0,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

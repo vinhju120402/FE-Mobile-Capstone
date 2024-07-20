@@ -7,9 +7,13 @@ import 'package:eduappui/remote/model/response/violation_type_response.dart';
 import 'package:eduappui/remote/service/repository/class_repository.dart';
 import 'package:eduappui/remote/service/repository/student_in_class_repository.dart';
 import 'package:eduappui/remote/service/repository/violation_repository.dart';
+import 'package:eduappui/widget/TextField/common_text_field.dart';
+import 'package:eduappui/widget/app_bar.dart';
+import 'package:eduappui/widget/base_main_content.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -31,7 +35,6 @@ class EditviocationState extends State<Editviocation> {
   final TextEditingController timeController = TextEditingController();
   final TextEditingController violateGroupController = TextEditingController();
   final TextEditingController violateTypeController = TextEditingController();
-  final TextEditingController codeController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   bool isLoading = true;
   List<ViolationGroupResponse> violationGroup = [];
@@ -42,6 +45,8 @@ class EditviocationState extends State<Editviocation> {
   int? studentInClassId;
   int? violationTypeId;
   String violationName = '';
+  List<String> violationImagesList = [];
+  List<File> imageFiles = [];
 
   @override
   void initState() {
@@ -49,33 +54,49 @@ class EditviocationState extends State<Editviocation> {
     if (kDebugMode) {
       print('ID: ${widget.id}');
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      initializeData();
-    });
+    initializeData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   String selectedViolation = '';
-  File? imageFile;
 
   Future<void> _takePicture() async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedImage != null) {
-      setState(() {
-        imageFile = File(pickedImage.path);
-      });
+      if (imageFiles.length < 2) {
+        setState(() {
+          imageFiles.add(File(pickedImage.path));
+        });
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('You can only select up to 2 images.')),
+          );
+        }
+      }
     }
   }
 
   Future<void> _selectPicture() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    final pickedImages = await picker.pickMultiImage();
 
-    if (pickedImage != null) {
+    if (imageFiles.length + pickedImages.length <= 2) {
       setState(() {
-        imageFile = File(pickedImage.path);
+        imageFiles.addAll(pickedImages.map((pickedImage) => File(pickedImage.path)).toList());
       });
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You can only select up to 2 images.')),
+        );
+      }
     }
   }
 
@@ -133,21 +154,22 @@ class EditviocationState extends State<Editviocation> {
                 '';
         violationTypeId = violation.violationTypeId;
         violationName = violation.violationName ?? '';
-        codeController.text = violation.code ?? '';
         descriptionController.text = violation.description ?? '';
+        violationImagesList = violation.imageUrls ?? [];
+        loadImages(violationImagesList);
       } else {
         if (mounted) {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text('Get Violation Failed'),
-              content: Text('Violation not found. Please try again.'),
+              title: const Text('Get Violation Failed'),
+              content: const Text('Violation not found. Please try again.'),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             ),
@@ -185,18 +207,15 @@ class EditviocationState extends State<Editviocation> {
   }
 
   Future<void> editViolation(int id) async {
-    List<File>? listImage = [];
-    listImage.add(imageFile ?? File(''));
     ViolationRequest violationRequest = ViolationRequest(
       classId: classId ?? 0,
       studentInClassId: studentInClassId ?? 0,
       violationTypeId: violationTypeId ?? 0,
       teacherId: null,
-      code: codeController.text,
       violationName: violateTypeController.text,
       description: descriptionController.text,
       date: DateFormat('M/d/yyyy').parse(timeController.text),
-      images: listImage,
+      images: imageFiles,
     );
 
     try {
@@ -204,7 +223,7 @@ class EditviocationState extends State<Editviocation> {
       if (response == 200) {
         if (mounted) {
           context.pop();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Edit violation success.')));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit violation success.')));
         }
       }
     } catch (e) {
@@ -212,7 +231,7 @@ class EditviocationState extends State<Editviocation> {
         print(e);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Edit violation failed.')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit violation failed.')));
       }
     }
   }
@@ -222,215 +241,210 @@ class EditviocationState extends State<Editviocation> {
     studentInClass = response;
   }
 
+  Future<void> loadImages(List<String> imageFromAPIList) async {
+    final cacheManager = DefaultCacheManager();
+
+    final List<File> files = [];
+    for (String url in imageFromAPIList) {
+      final file = await cacheManager.getSingleFile(url);
+      files.add(file);
+    }
+    setState(() {
+      imageFiles = files;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(226, 134, 253, 237),
-      appBar: AppBar(
-        title: Text('Edit Violation'),
-        backgroundColor: Color.fromARGB(189, 7, 206, 43),
-      ),
-      body: isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      controller: classController,
-                      onTap: () {
-                        _buildClassBottomSheet(context);
-                      },
-                      readOnly: true, // Prevent keyboard from appearing on tap
-                      decoration: InputDecoration(
-                        labelText: 'Class',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    TextFormField(
-                      controller: nameController,
-                      onTap: () {
-                        _buildStudentInClassList(context);
-                      },
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        labelText: 'Student name',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    TextFormField(
-                      controller: timeController,
-                      readOnly: true,
-                      onTap: _selectDateTime,
-                      decoration: InputDecoration(
-                        labelText: 'Time',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    TextFormField(
-                      controller: violateGroupController,
-                      onTap: () {
-                        _buildViolationGroupBottomSheet(context);
-                      },
-                      readOnly: true, // Prevent keyboard from appearing on tap
-                      decoration: InputDecoration(
-                        labelText: 'Violation group',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    TextFormField(
-                      controller: violateTypeController,
-                      onTap: () {
-                        _buildViolationTypeBottomSheet(context);
-                      },
-                      readOnly: true, // Prevent keyboard from appearing on tap
-                      decoration: InputDecoration(
-                        labelText: 'Violation type',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    TextFormField(
-                      controller: codeController,
-                      decoration: InputDecoration(
-                        labelText: 'Code',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    TextFormField(
-                      controller: descriptionController,
-                      maxLines: null,
-                      maxLength: 300,
-                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                      onChanged: (value) {
-                        setState(() {});
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Description',
-                        counterText: '${descriptionController.text.length}/300',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return IgnorePointer(
+      ignoring: isLoading,
+      child: Scaffold(
+        appBar: CustomAppbar(
+          onBack: () => context.pop(),
+          title: 'Edit Violation',
+        ),
+        body: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : BaseMainContent(
+                children: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: _takePicture,
-                          icon: Icon(Icons.camera_alt),
-                          label: Text('Chụp ảnh'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              vertical: 15.0,
-                              horizontal: 20.0,
-                            ),
-                          ),
+                        const Text(
+                          'Class',
+                          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                         ),
-                        ElevatedButton.icon(
-                          onPressed: _selectPicture,
-                          icon: Icon(Icons.photo_library),
-                          label: Text('Chọn ảnh'),
+                        CommonTextField(
+                          maxLines: 1,
+                          inputController: classController,
+                          isReadOnly: true,
+                          onTap: () => _buildClassBottomSheet(context),
+                        ),
+                        const SizedBox(height: 20.0),
+                        const Text(
+                          'Student name',
+                          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                        ),
+                        CommonTextField(
+                          maxLines: 1,
+                          inputController: nameController,
+                          isReadOnly: true,
+                          onTap: () => _buildStudentInClassList(context),
+                        ),
+                        const SizedBox(height: 20.0),
+                        const Text(
+                          'Time',
+                          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                        ),
+                        CommonTextField(
+                          maxLines: 1,
+                          inputController: timeController,
+                          isReadOnly: true,
+                          onTap: () => _selectDateTime(),
+                        ),
+                        const SizedBox(height: 20.0),
+                        const Text(
+                          'Violation group',
+                          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                        ),
+                        CommonTextField(
+                          maxLines: 1,
+                          inputController: violateGroupController,
+                          isReadOnly: true,
+                          onTap: () => _buildViolationGroupBottomSheet(context),
+                        ),
+                        const SizedBox(height: 20.0),
+                        const Text(
+                          'Violation type',
+                          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                        ),
+                        CommonTextField(
+                          maxLines: 1,
+                          inputController: violateTypeController,
+                          isReadOnly: true,
+                          onTap: () => _buildViolationTypeBottomSheet(context),
+                        ),
+                        const SizedBox(height: 20.0),
+                        const Text(
+                          'Description',
+                          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                        ),
+                        CommonTextField(
+                          maxLines: 3,
+                          inputController: descriptionController,
+                        ),
+                        const SizedBox(height: 20.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: _takePicture,
+                              icon: const Icon(Icons.camera_alt, color: Colors.white),
+                              label: const Text('Chụp ảnh', style: TextStyle(fontSize: 14, color: Colors.white)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 15.0,
+                                  horizontal: 20.0,
+                                ),
+                              ),
+                            ),
+                            ElevatedButton.icon(
+                              onPressed: _selectPicture,
+                              icon: const Icon(Icons.photo_library, color: Colors.white),
+                              label: const Text('Chọn ảnh', style: TextStyle(fontSize: 14, color: Colors.white)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 15.0,
+                                  horizontal: 20.0,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10.0),
+                        if (imageFiles.isNotEmpty)
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: imageFiles.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black26, // Shadow color
+                                      blurRadius: 10.0, // Shadow blur radius
+                                      offset: Offset(0, 5), // Shadow offset
+                                    ),
+                                  ],
+                                  border: Border.all(
+                                    color: Colors.white, // Border color
+                                    width: 2.0, // Border width
+                                  ),
+                                  image: DecorationImage(
+                                    image: FileImage(imageFiles[index]),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(8.0), // Padding inside the container
+                                margin: const EdgeInsets.all(8.0), // Margin outside the container
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      imageFiles.removeAt(index);
+                                    });
+                                  },
+                                  child: const Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Icon(Icons.close, color: Colors.red, size: 20.0),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        const SizedBox(height: 20.0),
+                        ElevatedButton(
+                          onPressed: () {
+                            editViolation(widget.id);
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
+                            textStyle: const TextStyle(fontSize: 18),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-                            padding: EdgeInsets.symmetric(
-                              vertical: 15.0,
-                              horizontal: 20.0,
-                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 15.0),
                           ),
+                          child: const Text('Gửi', style: TextStyle(color: Colors.white)),
                         ),
+                        const SizedBox(height: 20.0),
                       ],
                     ),
-                    SizedBox(height: 10.0),
-                    if (imageFile != null)
-                      Container(
-                        width: 120.0,
-                        height: 120.0,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          image: DecorationImage(
-                            image: FileImage(imageFile!),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    SizedBox(height: 20.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        editViolation(widget.id);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        textStyle: TextStyle(fontSize: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 15.0),
-                      ),
-                      child: Text('Gửi'),
-                    ),
-                    SizedBox(height: 20.0),
-                  ],
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 
@@ -449,7 +463,7 @@ class EditviocationState extends State<Editviocation> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     controller: searchController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Tìm kiếm',
                       prefixIcon: Icon(Icons.search),
                     ),
@@ -509,7 +523,7 @@ class EditviocationState extends State<Editviocation> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     controller: searchController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Tìm kiếm',
                       prefixIcon: Icon(Icons.search),
                     ),
@@ -568,7 +582,7 @@ class EditviocationState extends State<Editviocation> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     controller: searchController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Tìm kiếm',
                       prefixIcon: Icon(Icons.search),
                     ),
@@ -629,7 +643,7 @@ class EditviocationState extends State<Editviocation> {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     controller: searchController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Tìm kiếm',
                       prefixIcon: Icon(Icons.search),
                     ),

@@ -7,6 +7,9 @@ import 'package:eduappui/remote/model/response/violation_type_response.dart';
 import 'package:eduappui/remote/service/repository/class_repository.dart';
 import 'package:eduappui/remote/service/repository/student_in_class_repository.dart';
 import 'package:eduappui/remote/service/repository/violation_repository.dart';
+import 'package:eduappui/widget/TextField/common_text_field.dart';
+import 'package:eduappui/widget/app_bar.dart';
+import 'package:eduappui/widget/base_main_content.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,7 +33,6 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   final TextEditingController timeController = TextEditingController();
   final TextEditingController violateGroupController = TextEditingController();
   final TextEditingController violateTypeController = TextEditingController();
-  final TextEditingController codeController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   List<ViolationGroupResponse> violationGroup = [];
   List<ViolationTypeResponse> violationType = [];
@@ -136,14 +138,13 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
 
   void createViolation() async {
     List<File>? listImage = [];
-    listImage.addAll(imageFiles);
+    listImage = imageFiles;
     ViolationRequest violationRequest = ViolationRequest(
       studentInClassId: studentInClassId ?? 0,
       classId: classId ?? 0,
       date: DateTime.parse(timeController.text),
       violationTypeId: violationTypeId ?? 0,
       violationName: violateTypeController.text,
-      code: codeController.text,
       description: descriptionController.text,
       images: listImage,
     );
@@ -197,90 +198,69 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Create Violation'),
-        backgroundColor: Color.fromARGB(189, 7, 206, 43),
+      appBar: CustomAppbar(
+        onBack: () => context.pop(),
+        title: 'Create Violation',
       ),
-      body: Container(
-        color: Color.fromARGB(226, 134, 253, 237),
-        child: SingleChildScrollView(
+      body: BaseMainContent(
+        children: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextFormField(
-                  controller: classController,
-                  onTap: () {
-                    _buildClassBottomSheet(context);
-                  },
-                  readOnly: true, // Prevent keyboard from appearing on tap
-                  decoration: InputDecoration(
-                    labelText: 'Class',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
+                const Text(
+                  'Class',
+                  style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                ),
+                CommonTextField(
+                  maxLines: 1,
+                  inputController: classController,
+                  isReadOnly: true,
+                  onTap: () => _buildClassBottomSheet(context),
                 ),
                 SizedBox(height: 20.0),
-                TextFormField(
-                  controller: nameController,
-                  onTap: () {
-                    _buildStudentInClassList(context);
-                  },
-                  readOnly: true, // Prevent keyboard from appearing on tap
-                  decoration: InputDecoration(
-                    labelText: 'Student name',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
+                const Text(
+                  'Student name',
+                  style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                ),
+                CommonTextField(
+                  maxLines: 1,
+                  inputController: nameController,
+                  isReadOnly: true,
+                  onTap: () => _buildStudentInClassList(context),
                 ),
                 SizedBox(height: 20.0),
-                TextFormField(
-                  controller: timeController,
-                  readOnly: true,
-                  onTap: _selectDateTime,
-                  decoration: InputDecoration(
-                    labelText: 'Time',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
+                const Text(
+                  'Time',
+                  style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                ),
+                CommonTextField(
+                  maxLines: 1,
+                  inputController: timeController,
+                  isReadOnly: true,
+                  onTap: () => _selectDateTime(),
                 ),
                 SizedBox(height: 20.0),
-                TextFormField(
-                  controller: violateGroupController,
-                  onTap: () {
-                    _buildViolationGroupBottomSheet(context);
-                  },
-                  readOnly: true, // Prevent keyboard from appearing on tap
-                  decoration: InputDecoration(
-                    labelText: 'Violation group',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
+                const Text(
+                  'Violation group',
+                  style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                ),
+                CommonTextField(
+                  maxLines: 1,
+                  inputController: violateGroupController,
+                  isReadOnly: true,
+                  onTap: () => _buildViolationGroupBottomSheet(context),
                 ),
                 SizedBox(height: 20.0),
-                TextFormField(
-                  controller: violateTypeController,
+                const Text(
+                  'Violation type',
+                  style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                ),
+                CommonTextField(
+                  maxLines: 1,
+                  inputController: violateTypeController,
+                  isReadOnly: true,
                   onTap: () {
                     if (!isSelectedViolationGroup || violateGroupController.text.isEmpty) {
                       ScaffoldMessenger.of(context)
@@ -289,52 +269,16 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                       _buildViolationTypeBottomSheet(context);
                     }
                   },
-                  readOnly: true, // Prevent keyboard from appearing on tap
-                  decoration: InputDecoration(
-                    labelText: 'Violation type',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
                 ),
                 SizedBox(height: 20.0),
-                TextFormField(
-                  controller: codeController,
-                  decoration: InputDecoration(
-                    labelText: 'Code',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                ),
                 SizedBox(height: 20.0),
-                TextFormField(
-                  controller: descriptionController,
-                  maxLines: null,
-                  maxLength: 300,
-                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Description',
-                    counterText: '${descriptionController.text.length}/300',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
+                const Text(
+                  'Description',
+                  style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                ),
+                CommonTextField(
+                  maxLines: 3,
+                  inputController: descriptionController,
                 ),
                 SizedBox(height: 20.0),
                 Row(
@@ -342,8 +286,8 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   children: [
                     ElevatedButton.icon(
                       onPressed: _takePicture,
-                      icon: Icon(Icons.camera_alt),
-                      label: Text('Chụp ảnh'),
+                      icon: const Icon(Icons.camera_alt, color: Colors.white),
+                      label: const Text('Chụp ảnh', style: TextStyle(fontSize: 14, color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         shape: RoundedRectangleBorder(
@@ -357,8 +301,8 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                     ),
                     ElevatedButton.icon(
                       onPressed: _selectPicture,
-                      icon: Icon(Icons.photo_library),
-                      label: Text('Chọn ảnh'),
+                      icon: const Icon(Icons.photo_library, color: Colors.white),
+                      label: const Text('Chọn ảnh', style: TextStyle(fontSize: 14, color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         shape: RoundedRectangleBorder(
@@ -384,7 +328,37 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                     ),
                     itemCount: imageFiles.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return Image.file(imageFiles[index]);
+                      return Container(
+                        width: 120.0,
+                        height: 120.0,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26, // Shadow color
+                              blurRadius: 10.0, // Shadow blur radius
+                              offset: Offset(0, 5), // Shadow offset
+                            ),
+                          ],
+                          border: Border.all(
+                            color: Colors.white, // Border color
+                            width: 2.0, // Border width
+                          ),
+                          image: DecorationImage(
+                            image: FileImage(imageFiles[index]),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        padding: const EdgeInsets.all(8.0), // Padding inside the container
+                        margin: const EdgeInsets.all(8.0), // Margin outside the container
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Icon(Icons.close, color: Colors.red, size: 20.0),
+                          ],
+                        ),
+                      );
                     },
                   ),
                 SizedBox(height: 20.0),
@@ -400,7 +374,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                     ),
                     padding: EdgeInsets.symmetric(vertical: 15.0),
                   ),
-                  child: const Text('Gửi'),
+                  child: const Text('Gửi', style: TextStyle(color: Colors.white)),
                 ),
                 SizedBox(height: 20.0),
               ],

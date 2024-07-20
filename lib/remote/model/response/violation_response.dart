@@ -8,14 +8,15 @@ class ViolationResponse {
   int? violationGroupId;
   String? violationGroupName;
   int? teacherId;
-  String? code;
   String? violationName;
   String? description;
   String? date;
+  List<String>? imageUrls;
   String? createdAt;
   int? createdBy;
   String? updatedAt;
   String? updatedBy;
+  String? status;
 
   ViolationResponse(
       {this.violationId,
@@ -27,14 +28,15 @@ class ViolationResponse {
       this.violationGroupId,
       this.violationGroupName,
       this.teacherId,
-      this.code,
       this.violationName,
       this.description,
       this.date,
+      this.imageUrls,
       this.createdAt,
       this.createdBy,
       this.updatedAt,
-      this.updatedBy});
+      this.updatedBy,
+      this.status});
 
   ViolationResponse.fromJson(Map<String, dynamic> json) {
     violationId = json['violationId'];
@@ -46,14 +48,15 @@ class ViolationResponse {
     violationGroupId = json['violationGroupId'];
     violationGroupName = json['violationGroupName'];
     teacherId = json['teacherId'];
-    code = json['code'];
     violationName = json['violationName'];
     description = json['description'];
     date = json['date'];
+    imageUrls = json['imageUrls'].cast<String>();
     createdAt = json['createdAt'];
     createdBy = json['createdBy'];
     updatedAt = json['updatedAt'];
     updatedBy = json['updatedBy'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -67,14 +70,15 @@ class ViolationResponse {
     data['violationGroupId'] = violationGroupId;
     data['violationGroupName'] = violationGroupName;
     data['teacherId'] = teacherId;
-    data['code'] = code;
     data['violationName'] = violationName;
     data['description'] = description;
     data['date'] = date;
+    data['imageUrls'] = imageUrls;
     data['createdAt'] = createdAt;
     data['createdBy'] = createdBy;
     data['updatedAt'] = updatedAt;
     data['updatedBy'] = updatedBy;
+    data['status'] = status;
     return data;
   }
 }
