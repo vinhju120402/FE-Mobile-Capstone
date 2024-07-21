@@ -76,7 +76,7 @@ class EditviocationState extends State<Editviocation> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('You can only select up to 2 images.')),
+            SnackBar(content: Text('Bạn chỉ có thể chọn tối đa 2 hình ảnh.')),
           );
         }
       }
@@ -94,7 +94,7 @@ class EditviocationState extends State<Editviocation> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('You can only select up to 2 images.')),
+          const SnackBar(content: Text('Bạn chỉ có thể chọn tối đa 2 hình ảnh.')),
         );
       }
     }
@@ -162,14 +162,14 @@ class EditviocationState extends State<Editviocation> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Get Violation Failed'),
-              content: const Text('Violation not found. Please try again.'),
+              title: const Text('Lấy thông tin vi phạm thất bại'),
+              content: const Text('Không thể lấy thông tin vi phạm.'),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('OK'),
+                  child: const Text('Chấp nhận'),
                 ),
               ],
             ),
@@ -223,7 +223,7 @@ class EditviocationState extends State<Editviocation> {
       if (response == 200) {
         if (mounted) {
           context.pop();
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit violation success.')));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Chỉnh sửa vi phạm thành công.')));
         }
       }
     } catch (e) {
@@ -231,7 +231,7 @@ class EditviocationState extends State<Editviocation> {
         print(e);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit violation failed.')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Chỉnh sửa vi phạm thất bại.')));
       }
     }
   }
@@ -297,7 +297,7 @@ class EditviocationState extends State<Editviocation> {
                         ),
                         const SizedBox(height: 20.0),
                         const Text(
-                          'Time',
+                          'Thời gian',
                           style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                         ),
                         CommonTextField(
@@ -308,7 +308,7 @@ class EditviocationState extends State<Editviocation> {
                         ),
                         const SizedBox(height: 20.0),
                         const Text(
-                          'Violation group',
+                          'Nhóm vi phạm',
                           style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                         ),
                         CommonTextField(
@@ -319,7 +319,7 @@ class EditviocationState extends State<Editviocation> {
                         ),
                         const SizedBox(height: 20.0),
                         const Text(
-                          'Violation type',
+                          'Loại vi phạm',
                           style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                         ),
                         CommonTextField(
@@ -330,7 +330,7 @@ class EditviocationState extends State<Editviocation> {
                         ),
                         const SizedBox(height: 20.0),
                         const Text(
-                          'Description',
+                          'Mô tả',
                           style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                         ),
                         CommonTextField(

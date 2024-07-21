@@ -33,7 +33,7 @@ class NotificationScreen extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    'Showing ${notifications.length} results',
+                    'Hiển thị ${notifications.length} Kết quả',
                     style: TextStyle(
                       fontSize: 16.0,
                     ),
@@ -45,7 +45,7 @@ class NotificationScreen extends StatelessWidget {
               padding: EdgeInsets.all(16.0),
               child: CommonTextField(
                 border: 20.0,
-                hintText: 'Search',
+                hintText: 'Tìm kiếm thông báo',
                 onChanged: (value) {},
               ),
             ),
@@ -85,11 +85,11 @@ class NotificationScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              notifications[index]['message']!,
+                              notifications[index]['Nội Dung']!,
                               style: TextStyle(color: Colors.black, fontSize: 14.0, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              notifications[index]['date']!,
+                              notifications[index]['Ngày']!,
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 9.0,

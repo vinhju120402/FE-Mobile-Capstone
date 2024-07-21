@@ -11,7 +11,7 @@ class ContactScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppbar(
         onBack: () => context.pop(),
-        title: 'Contact Us',
+        title: 'Liên hệ trường học',
       ),
       body: const BaseMainContent(
         children: Column(
@@ -29,7 +29,7 @@ class ContactScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center, // Căn giữa nội dung
                     children: [
                       Text(
-                        'School Services',
+                        'Dịch vụ hỗ trợ trường học',
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,

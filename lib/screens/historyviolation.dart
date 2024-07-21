@@ -47,7 +47,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return Scaffold(
       appBar: CustomAppbar(
         onBack: () => context.pop(),
-        title: 'History Violation',
+        title: 'Lịch sử vi phạm',
       ),
       body: Stack(
         children: [
@@ -59,7 +59,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Row(
                     children: [
                       Text(
-                        'Showing $numberResult results',
+                        'Hiển thị $numberResult Kết quả',
                         style: TextStyle(
                           fontSize: 16.0,
                         ),
@@ -71,7 +71,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   padding: EdgeInsets.all(16.0),
                   child: CommonTextField(
                     border: 20.0,
-                    hintText: 'Search',
+                    hintText: 'Tìm kiếm',
                     onChanged: (value) {},
                   ),
                 ),

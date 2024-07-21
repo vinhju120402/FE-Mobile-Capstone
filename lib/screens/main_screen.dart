@@ -30,19 +30,19 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     categories = {
-      "Create Violation": {
+      "Tạo Vi Phạm": {
         "icon": const Icon(Icons.add, color: Colors.white, size: 30),
       },
-      "Rule": {
+      "Quy Định": {
         "icon": const Icon(Icons.rule, color: Colors.white, size: 30),
       },
-      "History Violation": {
+      "Lịch Sử Vi Phạm": {
         "icon": const Icon(Icons.history_edu, color: Colors.white, size: 30),
       },
-      "Profile": {
+      "Tài Khoản": {
         "icon": const Icon(Icons.person, color: Colors.white, size: 30),
       },
-      "Contact": {
+      "Liên Lạc": {
         "icon": const Icon(Icons.contact_emergency, color: Colors.white, size: 30),
       },
     };
@@ -54,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
     ];
 
     if (isAdmin == true) {
-      categories!.remove("Duty schedule");
+      categories!.remove("Lịch Trực");
     }
     getCurrentUser();
   }
@@ -150,7 +150,7 @@ Widget _buildUpcomingSchedule(BuildContext context) {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Upcoming Schedule',
+              'Lịch trực sắp tới',
               style: TextStyle(
                 fontSize: 18,
                 color: Color(0xFF55B5F3),
@@ -203,7 +203,7 @@ Widget _buildUpcomingSchedule(BuildContext context) {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'Go to details',
+                        'Xem chi tiết',
                         style: TextStyle(fontSize: 9, color: Colors.lightBlue),
                       ),
                       Icon(
@@ -329,7 +329,7 @@ Widget _buildOther(Map<String, Map<String, dynamic>>? categories) {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Category',
+              'Chức năng khác',
               style: TextStyle(
                 fontSize: 18,
                 color: Color(0xFF55B5F3),
@@ -371,9 +371,9 @@ class MenuItem {
 
 class MenuItems {
   static const List<MenuItem> item = [notifications, settings, logoutIcon];
-  static const settings = MenuItem(text: 'Settings', icon: Icons.settings);
-  static const notifications = MenuItem(text: 'Notifications', icon: Icons.notifications);
-  static const logoutIcon = MenuItem(text: 'Log Out', icon: Icons.logout);
+  static const settings = MenuItem(text: 'Cài Đặt', icon: Icons.settings);
+  static const notifications = MenuItem(text: 'Thông Báo', icon: Icons.notifications);
+  static const logoutIcon = MenuItem(text: 'Đăng Xuất', icon: Icons.logout);
 
   static Widget buildItem(MenuItem item) {
     return Row(
@@ -425,17 +425,17 @@ Widget _buildCardCategoryItem(
   return GestureDetector(
     onTap: () {
       // Navigate to the respective screen based on the tapped category
-      if (categoryName == "Rule") {
+      if (categoryName == "Quy Định") {
         context.push(ScreenRoute.ruleScreen);
-      } else if (categoryName == "Create Violation") {
+      } else if (categoryName == "Tạo Vi Phạm") {
         context.push(ScreenRoute.createViolationScreen);
-      } else if (categoryName == "Contact") {
+      } else if (categoryName == "Liên Lạc") {
         context.push(ScreenRoute.contactScreen);
-      } else if (categoryName == "Profile") {
+      } else if (categoryName == "Tài Khoản") {
         context.push(ScreenRoute.profileScreen);
-      } else if (categoryName == "History Violation") {
+      } else if (categoryName == "Lịch Sử Vi Phạm") {
         context.push(ScreenRoute.violationHistoryScreen);
-      } else if (categoryName == "Duty schedule") {
+      } else if (categoryName == "Lịch Trực") {
         context.push(ScreenRoute.dutyScheduleScreen);
       }
     },

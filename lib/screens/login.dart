@@ -30,7 +30,7 @@ class LoginPageState extends State<LoginPage> {
     _progressDialog = ProgressDialog(context: context);
     _progressDialog!.show(
       max: 100,
-      msg: 'please wait ..',
+      msg: 'vui lòng chờ giây lát ..',
       barrierColor: Colors.transparent,
     );
   }
@@ -43,7 +43,7 @@ class LoginPageState extends State<LoginPage> {
       if (phoneNumber.isEmpty || password.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text(' Please enter your phone number and password!')));
+              .showSnackBar(const SnackBar(content: Text(' Vui lòng nhập số điện thoại và mật khẩu của bạn!')));
           return;
         }
       }
@@ -79,8 +79,8 @@ class LoginPageState extends State<LoginPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Login Failed'),
-            content: const Text('Please check your phone number and password'),
+            title: const Text('Đăng nhập thất bai'),
+            content: const Text('Vui lòng kiểm tra số điện thoại và mật khẩu của bạn'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -106,14 +106,14 @@ class LoginPageState extends State<LoginPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildLogoContent(screenHeight, screenWidth),
-          const Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          const Text('Đăng nhập', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: CommonTextField(
               maxLines: 1,
               inputController: phoneNumberController,
-              hintText: 'Phone Number',
+              hintText: 'Số Điện Thoại',
             ),
           ),
           const SizedBox(height: 20), // Khoảng cách giữa dòng chữ và ô nhập liệu
@@ -122,7 +122,7 @@ class LoginPageState extends State<LoginPage> {
             child: CommonTextField(
               maxLines: 1,
               inputController: passwordController,
-              hintText: 'Password',
+              hintText: 'Mật Khẩu',
               isPassword: true,
             ),
           ),
@@ -142,7 +142,7 @@ class LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: const Center(
                   child: Text(
-                    'Sign In',
+                    'Đăng Nhập',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,

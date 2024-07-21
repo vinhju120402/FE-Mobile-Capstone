@@ -29,7 +29,7 @@ class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Duty Schedule'),
+        title: const Text('Lịch trực'),
         backgroundColor: const Color.fromARGB(189, 7, 206, 43),
       ),
       body: Container(

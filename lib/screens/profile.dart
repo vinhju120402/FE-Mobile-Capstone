@@ -41,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
-        title: 'Profile',
+        title: 'Tài khoản',
         onBack: () => context.pop(),
       ),
       body: BaseMainContent(
@@ -120,7 +120,7 @@ Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditi
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Name',
+          'Tên',
           style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
         ),
         CommonTextField(
@@ -129,7 +129,7 @@ Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditi
         ),
         SizedBox(height: 20),
         Text(
-          'School Name',
+          'Tên Trường',
           style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
         ),
         CommonTextField(
@@ -137,7 +137,7 @@ Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditi
         ),
         SizedBox(height: 20),
         Text(
-          'Address',
+          'Địa chỉ',
           style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
         ),
         CommonTextField(
@@ -146,7 +146,7 @@ Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditi
         ),
         SizedBox(height: 20),
         Text(
-          'Phone number',
+          'Số điện thoại',
           style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
         ),
         CommonTextField(
@@ -169,7 +169,7 @@ Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditi
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: const Center(
                 child: Text(
-                  'Edit Profile',
+                  'Chỉnh sửa thông tin',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,

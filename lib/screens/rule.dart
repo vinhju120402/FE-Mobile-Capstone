@@ -41,7 +41,7 @@ class _RuleScreenState extends State<RuleScreen> {
     return Scaffold(
       appBar: CustomAppbar(
         onBack: () => context.pop(),
-        title: 'Rule',
+        title: 'Quy định',
       ),
       body: Stack(
         children: [
@@ -66,7 +66,7 @@ class _RuleScreenState extends State<RuleScreen> {
                   padding: EdgeInsets.all(16.0),
                   child: CommonTextField(
                     border: 20.0,
-                    hintText: 'Search',
+                    hintText: 'Tìm kiếm',
                     onChanged: (value) {},
                   ),
                 ),
@@ -114,7 +114,7 @@ class _RuleScreenState extends State<RuleScreen> {
                                   style: TextStyle(color: Colors.black, fontSize: 9.0, fontStyle: FontStyle.italic),
                                 ),
                                 Text(
-                                  'Minus point: -${ruleResponse[index].minusPoints ?? ''}',
+                                  'Điểm Trừ: -${ruleResponse[index].minusPoints ?? ''}',
                                   style: TextStyle(color: Colors.red, fontSize: 9.0, fontStyle: FontStyle.italic),
                                 ),
                               ],

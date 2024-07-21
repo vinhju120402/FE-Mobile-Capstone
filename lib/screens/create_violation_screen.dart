@@ -12,7 +12,6 @@ import 'package:eduappui/widget/app_bar.dart';
 import 'package:eduappui/widget/base_main_content.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
@@ -72,7 +71,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('You can only select up to 2 images.')),
+            SnackBar(content: Text('Bạn chỉ có thể chọn tối đa 2 ảnh.')),
           );
         }
       }
@@ -90,7 +89,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('You can only select up to 2 images.')),
+          SnackBar(content: Text('Bạn chỉ có thể chọn tối đa 2 ảnh.')),
         );
       }
     }
@@ -153,7 +152,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       if (res == 201) {
         if (mounted) {
           context.pop();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Create violation success.')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Tạo vi phạm thành công.')));
         }
       }
     } catch (e) {
@@ -161,7 +160,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
         print(e);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Create violation failed.')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Tạo vi phạm thất bại.')));
       }
     }
   }
@@ -190,7 +189,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     _progressDialog = ProgressDialog(context: context);
     _progressDialog!.show(
       max: 100,
-      msg: 'please wait ..',
+      msg: 'Vui lòng chờ giây lát ..',
       progressBgColor: Colors.red,
     );
   }
@@ -200,7 +199,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     return Scaffold(
       appBar: CustomAppbar(
         onBack: () => context.pop(),
-        title: 'Create Violation',
+        title: 'Tạo vi phạm',
       ),
       body: BaseMainContent(
         children: SingleChildScrollView(
@@ -210,7 +209,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Text(
-                  'Class',
+                  'Lớp',
                   style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                 ),
                 CommonTextField(
@@ -221,7 +220,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                 ),
                 SizedBox(height: 20.0),
                 const Text(
-                  'Student name',
+                  'Tên học sinh',
                   style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                 ),
                 CommonTextField(
@@ -232,7 +231,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                 ),
                 SizedBox(height: 20.0),
                 const Text(
-                  'Time',
+                  'Thời gian',
                   style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                 ),
                 CommonTextField(
@@ -243,7 +242,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                 ),
                 SizedBox(height: 20.0),
                 const Text(
-                  'Violation group',
+                  'Nhóm vi phạm',
                   style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                 ),
                 CommonTextField(
@@ -254,7 +253,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                 ),
                 SizedBox(height: 20.0),
                 const Text(
-                  'Violation type',
+                  'Loại vi phạm',
                   style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                 ),
                 CommonTextField(
@@ -264,7 +263,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   onTap: () {
                     if (!isSelectedViolationGroup || violateGroupController.text.isEmpty) {
                       ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text('Please select violation group first.')));
+                          .showSnackBar(SnackBar(content: Text('Vui lòng chọn nhóm vi phạm trước.')));
                     } else {
                       _buildViolationTypeBottomSheet(context);
                     }
@@ -273,7 +272,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                 SizedBox(height: 20.0),
                 SizedBox(height: 20.0),
                 const Text(
-                  'Description',
+                  'Mô tả',
                   style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                 ),
                 CommonTextField(

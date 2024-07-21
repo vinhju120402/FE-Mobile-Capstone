@@ -31,12 +31,12 @@ class SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Select Language'),
+          title: Text('Chọn ngôn ngữ'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text('English'),
+                title: Text('TIêng Việt'),
                 onTap: () {
                   context.pop();
                 },
@@ -50,7 +50,7 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   _rateReviewOntap() {
     RateMyApp rateMyApp = RateMyApp(
-      preferencesPrefix: 'rateMyApp_',
+      preferencesPrefix: 'Đánh giá ứng dụng',
       minDays: 7,
       minLaunches: 10,
       remindDays: 7,
@@ -58,12 +58,12 @@ class SettingsScreenState extends State<SettingsScreen> {
     );
     rateMyApp.showStarRateDialog(
       context,
-      title: 'Rate this app',
-      message: 'You like this app ? Then take a little bit of your time to leave a rating :',
+      title: 'Đánh giá ứng dụng',
+      message: 'Bạn thích ứng dụng này? Sau đó hãy dành chút thời gian của bạn để để lại đánh giá :',
       actionsBuilder: (context, stars) {
         return [
           TextButton(
-            child: Text('OK'),
+            child: Text('Chấp nhận'),
             onPressed: () async {
               context.pop();
             },
@@ -86,7 +86,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
-        title: 'Settings',
+        title: 'Cài Đặt',
         onBack: () => context.pop(),
       ),
       body: BaseMainContent(
@@ -110,7 +110,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       _buildSettingItem(
                         Icons.language,
-                        'Language',
+                        'Ngôn ngữ',
                         onTap: _languageOntap,
                       ),
                       SizedBox(height: 20),
@@ -128,7 +128,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                       SizedBox(height: 20),
                       _buildSettingItem(
                         Icons.rate_review,
-                        'Rate the Mypass app',
+                        'Đánh giá ứng dụng',
                         onTap: _rateReviewOntap,
                       ),
                       SizedBox(height: 20),
@@ -138,11 +138,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                         onTap: () => context.push(ScreenRoute.faqScreen),
                       ),
                       SizedBox(height: 20),
-                      _buildSettingItem(Icons.info, 'About app'),
+                      _buildSettingItem(Icons.info, 'Thông tin ứng dụng'),
                       SizedBox(height: 20),
                       _buildSettingItem(
                         Icons.logout,
-                        'Logout',
+                        'Đăng xuất',
                         color: Colors.red,
                         onTap: () => logout(localClientImpl, secureStorageImpl),
                       ),
