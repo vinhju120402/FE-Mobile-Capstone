@@ -1,7 +1,10 @@
 import 'package:eduappui/remote/model/response/schedule_response.dart';
 import 'package:eduappui/remote/service/repository/schedule_repository.dart';
+import 'package:eduappui/widget/app_bar.dart';
+import 'package:eduappui/widget/base_main_content.dart';
 import 'package:eduappui/widget/schedule_item.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DutyScheduleScreen extends StatefulWidget {
   const DutyScheduleScreen({super.key});
@@ -13,6 +16,7 @@ class DutyScheduleScreen extends StatefulWidget {
 class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
   ScheduleRepositoryImpl scheduleRepository = ScheduleRepositoryImpl();
   List<ScheduleResponse> scheduleList = [];
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
@@ -22,52 +26,39 @@ class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
   getSchedule() async {
     var schedule = await scheduleRepository.getDutySchedule();
     scheduleList = schedule;
+    isLoading = false;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lịch trực'),
-        backgroundColor: const Color.fromARGB(189, 7, 206, 43),
+      appBar: CustomAppbar(
+        onBack: () => context.pop(),
+        title: 'Lịch trực',
       ),
-      body: Container(
-        color: const Color.fromARGB(226, 134, 253, 237),
-        child: Column(
-          children: [
-            Container(
-              color: const Color.fromARGB(189, 7, 206, 43),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : BaseMainContent(
+              children: Column(
                 children: [
-                  Icon(Icons.arrow_back, color: Colors.white),
-                  Text(
-                    '1/2/2024-7/2/2024',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: scheduleList.length,
+                    itemBuilder: (context, index) {
+                      return ScheduleItem(
+                        className: scheduleList[index].classId.toString(),
+                        supervisorName: scheduleList[index].supervisorName ?? '',
+                        from: scheduleList[index].from.toString(),
+                        to: scheduleList[index].to.toString(),
+                        teacherName: scheduleList[index].teacherName ?? '',
+                      );
+                    },
                   ),
-                  Icon(Icons.arrow_forward, color: Colors.white),
                 ],
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: scheduleList.length,
-                itemBuilder: (context, index) {
-                  return ScheduleItem(
-                    className: scheduleList[index].classId.toString(),
-                    supervisorName: scheduleList[index].supervisorName ?? '',
-                    date: scheduleList[index].from.toString(),
-                    time: scheduleList[index].to.toString(),
-                    teacherName: scheduleList[index].teacherName ?? '',
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

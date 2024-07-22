@@ -2,11 +2,14 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:eduappui/remote/constant/constants.dart';
 import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/local/secure_storage.dart';
+import 'package:eduappui/remote/model/response/schedule_response.dart';
+import 'package:eduappui/remote/service/repository/schedule_repository.dart';
 import 'package:eduappui/remote/service/repository/user_repository.dart';
 import 'package:eduappui/routers/screen_route.dart';
 import 'package:eduappui/widget/base_main_content.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -25,6 +28,9 @@ class _MainScreenState extends State<MainScreen> {
   int? userId;
   String? userName;
   bool isLoading = true;
+  ScheduleRepositoryImpl scheduleRepository = ScheduleRepositoryImpl();
+  List<ScheduleResponse> scheduleList = [];
+  ScheduleResponse? firstOngoing;
 
   @override
   void initState() {
@@ -57,6 +63,7 @@ class _MainScreenState extends State<MainScreen> {
       categories!.remove("Lịch Trực");
     }
     getCurrentUser();
+    getSchedule();
   }
 
   getCurrentUser() async {
@@ -68,6 +75,22 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  getSchedule() async {
+    var schedule = await scheduleRepository.getDutySchedule();
+    scheduleList = schedule;
+    firstOngoing = getFirstOngoingSchedule(scheduleList);
+    setState(() {});
+  }
+
+  ScheduleResponse? getFirstOngoingSchedule(List<ScheduleResponse> schedules) {
+    for (var schedule in schedules) {
+      if (schedule.status == 'ONGOING') {
+        return schedule;
+      }
+    }
+    return null;
   }
 
   @override
@@ -83,6 +106,7 @@ class _MainScreenState extends State<MainScreen> {
                   categories: categories,
                   localClientImpl: localClientImpl,
                   secureStorageImpl: secureStorageImpl,
+                  firstOngoing: firstOngoing,
                 )
         ],
       ),
@@ -96,13 +120,15 @@ class MainScreenContent extends StatelessWidget {
   final Map<String, Map<String, dynamic>>? categories;
   final LocalClientImpl localClientImpl;
   final SecureStorageImpl secureStorageImpl;
+  final ScheduleResponse? firstOngoing;
   const MainScreenContent(
       {super.key,
       this.categories,
       required this.localClientImpl,
       required this.secureStorageImpl,
       required this.isAdmin,
-      required this.userName});
+      required this.userName,
+      this.firstOngoing});
 
   @override
   Widget build(BuildContext context) {
@@ -127,8 +153,8 @@ class MainScreenContent extends StatelessWidget {
               children: Column(
             children: [
               Visibility(
-                visible: isAdmin == false,
-                child: _buildUpcomingSchedule(context),
+                // visible: isAdmin == false,
+                child: _buildUpcomingSchedule(context, firstOngoing),
               ),
               _buildOther(categories),
             ],
@@ -140,22 +166,19 @@ class MainScreenContent extends StatelessWidget {
   }
 }
 
-Widget _buildUpcomingSchedule(BuildContext context) {
+Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoing) {
   return Padding(
     padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
     child: Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.all(1.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Lịch trực sắp tới',
-              style: TextStyle(
-                fontSize: 18,
-                color: Color(0xFF55B5F3),
-                fontWeight: FontWeight.w600,
-              ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Lịch trực sắp tới',
+            style: TextStyle(
+              fontSize: 18,
+              color: Color(0xFF55B5F3),
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -163,19 +186,30 @@ Widget _buildUpcomingSchedule(BuildContext context) {
         Card(
           color: Colors.white,
           elevation: 3,
-          child: SizedBox(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             width: double.infinity,
-            height: 100,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Expanded(
-                  child: Center(
-                    child: Text(
-                      '1/2/2024',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (firstOngoing != null)
+                        Text(
+                          DateFormat('dd/MM/yyyy').format(DateTime.parse(firstOngoing.from ?? '')),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      Text('đến', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                      if (firstOngoing != null)
+                        Text(
+                          DateFormat('dd/MM/yyyy').format(DateTime.parse(firstOngoing.to ?? '')),
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                    ],
                   ),
                 ),
                 Container(
@@ -184,14 +218,33 @@ Widget _buildUpcomingSchedule(BuildContext context) {
                   color: Colors.black,
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Thời gian: 7h-8h', style: TextStyle(fontSize: 12)),
+                      Text('Sao Đỏ:', style: TextStyle(fontSize: 12)),
+                      Text(firstOngoing?.supervisorName ?? '',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       SizedBox(height: 10),
-                      Text('Lớp: 12A1', style: TextStyle(fontSize: 12)),
+                      Text('Giám Thị:', style: TextStyle(fontSize: 12)),
+                      Text(firstOngoing?.teacherName ?? '',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 10),
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Lớp: ',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            TextSpan(
+                              text: firstOngoing?.classId.toString() ?? '',
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -370,9 +423,8 @@ class MenuItem {
 }
 
 class MenuItems {
-  static const List<MenuItem> item = [notifications, settings, logoutIcon];
+  static const List<MenuItem> item = [settings, logoutIcon];
   static const settings = MenuItem(text: 'Cài Đặt', icon: Icons.settings);
-  static const notifications = MenuItem(text: 'Thông Báo', icon: Icons.notifications);
   static const logoutIcon = MenuItem(text: 'Đăng Xuất', icon: Icons.logout);
 
   static Widget buildItem(MenuItem item) {
@@ -399,9 +451,6 @@ class MenuItems {
 Future<void> onChanged(
     BuildContext context, MenuItem item, LocalClientImpl localClientImpl, SecureStorageImpl secureStorage) async {
   switch (item) {
-    case MenuItems.notifications:
-      context.push(ScreenRoute.notificationPage);
-      break;
     case MenuItems.settings:
       context.push(ScreenRoute.settingsScreen);
       break;

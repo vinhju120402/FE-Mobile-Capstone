@@ -7,6 +7,7 @@ class ScheduleResponse {
   String? teacherName;
   String? from;
   String? to;
+  String? status;
 
   ScheduleResponse(
       {this.scheduleId,
@@ -16,7 +17,8 @@ class ScheduleResponse {
       this.teacherId,
       this.teacherName,
       this.from,
-      this.to});
+      this.to,
+      this.status});
 
   ScheduleResponse.fromJson(Map<String, dynamic> json) {
     scheduleId = json['scheduleId'];
@@ -27,6 +29,7 @@ class ScheduleResponse {
     teacherName = json['teacherName'];
     from = json['from'];
     to = json['to'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -39,11 +42,7 @@ class ScheduleResponse {
     data['teacherName'] = teacherName;
     data['from'] = from;
     data['to'] = to;
+    data['status'] = status;
     return data;
-  }
-
-  @override
-  String toString() {
-    return 'ScheduleResponse{scheduleId: $scheduleId, classId: $classId, supervisorId: $supervisorId, supervisorName: $supervisorName, teacherId: $teacherId, teacherName: $teacherName, from: $from, to: $to}';
   }
 }

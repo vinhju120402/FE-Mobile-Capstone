@@ -21,6 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController addrress = TextEditingController();
   TextEditingController phone = TextEditingController();
+  TextEditingController school = TextEditingController();
 
   getCurrentUser() async {
     userId = int.parse(await localClientImpl.readData(Constants.user_id));
@@ -28,6 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     nameController.text = response.userName ?? '';
     addrress.text = response.address ?? '';
     phone.text = response.phone ?? '';
+    school.text = response.schoolName ?? '';
     setState(() {});
   }
 
@@ -49,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             const SizedBox(height: 16.0),
             _buildAvatarSection('https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg'),
-            _buildPersonalInfoSection(nameController, addrress, phone),
+            _buildPersonalInfoSection(nameController, addrress, phone, school),
           ],
         ),
       ),
@@ -113,7 +115,7 @@ Widget _buildAvatarSection(String image) {
 }
 
 Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditingController addrressController,
-    TextEditingController phoneNumberController) {
+    TextEditingController phoneNumberController, TextEditingController schoolController) {
   return Padding(
     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
     child: Column(
@@ -126,6 +128,7 @@ Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditi
         CommonTextField(
           maxLines: 1,
           inputController: nameController,
+          isDisable: true,
         ),
         SizedBox(height: 20),
         Text(
@@ -134,6 +137,8 @@ Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditi
         ),
         CommonTextField(
           maxLines: 1,
+          inputController: schoolController,
+          isDisable: true,
         ),
         SizedBox(height: 20),
         Text(
@@ -143,6 +148,7 @@ Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditi
         CommonTextField(
           maxLines: 1,
           inputController: addrressController,
+          isDisable: true,
         ),
         SizedBox(height: 20),
         Text(
@@ -152,33 +158,34 @@ Widget _buildPersonalInfoSection(TextEditingController nameController, TextEditi
         CommonTextField(
           maxLines: 1,
           inputController: phoneNumberController,
+          isDisable: true,
         ),
         SizedBox(height: 30),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue, // Màu nền xanh cho nút Sign In
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20), // Bo góc tròn
-              ),
-            ),
-            child: Container(
-              width: double.infinity, // Tự động mở rộng chiều dài
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: const Center(
-                child: Text(
-                  'Chỉnh sửa thông tin',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(8.0),
+        //   child: ElevatedButton(
+        //     onPressed: () {},
+        //     style: ElevatedButton.styleFrom(
+        //       backgroundColor: Colors.blue, // Màu nền xanh cho nút Sign In
+        //       shape: RoundedRectangleBorder(
+        //         borderRadius: BorderRadius.circular(20), // Bo góc tròn
+        //       ),
+        //     ),
+        //     child: Container(
+        //       width: double.infinity, // Tự động mở rộng chiều dài
+        //       padding: const EdgeInsets.symmetric(vertical: 16),
+        //       child: const Center(
+        //         child: Text(
+        //           'Chỉnh sửa thông tin',
+        //           style: TextStyle(
+        //             fontSize: 16,
+        //             color: Colors.white,
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     ),
   );

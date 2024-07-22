@@ -149,6 +149,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     );
     try {
       var res = await violationRepository.createViolation(violationRequest);
+      showProgress();
       if (res == 201) {
         if (mounted) {
           context.pop();

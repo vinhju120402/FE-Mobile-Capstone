@@ -2,64 +2,74 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ScheduleItem extends StatelessWidget {
-  final String date;
-  final String time;
+  final String from;
+  final String to;
   final String supervisorName;
   final String className;
   final String teacherName;
 
   const ScheduleItem(
       {super.key,
-      required this.date,
-      required this.time,
+      required this.from,
+      required this.to,
       required this.supervisorName,
       required this.className,
       required this.teacherName});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black)),
-        color: Color.fromARGB(226, 134, 253, 237),
+    return Card(
+      color: Colors.white,
+      elevation: 4.0,
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
       ),
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Center(
-              child: Text(
-                DateFormat.yMMMEd().format(DateTime.parse(date)),
-                style: TextStyle(fontSize: 14),
-                textAlign: TextAlign.center,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    DateFormat('dd/MM/yyyy').format(DateTime.parse(from)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                  Text('đến', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  Text(
+                    DateFormat('dd/MM/yyyy').format(DateTime.parse(to)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
             ),
-          ),
-          Container(
-            height: 130,
-            width: 1,
-            color: Colors.black,
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Thời gian: ${DateFormat.yMMMEd().format(DateTime.parse(date))}'),
-                SizedBox(height: 10),
-                Text('Họ và Tên: $supervisorName'),
-                SizedBox(height: 10),
-                Text('Lớp: $className'),
-                SizedBox(height: 10),
-                Text('Giám Thị: $teacherName'),
-                SizedBox(height: 10),
-              ],
+            Container(
+              height: 130,
+              width: 1,
+              color: Colors.black,
             ),
-          ),
-        ],
+            SizedBox(width: 16),
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Sao Đỏ: $supervisorName'),
+                  SizedBox(height: 10),
+                  Text('Lớp: $className'),
+                  SizedBox(height: 10),
+                  Text('Giám Thị: $teacherName'),
+                  SizedBox(height: 10),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
