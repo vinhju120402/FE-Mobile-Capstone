@@ -180,7 +180,7 @@ class EditviocationState extends State<Editviocation> {
       setState(() {});
     } on PlatformException catch (e) {
       if (kDebugMode) {
-        print('Error: ${e.message}');
+        print('Lỗi: ${e.message}');
       }
     }
   }
