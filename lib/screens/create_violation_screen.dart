@@ -1,12 +1,17 @@
 import 'dart:io';
+import 'package:eduappui/remote/constant/constants.dart';
+import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/request/violation_request.dart';
 import 'package:eduappui/remote/model/response/class_reponse.dart';
+import 'package:eduappui/remote/model/response/school_year_response.dart';
 import 'package:eduappui/remote/model/response/student_in_class_response.dart';
 import 'package:eduappui/remote/model/response/violation_group_response.dart';
 import 'package:eduappui/remote/model/response/violation_type_response.dart';
 import 'package:eduappui/remote/service/repository/class_repository.dart';
+import 'package:eduappui/remote/service/repository/school_year_repository.dart';
 import 'package:eduappui/remote/service/repository/student_in_class_repository.dart';
 import 'package:eduappui/remote/service/repository/violation_repository.dart';
+import 'package:eduappui/routers/screen_route.dart';
 import 'package:eduappui/widget/TextField/common_text_field.dart';
 import 'package:eduappui/widget/app_bar.dart';
 import 'package:eduappui/widget/base_main_content.dart';
@@ -42,6 +47,10 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   int? studentInClassId;
   int? violationTypeId;
   ProgressDialog? _progressDialog;
+  SchoolYearRepositoryImpl schoolYearRepository = SchoolYearRepositoryImpl();
+  LocalClientImpl localClientImpl = LocalClientImpl();
+  List<SchoolYearResponse> schoolYear = [];
+  final TextEditingController schoolYearController = TextEditingController();
 
   @override
   void initState() {
@@ -49,6 +58,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     _getCurrentTime();
     getViolationGroup();
     getClassList();
+    getSchoolYear();
   }
 
   @override
@@ -138,7 +148,10 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   void createViolation() async {
     List<File>? listImage = [];
     listImage = imageFiles;
+    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
     ViolationRequest violationRequest = ViolationRequest(
+      schoolId: schoolId,
+      schoolYear: schoolYearController.text.isNotEmpty ? int.parse(schoolYearController.text) : 0,
       studentInClassId: studentInClassId ?? 0,
       classId: classId ?? 0,
       date: DateTime.parse(timeController.text),
@@ -152,8 +165,8 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       showProgress();
       if (res == 201) {
         if (mounted) {
-          context.pop();
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Tạo vi phạm thành công.')));
+          GoRouter.of(context).go(ScreenRoute.homeScreen);
         }
       }
     } catch (e) {
@@ -195,6 +208,14 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     );
   }
 
+  void getSchoolYear() async {
+    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
+    var response = await schoolYearRepository.getListSchoolYear(schoolId);
+    if (response.isNotEmpty) {
+      schoolYear = response;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -209,6 +230,16 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const Text(
+                  'Niên khóa',
+                  style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                ),
+                CommonTextField(
+                  maxLines: 1,
+                  isReadOnly: true,
+                  inputController: schoolYearController,
+                  onTap: () => _buildSchoolYearList(context),
+                ),
                 const Text(
                   'Lớp',
                   style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
@@ -605,6 +636,44 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                             print('ID học sinh: ${filteredStudentInClass[index].studentId}');
                           }
                           studentInClassId = filteredStudentInClass[index].studentInClassId;
+                          Navigator.pop(context);
+                          setState(() {});
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {});
+      }
+    });
+  }
+
+  void _buildSchoolYearList(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: schoolYear.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(schoolYear[index].year.toString()),
+                        onTap: () {
+                          schoolYearController.text = schoolYear[index].year.toString();
+                          if (kDebugMode) {
+                            print('Niên khóa: ${schoolYear[index].year}');
+                          }
                           Navigator.pop(context);
                           setState(() {});
                         },

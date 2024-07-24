@@ -15,7 +15,7 @@ class ViolationResponse {
   String? createdAt;
   int? createdBy;
   String? updatedAt;
-  String? updatedBy;
+  int? updatedBy;
   String? status;
 
   ViolationResponse(

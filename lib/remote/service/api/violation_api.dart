@@ -5,6 +5,7 @@ import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/request/violation_request.dart';
 import 'package:eduappui/remote/model/response/violation_response.dart';
 import 'package:eduappui/remote/network/network_client.dart';
+import 'package:snackbar/snackbar.dart';
 
 class ViolationAPI {
   final NetworkClient networkClient = NetworkClient();
@@ -53,6 +54,8 @@ class ViolationAPI {
     }
 
     FormData formData = FormData.fromMap({
+      'schoolId': violationRequest.schoolId,
+      'year': violationRequest.schoolYear,
       'classId': violationRequest.classId,
       'studentInClassId': violationRequest.studentInClassId,
       'violationTypeId': violationRequest.violationTypeId,
@@ -71,9 +74,10 @@ class ViolationAPI {
       requestBody: formData,
     );
 
-    if (response.statusCode == 201 || response.statusCode == 200) {
+    if (response.data['success'] == true) {
       return 201;
     } else {
+      snack(response.data['message']);
       throw ServerException.withException(
         dioError: DioException(
           response: response,

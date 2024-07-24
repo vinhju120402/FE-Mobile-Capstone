@@ -30,8 +30,11 @@ class Constants {
 
   static String get_user = '$api_base_url/users';
 
+  static String get_school_year = '$api_base_url/school-years';
+
   // Constant String
   static const String access_token = 'access_token';
   static const String expired_at = 'expired_at';
   static const String user_id = 'user_id';
+  static const String school_id = 'school_id';
 }

@@ -52,7 +52,8 @@ dependencies:
   rate_my_app: ^2.2.0
   cached_network_image: ^3.2.3
   flutter_cache_manager: ^3.1.2
-  path_provider: ^2.0.10  
+  path_provider: ^2.0.10
+  snackbar: ^1.0.2
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,8 @@
 import 'dart:io';
 
 class ViolationRequest {
+  int? schoolId;
+  int? schoolYear;
   int classId;
   int studentInClassId;
   int violationTypeId;
@@ -11,6 +13,8 @@ class ViolationRequest {
   List<File>? images;
 
   ViolationRequest({
+    this.schoolId,
+    this.schoolYear,
     required this.classId,
     required this.studentInClassId,
     required this.violationTypeId,
@@ -23,6 +27,8 @@ class ViolationRequest {
 
   factory ViolationRequest.fromJson(Map<String, dynamic> json) {
     return ViolationRequest(
+      schoolId: json['SchoolId'],
+      schoolYear: json['Year'],
       classId: json['ClassId'],
       studentInClassId: json['StudentInClassId'],
       violationTypeId: json['ViolationTypeId'],
@@ -36,6 +42,8 @@ class ViolationRequest {
 
   Map<String, dynamic> toJson() {
     return {
+      'SchoolId': schoolId,
+      'Year': schoolYear,
       'ClassId': classId,
       'StudentInClassId': studentInClassId,
       'ViolationTypeId': violationTypeId,
@@ -49,6 +57,6 @@ class ViolationRequest {
 
   @override
   String toString() {
-    return 'ViolationRequest(classId: $classId, studentInClassId: $studentInClassId, violationTypeId: $violationTypeId, teacherId: $teacherId, violationName: $violationName, description: $description, date: $date, images: $images)';
+    return 'ViolationRequest(SchoolId: $schoolId, SchoolYear: $schoolYear ,classId: $classId, studentInClassId: $studentInClassId, violationTypeId: $violationTypeId, teacherId: $teacherId, violationName: $violationName, description: $description, date: $date, images: $images)';
   }
 }

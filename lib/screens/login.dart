@@ -54,6 +54,7 @@ class LoginPageState extends State<LoginPage> {
         Map<String, dynamic> decodedToken = JwtDecoder.decode(response.token!);
         await localClientImpl.saveData(Constants.expired_at, decodedToken['exp'].toString());
         await localClientImpl.saveData(Constants.user_id, decodedToken['UserId']);
+        await localClientImpl.saveData(Constants.school_id, decodedToken['SchoolId']);
         if (decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] == 'STUDENT_SUPERVISOR') {
           if (kDebugMode) {
             print(
