@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:eduappui/remote/constant/constants.dart';
 import 'package:eduappui/remote/errors/exceptions.dart';
+import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/request/violation_request.dart';
 import 'package:eduappui/remote/model/response/violation_response.dart';
 import 'package:eduappui/remote/network/network_client.dart';
@@ -61,9 +62,11 @@ class ViolationAPI {
       'date': violationRequest.date?.toIso8601String(),
       'images': imageFiles,
     });
+    LocalClientImpl localClientImpl = LocalClientImpl();
+    bool isTeacher = await localClientImpl.readData('isAdmin');
 
     final response = await networkClient.invoke(
-      Constants.create_student_violation,
+      isTeacher ? Constants.create_teacher_violation : Constants.create_student_violation,
       RequestType.post,
       requestBody: formData,
     );

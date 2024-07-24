@@ -20,6 +20,8 @@ class Constants {
 
   static String create_student_violation = '$api_base_url/violations/student';
 
+  static String create_teacher_violation = '$api_base_url/violations/supervisor';
+
   static String edit_violation_history = '$api_base_url/violations';
 
   static String get_duty_schedule = '$api_base_url/patrol-schedules';
