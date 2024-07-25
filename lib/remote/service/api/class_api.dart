@@ -6,8 +6,9 @@ import 'package:eduappui/remote/network/network_client.dart';
 class ClassApi {
   final NetworkClient networkClient = NetworkClient();
 
-  Future getListClass({Map<String, String>? sortOrders}) async {
-    final response = await networkClient.invoke(Constants.class_list, RequestType.get, queryParameters: sortOrders);
+  Future getListClass(int schoolId, {Map<String, String>? sortOrders}) async {
+    final response = await networkClient.invoke("${Constants.class_list}/school/$schoolId", RequestType.get,
+        queryParameters: sortOrders);
 
     if (response.statusCode == 200) {
       if (response.data['data'] == null) {

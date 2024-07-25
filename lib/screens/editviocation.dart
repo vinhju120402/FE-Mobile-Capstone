@@ -195,7 +195,8 @@ class EditviocationState extends State<Editviocation> {
   }
 
   Future<void> getClassList() async {
-    var response = await classRepository.getListClass();
+    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
+    var response = await classRepository.getListClass(schoolId);
     classList = response;
   }
 

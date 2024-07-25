@@ -51,6 +51,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   LocalClientImpl localClientImpl = LocalClientImpl();
   List<SchoolYearResponse> schoolYear = [];
   final TextEditingController schoolYearController = TextEditingController();
+  int? schoolYearId;
   DateTime? pickerStartDate;
   DateTime? pickerEndDate;
 
@@ -59,7 +60,6 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     super.initState();
     getSchoolYear();
     getViolationGroup();
-    getClassList();
   }
 
   @override
@@ -191,8 +191,10 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   }
 
   void getClassList() async {
-    var response = await classRepository.getListClass();
+    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
+    var response = await classRepository.getListClass(schoolId);
     classList = response;
+    classList.removeWhere((x) => x.schoolYearId != schoolYearId);
   }
 
   void getSutdentInClass(int? classId) async {
@@ -249,7 +251,14 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   maxLines: 1,
                   inputController: classController,
                   isReadOnly: true,
-                  onTap: () => _buildClassBottomSheet(context),
+                  onTap: () {
+                    if (schoolYearController.text.isEmpty) {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text('Vui lòng chọn niên khóa trước.')));
+                    } else {
+                      _buildClassBottomSheet(context);
+                    }
+                  },
                 ),
                 SizedBox(height: 20.0),
                 const Text(
@@ -672,12 +681,14 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                         title: Text(schoolYear[index].year.toString()),
                         onTap: () {
                           schoolYearController.text = schoolYear[index].year.toString();
+                          schoolYearId = schoolYear[index].schoolYearId;
                           pickerStartDate = DateTime.parse(schoolYear[index].startDate ?? '');
                           pickerEndDate = DateTime.parse(schoolYear[index].endDate ?? '');
                           if (kDebugMode) {
                             print('Niên khóa: ${schoolYear[index].year}');
                           }
                           timeController.text = pickerStartDate.toString();
+                          getClassList();
                           Navigator.pop(context);
                           setState(() {});
                         },
