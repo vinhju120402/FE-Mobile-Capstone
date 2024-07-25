@@ -8,7 +8,7 @@ abstract class ViolationRepository {
   Future<List<ViolationResponse>> getListViolation();
   Future<ViolationResponse> getViolationById(int id);
   Future createViolation(ViolationRequest violation);
-  Future<List<ViolationGroupResponse>> getViolationGroup({String? sortOrder});
+  Future<List<ViolationGroupResponse>> getViolationGroup(int schoolId, {String? sortOrder});
   Future<List<ViolationTypeResponse>> getListViolationTypeByGroup(int groupId, {String? sortOrder});
 }
 
@@ -35,9 +35,9 @@ class ViolationRepositoryImpl extends ViolationRepository {
   }
 
   @override
-  Future<List<ViolationGroupResponse>> getViolationGroup({String? sortOrder}) async {
+  Future<List<ViolationGroupResponse>> getViolationGroup(int schoolId, {String? sortOrder}) async {
     List<dynamic> dynamicList =
-        await historyViolationAPI.getViolationGroup(sortOrders: {"sortOrder": sortOrder ?? "desc"});
+        await historyViolationAPI.getViolationGroup(schoolId, sortOrders: {"sortOrder": sortOrder ?? "desc"});
     List<ViolationGroupResponse> responseList =
         dynamicList.map((item) => ViolationGroupResponse.fromJson(item)).toList();
     return responseList;

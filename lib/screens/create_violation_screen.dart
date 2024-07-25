@@ -180,7 +180,8 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   }
 
   void getViolationGroup() async {
-    var response = await violationRepository.getViolationGroup();
+    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
+    var response = await violationRepository.getViolationGroup(schoolId);
     violationGroup = response;
   }
 

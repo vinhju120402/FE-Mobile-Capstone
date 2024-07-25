@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:eduappui/remote/constant/constants.dart';
+import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/request/violation_request.dart';
 import 'package:eduappui/remote/model/response/class_reponse.dart';
 import 'package:eduappui/remote/model/response/student_in_class_response.dart';
@@ -47,6 +49,7 @@ class EditviocationState extends State<Editviocation> {
   String violationName = '';
   List<String> violationImagesList = [];
   List<File> imageFiles = [];
+  LocalClientImpl localClientImpl = LocalClientImpl();
 
   @override
   void initState() {
@@ -186,7 +189,8 @@ class EditviocationState extends State<Editviocation> {
   }
 
   Future<void> getViolationGroup() async {
-    var response = await violationRepository.getViolationGroup();
+    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
+    var response = await violationRepository.getViolationGroup(schoolId);
     violationGroup = response;
   }
 

@@ -80,9 +80,9 @@ class ViolationAPI {
     }
   }
 
-  Future getViolationGroup({Map<String, String>? sortOrders}) async {
-    final response =
-        await networkClient.invoke(Constants.violation_group, RequestType.get, queryParameters: sortOrders);
+  Future getViolationGroup(int schoolId, {Map<String, String>? sortOrders}) async {
+    final response = await networkClient.invoke("${Constants.violation_group}/school/$schoolId", RequestType.get,
+        queryParameters: sortOrders);
 
     if (response.statusCode == 200) {
       return response.data['data'];
