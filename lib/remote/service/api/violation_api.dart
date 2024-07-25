@@ -5,7 +5,6 @@ import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/request/violation_request.dart';
 import 'package:eduappui/remote/model/response/violation_response.dart';
 import 'package:eduappui/remote/network/network_client.dart';
-import 'package:snackbar/snackbar.dart';
 
 class ViolationAPI {
   final NetworkClient networkClient = NetworkClient();
@@ -75,15 +74,9 @@ class ViolationAPI {
     );
 
     if (response.data['success'] == true) {
-      return 201;
+      return response.data;
     } else {
-      snack(response.data['message']);
-      throw ServerException.withException(
-        dioError: DioException(
-          response: response,
-          requestOptions: response.requestOptions,
-        ),
-      );
+      return response.data['message'];
     }
   }
 

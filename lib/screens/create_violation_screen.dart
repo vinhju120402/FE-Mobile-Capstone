@@ -51,14 +51,15 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   LocalClientImpl localClientImpl = LocalClientImpl();
   List<SchoolYearResponse> schoolYear = [];
   final TextEditingController schoolYearController = TextEditingController();
+  DateTime? pickerStartDate;
+  DateTime? pickerEndDate;
 
   @override
   void initState() {
     super.initState();
-    _getCurrentTime();
+    getSchoolYear();
     getViolationGroup();
     getClassList();
-    getSchoolYear();
   }
 
   @override
@@ -105,19 +106,19 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     }
   }
 
-  void _getCurrentTime() {
-    DateTime now = DateTime.now();
-    String formattedTime =
-        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
-    timeController.text = formattedTime;
-  }
-
   Future<void> _selectDateTime() async {
+    if (schoolYearController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Bạn chưa chọn niên khóa')),
+      );
+      return;
+    }
+
     DateTime? selectedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+      initialDate: pickerStartDate,
+      firstDate: pickerStartDate ?? DateTime.now(),
+      lastDate: pickerEndDate ?? DateTime.now().add(Duration(days: 365)),
     );
 
     if (selectedDate != null) {
@@ -160,21 +161,20 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       description: descriptionController.text,
       images: listImage,
     );
-    try {
-      var res = await violationRepository.createViolation(violationRequest);
-      showProgress();
-      if (res == 201) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Tạo vi phạm thành công.')));
-          GoRouter.of(context).go(ScreenRoute.homeScreen);
-        }
-      }
-    } catch (e) {
+    var res = await violationRepository.createViolation(violationRequest);
+
+    if (res is String) {
       if (kDebugMode) {
-        print(e);
+        print(res);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Tạo vi phạm thất bại.')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
+      }
+    } else {
+      if (mounted) {
+        showProgress();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Tạo vi phạm thành công.')));
+        GoRouter.of(context).go(ScreenRoute.homeScreen);
       }
     }
   }
@@ -671,9 +671,12 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                         title: Text(schoolYear[index].year.toString()),
                         onTap: () {
                           schoolYearController.text = schoolYear[index].year.toString();
+                          pickerStartDate = DateTime.parse(schoolYear[index].startDate ?? '');
+                          pickerEndDate = DateTime.parse(schoolYear[index].endDate ?? '');
                           if (kDebugMode) {
                             print('Niên khóa: ${schoolYear[index].year}');
                           }
+                          timeController.text = pickerStartDate.toString();
                           Navigator.pop(context);
                           setState(() {});
                         },
