@@ -54,10 +54,12 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   int? schoolYearId;
   DateTime? pickerStartDate;
   DateTime? pickerEndDate;
+  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
+    isAdmin = localClientImpl.readData("isAdmin");
     getSchoolYear();
     getViolationGroup();
   }
@@ -243,6 +245,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   inputController: schoolYearController,
                   onTap: () => _buildSchoolYearList(context),
                 ),
+                SizedBox(height: 20.0),
                 const Text(
                   'Lớp',
                   style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
@@ -345,7 +348,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                       icon: const Icon(Icons.photo_library, color: Colors.white),
                       label: const Text('Chọn ảnh', style: TextStyle(fontSize: 14, color: Colors.white)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: isAdmin ? Colors.blue : Color(0xFFB74848),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
@@ -408,7 +411,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                     createViolation();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: isAdmin ? Colors.blue : Color(0xFFB74848),
                     textStyle: TextStyle(fontSize: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),

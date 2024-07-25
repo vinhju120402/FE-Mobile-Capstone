@@ -1,3 +1,4 @@
+import 'package:eduappui/remote/local/local_client.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -16,43 +17,11 @@ class HistoryViolationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isAdmin = false;
+    LocalClientImpl localClientImpl = LocalClientImpl();
+    isAdmin = localClientImpl.readData("isAdmin");
     return GestureDetector(
       onTap: ontapFunction,
-      // child: Padding(
-      //   padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      //   child: Container(
-      //     color: Color.fromARGB(188, 85, 239, 126),
-      //     padding: EdgeInsets.all(16.0),
-      //     child: Column(
-      //       crossAxisAlignment: CrossAxisAlignment.start,
-      //       children: [
-      //         Text(
-      //           'Họ và Tên: $name',
-      //           style: TextStyle(
-      //             color: Colors.black,
-      //             fontSize: 16.0,
-      //           ),
-      //         ),
-      //         SizedBox(height: 8.0),
-      //         Text(
-      //           'Loại Vi Phạm: $violationName',
-      //           style: TextStyle(
-      //             color: Colors.black,
-      //             fontSize: 16.0,
-      //           ),
-      //         ),
-      //         SizedBox(height: 8.0),
-      //         Text(
-      //           'Date: ${DateFormat.yMd().format(DateTime.parse(date))} ',
-      //           style: TextStyle(
-      //             color: Colors.black,
-      //             fontSize: 14.0,
-      //           ),
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      // ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Stack(
@@ -69,7 +38,7 @@ class HistoryViolationItem extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border(
-                  left: BorderSide(color: Colors.blue, width: 5.0),
+                  left: BorderSide(color: isAdmin ? Colors.blue : Color(0xFFB74848), width: 5.0),
                 ),
                 boxShadow: const [
                   BoxShadow(

@@ -1,3 +1,4 @@
+import 'package:eduappui/remote/local/local_client.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
@@ -7,6 +8,8 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    LocalClientImpl localClientImpl = LocalClientImpl();
+    bool isAdmin = localClientImpl.readData('isAdmin');
     return Stack(
       children: [
         SizedBox(
@@ -15,13 +18,13 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
           child: Row(
             children: [
               Expanded(child: Container(color: Colors.white)),
-              Expanded(child: Container(color: Colors.blue)),
+              Expanded(child: Container(color: isAdmin ? Colors.blue : Color(0xFFB74848))),
             ],
           ),
         ),
         Container(
-          decoration: const BoxDecoration(
-            color: Colors.blue,
+          decoration: BoxDecoration(
+            color: isAdmin ? Colors.blue : Color(0xFFB74848),
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(20),
               bottomRight: Radius.circular(20),

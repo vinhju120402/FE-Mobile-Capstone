@@ -37,19 +37,19 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     categories = {
       "Tạo Vi Phạm": {
-        "icon": const Icon(Icons.add, color: Colors.white, size: 30),
+        "icon": const Icon(Icons.add),
       },
       "Quy Định": {
-        "icon": const Icon(Icons.rule, color: Colors.white, size: 30),
+        "icon": const Icon(Icons.rule),
       },
       "Lịch Sử Vi Phạm": {
-        "icon": const Icon(Icons.history_edu, color: Colors.white, size: 30),
+        "icon": const Icon(Icons.history_edu),
       },
       "Tài Khoản": {
-        "icon": const Icon(Icons.person, color: Colors.white, size: 30),
+        "icon": const Icon(Icons.person),
       },
       "Liên Lạc": {
-        "icon": const Icon(Icons.contact_emergency, color: Colors.white, size: 30),
+        "icon": const Icon(Icons.contact_emergency),
       },
     };
 
@@ -58,10 +58,6 @@ class _MainScreenState extends State<MainScreen> {
       Icons.class_,
       Icons.person,
     ];
-
-    if (isAdmin == true) {
-      categories!.remove("Lịch Trực");
-    }
     getCurrentUser();
     getSchedule();
   }
@@ -99,7 +95,10 @@ class _MainScreenState extends State<MainScreen> {
       body: Stack(
         children: [
           isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(
+                  child: CircularProgressIndicator(
+                  color: isAdmin ?? false ? Colors.blue : Color(0xFFB74848),
+                ))
               : MainScreenContent(
                   userName: userName ?? '',
                   isAdmin: isAdmin ?? false,
@@ -142,7 +141,7 @@ class MainScreenContent extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(child: Container(color: Colors.white)),
-                    Expanded(child: Container(color: Colors.blue)),
+                    Expanded(child: Container(color: isAdmin ? Colors.blue : Color(0xFFB74848))),
                   ],
                 ),
               ),
@@ -153,10 +152,10 @@ class MainScreenContent extends StatelessWidget {
               children: Column(
             children: [
               Visibility(
-                // visible: isAdmin == false,
-                child: _buildUpcomingSchedule(context, firstOngoing),
+                visible: isAdmin == false,
+                child: _buildUpcomingSchedule(context, firstOngoing, isAdmin),
               ),
-              _buildOther(categories),
+              _buildOther(categories, isAdmin),
             ],
           )),
           const SizedBox(height: 50)
@@ -166,7 +165,7 @@ class MainScreenContent extends StatelessWidget {
   }
 }
 
-Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoing) {
+Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoing, bool isAdmin) {
   return Padding(
     padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
     child: Column(
@@ -177,7 +176,7 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
             'Lịch trực sắp tới',
             style: TextStyle(
               fontSize: 18,
-              color: Color(0xFF55B5F3),
+              color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -187,7 +186,7 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
           color: Colors.white,
           elevation: 3,
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 13),
             width: double.infinity,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -251,18 +250,18 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
                 Expanded(
                     child: InkWell(
                   onTap: () => context.push(ScreenRoute.dutyScheduleScreen),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         'Xem chi tiết',
-                        style: TextStyle(fontSize: 9, color: Colors.lightBlue),
+                        style: TextStyle(fontSize: 12, color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116)),
                       ),
                       Icon(
                         Icons.navigate_next_outlined,
                         size: 20,
-                        color: Colors.lightBlue,
+                        color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116),
                       ),
                     ],
                   ),
@@ -280,8 +279,8 @@ Widget _buildHeaderContent(BuildContext context, LocalClientImpl localClient, Se
     bool isAdmin, String userName) {
   return Container(
     height: 80,
-    decoration: const BoxDecoration(
-      color: Colors.blue,
+    decoration: BoxDecoration(
+      color: isAdmin ? Colors.blue : Color(0xFFB74848),
       borderRadius: BorderRadius.only(
         bottomLeft: Radius.circular(20),
         bottomRight: Radius.circular(20),
@@ -372,12 +371,12 @@ Widget _buildHeaderContent(BuildContext context, LocalClientImpl localClient, Se
   );
 }
 
-Widget _buildOther(Map<String, Map<String, dynamic>>? categories) {
+Widget _buildOther(Map<String, Map<String, dynamic>>? categories, bool isAdmin) {
   return Padding(
     padding: const EdgeInsets.only(top: 20, left: 15, right: 15),
     child: Column(
       children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.all(1.0),
           child: Align(
             alignment: Alignment.centerLeft,
@@ -385,7 +384,7 @@ Widget _buildOther(Map<String, Map<String, dynamic>>? categories) {
               'Chức năng khác',
               style: TextStyle(
                 fontSize: 18,
-                color: Color(0xFF55B5F3),
+                color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -404,7 +403,7 @@ Widget _buildOther(Map<String, Map<String, dynamic>>? categories) {
             String categoryName = categories.keys.elementAt(index);
             Map<String, dynamic> categoryData = categories[categoryName]!;
             Icon categoryIcon = categoryData["icon"];
-            return _buildCardCategoryItem(categoryIcon, categoryName, context);
+            return _buildCardCategoryItem(categoryIcon, categoryName, context, isAdmin);
           },
         )
       ],
@@ -428,9 +427,12 @@ class MenuItems {
   static const logoutIcon = MenuItem(text: 'Đăng Xuất', icon: Icons.logout);
 
   static Widget buildItem(MenuItem item) {
+    bool isAdmin = false;
+    LocalClientImpl localClientImpl = LocalClientImpl();
+    isAdmin = localClientImpl.readData("isAdmin");
     return Row(
       children: [
-        Icon(item.icon, color: Color(0xFF55B5F3), size: 12),
+        Icon(item.icon, color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116), size: 12),
         const SizedBox(
           width: 10,
         ),
@@ -470,6 +472,7 @@ Widget _buildCardCategoryItem(
   Icon categoryIcon,
   String categoryName,
   BuildContext context,
+  bool isAdmin,
 ) {
   return GestureDetector(
     onTap: () {
@@ -496,12 +499,12 @@ Widget _buildCardCategoryItem(
         children: [
           Icon(
             categoryIcon.icon,
-            color: const Color(0XFF55B5F3),
-            size: 30,
+            color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116),
+            size: 35,
           ),
           Text(
             categoryName,
-            style: const TextStyle(fontSize: 12),
+            style: const TextStyle(fontSize: 15),
           ),
         ],
       ),

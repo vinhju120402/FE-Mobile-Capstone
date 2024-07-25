@@ -1,3 +1,4 @@
+import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/response/violation_config_response.dart';
 import 'package:eduappui/remote/service/repository/rule_repository.dart';
 import 'package:eduappui/widget/TextField/common_text_field.dart';
@@ -17,10 +18,13 @@ class _RuleScreenState extends State<RuleScreen> {
   final RuleRepositoryImpl ruleRepositoryImpl = RuleRepositoryImpl();
   List<ViolationConfigResponse> ruleResponse = [];
   bool ruleLoading = true;
+  bool isAdmin = false;
+  LocalClientImpl localClientImpl = LocalClientImpl();
 
   @override
   void initState() {
     super.initState();
+    isAdmin = localClientImpl.readData("isAdmin");
     getRule();
   }
 
@@ -91,7 +95,7 @@ class _RuleScreenState extends State<RuleScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(10),
                               border: Border(
-                                left: BorderSide(color: Colors.blue, width: 5.0),
+                                left: BorderSide(color: isAdmin ? Colors.blue : Color(0xFFB74848), width: 5.0),
                               ),
                               boxShadow: const [
                                 BoxShadow(
@@ -130,7 +134,9 @@ class _RuleScreenState extends State<RuleScreen> {
           ),
           ruleLoading
               ? Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(
+                    color: isAdmin ? Colors.blue : Color(0xFFB74848),
+                  ),
                 )
               : SizedBox()
         ],

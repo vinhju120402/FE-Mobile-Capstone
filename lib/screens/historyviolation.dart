@@ -1,3 +1,4 @@
+import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/response/violation_response.dart';
 import 'package:eduappui/remote/service/repository/violation_repository.dart';
 import 'package:eduappui/routers/screen_route.dart';
@@ -21,10 +22,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
   int numberResult = 0;
   bool historyViolationLoading = true;
   List<ViolationResponse> historyViolationResponse = [];
+  bool isAdmin = false;
+  LocalClientImpl localClientImpl = LocalClientImpl();
 
   @override
   void initState() {
     super.initState();
+    isAdmin = localClientImpl.readData("isAdmin");
     getHistoryViolation();
   }
 
@@ -97,7 +101,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
           historyViolationLoading
               ? Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(
+                    color: isAdmin ? Colors.blue : Color(0xFFB74848),
+                  ),
                 )
               : SizedBox()
         ],

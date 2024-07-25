@@ -1,3 +1,4 @@
+import 'package:eduappui/remote/local/local_client.dart';
 import 'package:flutter/material.dart';
 
 class BaseMainContent extends StatelessWidget {
@@ -6,11 +7,13 @@ class BaseMainContent extends StatelessWidget {
   const BaseMainContent({super.key, this.children});
   @override
   Widget build(BuildContext context) {
+    LocalClientImpl localClientImpl = LocalClientImpl();
+    bool isAdmin = localClientImpl.readData('isAdmin');
     return Stack(
       children: [
         Container(
           height: 50,
-          color: Colors.blue,
+          color: isAdmin ? Colors.blue : Color(0xFFB74848),
         ),
         Container(
           decoration: const BoxDecoration(

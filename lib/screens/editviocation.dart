@@ -50,10 +50,12 @@ class EditviocationState extends State<Editviocation> {
   List<String> violationImagesList = [];
   List<File> imageFiles = [];
   LocalClientImpl localClientImpl = LocalClientImpl();
+  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
+    isAdmin = localClientImpl.readData("isAdmin");
     if (kDebugMode) {
       print('ID: ${widget.id}');
     }
@@ -366,7 +368,7 @@ class EditviocationState extends State<Editviocation> {
                               icon: const Icon(Icons.photo_library, color: Colors.white),
                               label: const Text('Chọn ảnh', style: TextStyle(fontSize: 14, color: Colors.white)),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
+                                backgroundColor: isAdmin ? Colors.blue : Color(0xFFB74848),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
@@ -434,7 +436,7 @@ class EditviocationState extends State<Editviocation> {
                             editViolation(widget.id);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: isAdmin ? Colors.blue : Color(0xFFB74848),
                             textStyle: const TextStyle(fontSize: 18),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),

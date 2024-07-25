@@ -19,6 +19,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   bool notificationsEnabled = true;
   LocalClientImpl localClientImpl = LocalClientImpl();
   SecureStorageImpl secureStorageImpl = SecureStorageImpl();
+  bool isAdmin = false;
 
   logout(LocalClientImpl localClientImpl, SecureStorageImpl secureStorageImpl) {
     localClientImpl.removeAll();
@@ -83,6 +84,12 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    isAdmin = localClientImpl.readData("isAdmin");
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
@@ -109,41 +116,51 @@ class SettingsScreenState extends State<SettingsScreen> {
                   child: Column(
                     children: [
                       _buildSettingItem(
+                        iconColor: isAdmin ? Colors.blue : Color(0xFFB74848),
                         Icons.language,
                         'Ngôn ngữ',
                         onTap: _languageOntap,
                       ),
                       SizedBox(height: 20),
                       _buildSettingItem(
+                        iconColor: isAdmin ? Colors.blue : Color(0xFFB74848),
                         Icons.description,
                         'Terms & Conditions',
                         onTap: () => context.push(ScreenRoute.termScreen),
                       ),
                       SizedBox(height: 20),
                       _buildSettingItem(
+                        iconColor: isAdmin ? Colors.blue : Color(0xFFB74848),
                         Icons.privacy_tip,
                         'Privacy Policy',
                         onTap: () => context.push(ScreenRoute.privacyScreen),
                       ),
                       SizedBox(height: 20),
                       _buildSettingItem(
+                        iconColor: isAdmin ? Colors.blue : Color(0xFFB74848),
                         Icons.rate_review,
                         'Đánh giá ứng dụng',
                         onTap: _rateReviewOntap,
                       ),
                       SizedBox(height: 20),
                       _buildSettingItem(
+                        iconColor: isAdmin ? Colors.blue : Color(0xFFB74848),
                         Icons.question_answer,
                         'FAQ?',
                         onTap: () => context.push(ScreenRoute.faqScreen),
                       ),
                       SizedBox(height: 20),
-                      _buildSettingItem(Icons.info, 'Thông tin ứng dụng'),
+                      _buildSettingItem(
+                        Icons.info,
+                        'Thông tin ứng dụng',
+                        iconColor: isAdmin ? Colors.blue : Color(0xFFB74848),
+                      ),
                       SizedBox(height: 20),
                       _buildSettingItem(
                         Icons.logout,
                         'Đăng xuất',
-                        color: Colors.red,
+                        iconColor: Colors.red,
+                        textColor: Colors.red,
                         onTap: () => logout(localClientImpl, secureStorageImpl),
                       ),
                     ],
@@ -158,7 +175,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-Widget _buildSettingItem(IconData icon, String title, {Color? color, Function()? onTap}) {
+Widget _buildSettingItem(IconData icon, String title, {Color? iconColor, Color? textColor, Function()? onTap}) {
   return InkWell(
     onTap: onTap,
     child: Row(
@@ -168,13 +185,13 @@ Widget _buildSettingItem(IconData icon, String title, {Color? color, Function()?
           children: [
             CircleAvatar(
               backgroundColor: Colors.grey[200],
-              child: Icon(icon, color: color ?? Colors.blue),
+              child: Icon(icon, color: iconColor ?? Colors.blue),
             ),
             SizedBox(width: 10),
-            Text(title, style: TextStyle(color: color ?? Colors.black)),
+            Text(title, style: TextStyle(color: textColor ?? Colors.black)),
           ],
         ),
-        Icon(Icons.arrow_forward_ios, color: color ?? Colors.grey[400]),
+        Icon(Icons.arrow_forward_ios, color: iconColor ?? Colors.grey[400]),
       ],
     ),
   );
