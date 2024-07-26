@@ -6,9 +6,9 @@ import 'package:eduappui/remote/network/network_client.dart';
 class RuleAPI {
   final NetworkClient networkClient = NetworkClient();
 
-  Future getViolationConfig({Map<String, dynamic>? query}) async {
+  Future getViolationConfig(int schoolId, {Map<String, dynamic>? query}) async {
     var response = await networkClient.invoke(
-      Constants.get_violation_config,
+      '${Constants.get_violation_config}/school/$schoolId',
       RequestType.get,
       queryParameters: query,
     );

@@ -1,3 +1,4 @@
+import 'package:eduappui/remote/constant/constants.dart';
 import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/response/violation_config_response.dart';
 import 'package:eduappui/remote/service/repository/rule_repository.dart';
@@ -34,7 +35,8 @@ class _RuleScreenState extends State<RuleScreen> {
   }
 
   void getRule() async {
-    var response = await ruleRepositoryImpl.getRule();
+    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
+    var response = await ruleRepositoryImpl.getRule(schoolId);
     ruleResponse = response;
     ruleLoading = false;
     setState(() {});
