@@ -7,6 +7,7 @@ class ScheduleItem extends StatelessWidget {
   final String supervisorName;
   final String className;
   final String teacherName;
+  final String status;
 
   const ScheduleItem(
       {super.key,
@@ -14,7 +15,8 @@ class ScheduleItem extends StatelessWidget {
       required this.to,
       required this.supervisorName,
       required this.className,
-      required this.teacherName});
+      required this.teacherName,
+      required this.status});
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +67,22 @@ class ScheduleItem extends StatelessWidget {
                   SizedBox(height: 10),
                   Text('Giám Thị: $teacherName'),
                   SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Text(
+                        'Trạng Thái: ',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        status,
+                        style: TextStyle(
+                          color: status == 'FINISHED' ? Colors.green : Colors.amber,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
