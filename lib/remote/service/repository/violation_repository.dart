@@ -5,7 +5,7 @@ import 'package:eduappui/remote/model/response/violation_type_response.dart';
 import 'package:eduappui/remote/service/api/violation_api.dart';
 
 abstract class ViolationRepository {
-  Future<List<ViolationResponse>> getListViolation();
+  Future<List<ViolationResponse>> getListViolation(int schoolId, {String? sortOrder});
   Future<ViolationResponse> getViolationById(int id);
   Future createViolation(ViolationRequest violation);
   Future<List<ViolationGroupResponse>> getViolationGroup(int schoolId, {String? sortOrder});
@@ -16,9 +16,9 @@ class ViolationRepositoryImpl extends ViolationRepository {
   final ViolationAPI historyViolationAPI = ViolationAPI();
 
   @override
-  Future<List<ViolationResponse>> getListViolation({String? sortOrder}) async {
+  Future<List<ViolationResponse>> getListViolation(int schoolId, {String? sortOrder}) async {
     List<dynamic> dynamicList =
-        await historyViolationAPI.getListViolation(sortOrders: {"sortOrder": sortOrder ?? "desc"});
+        await historyViolationAPI.getListViolation(schoolId, sortOrders: {"sortOrder": sortOrder ?? "desc"});
     List<ViolationResponse> responseList = dynamicList.map((item) => ViolationResponse.fromJson(item)).toList();
     return responseList;
   }

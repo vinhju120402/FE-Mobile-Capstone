@@ -1,3 +1,4 @@
+import 'package:eduappui/remote/constant/constants.dart';
 import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/response/violation_response.dart';
 import 'package:eduappui/remote/service/repository/violation_repository.dart';
@@ -38,7 +39,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void getHistoryViolation() async {
-    var response = await historyViolationRepositoryImpl.getListViolation();
+    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
+    var response = await historyViolationRepositoryImpl.getListViolation(schoolId);
     historyViolationResponse = response;
     numberResult = historyViolationResponse.length;
     historyViolationResponse = response;

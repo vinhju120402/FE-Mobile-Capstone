@@ -9,9 +9,9 @@ import 'package:eduappui/remote/network/network_client.dart';
 class ViolationAPI {
   final NetworkClient networkClient = NetworkClient();
 
-  Future getListViolation({Map<String, String>? sortOrders}) async {
-    final response =
-        await networkClient.invoke(Constants.history_violation, RequestType.get, queryParameters: sortOrders);
+  Future getListViolation(int schoolId, {Map<String, String>? sortOrders}) async {
+    final response = await networkClient.invoke('${Constants.history_violation}/school/$schoolId', RequestType.get,
+        queryParameters: sortOrders);
 
     if (response.statusCode == 200) {
       if (response.data['data'] == null) {
