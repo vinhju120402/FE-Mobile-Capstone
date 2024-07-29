@@ -1019,6 +1019,7 @@ class _MultiSelectDropDownState<T> extends State<MultiSelectDropDown<T>> {
   /// Clear the selected options.
   /// [MultiSelectController] is used to clear the selected options.
   void clear() {
+    widget.clearAction?.call(); // call the clear action
     if (!_controller._isDisposed) {
       _controller.clearAllSelection();
     } else {

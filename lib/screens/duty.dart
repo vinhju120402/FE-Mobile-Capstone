@@ -32,6 +32,11 @@ class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
   }
 
   void filterSchedule(String status) async {
+    // when status is empty, get all schedule
+    if (status.isEmpty) {
+      getSchedule();
+      return;
+    }
     var schedule = await scheduleRepository.getDutySchedule();
     scheduleList = schedule.where((element) => element.status == status).toList();
     setState(() {});
@@ -66,7 +71,7 @@ class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
                       ],
                       selectionType: SelectionType.single,
                       chipConfig: const ChipConfig(wrapType: WrapType.wrap),
-                      dropdownHeight: 300,
+                      dropdownHeight: 100,
                       optionTextStyle: const TextStyle(fontSize: 16, color: Colors.black),
                       selectedOptionIcon: const Icon(
                         Icons.check_circle,

@@ -3,11 +3,13 @@ import 'package:eduappui/remote/constant/constants.dart';
 import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/request/violation_request.dart';
 import 'package:eduappui/remote/model/response/class_reponse.dart';
+import 'package:eduappui/remote/model/response/schedule_response.dart';
 import 'package:eduappui/remote/model/response/school_year_response.dart';
 import 'package:eduappui/remote/model/response/student_in_class_response.dart';
 import 'package:eduappui/remote/model/response/violation_group_response.dart';
 import 'package:eduappui/remote/model/response/violation_type_response.dart';
 import 'package:eduappui/remote/service/repository/class_repository.dart';
+import 'package:eduappui/remote/service/repository/schedule_repository.dart';
 import 'package:eduappui/remote/service/repository/school_year_repository.dart';
 import 'package:eduappui/remote/service/repository/student_in_class_repository.dart';
 import 'package:eduappui/remote/service/repository/violation_repository.dart';
@@ -19,6 +21,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
 class CreateViolationScreen extends StatefulWidget {
@@ -55,6 +58,10 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   DateTime? pickerStartDate;
   DateTime? pickerEndDate;
   bool isAdmin = false;
+  ScheduleRepositoryImpl scheduleRepository = ScheduleRepositoryImpl();
+  List<ScheduleResponse> scheduleList = [];
+  final TextEditingController scheduleController = TextEditingController();
+  int? scheduleId;
 
   @override
   void initState() {
@@ -62,6 +69,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     isAdmin = localClientImpl.readData("isAdmin");
     getSchoolYear();
     getViolationGroup();
+    getSchedule();
   }
 
   @override
@@ -156,6 +164,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       schoolId: schoolId,
       schoolYear: schoolYearController.text.isNotEmpty ? int.parse(schoolYearController.text) : 0,
       studentInClassId: studentInClassId ?? 0,
+      scheduleId: scheduleId ?? 0,
       classId: classId ?? 0,
       date: DateTime.parse(timeController.text),
       violationTypeId: violationTypeId ?? 0,
@@ -221,6 +230,13 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     }
   }
 
+  void getSchedule() async {
+    var schedule = await scheduleRepository.getDutySchedule();
+    scheduleList = schedule;
+    // filter schedule by status ongoing
+    scheduleList = scheduleList.where((element) => element.status == 'ONGOING').toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -247,6 +263,24 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                 ),
                 SizedBox(height: 20.0),
                 const Text(
+                  'Ca trực',
+                  style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                ),
+                CommonTextField(
+                  maxLines: 1,
+                  isReadOnly: true,
+                  inputController: scheduleController,
+                  onTap: () {
+                    if (schoolYearController.text.isEmpty) {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text('Vui lòng chọn niên khóa trước.')));
+                    } else {
+                      _buildScheduleList(context);
+                    }
+                  },
+                ),
+                SizedBox(height: 20.0),
+                const Text(
                   'Lớp',
                   style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                 ),
@@ -255,9 +289,9 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   inputController: classController,
                   isReadOnly: true,
                   onTap: () {
-                    if (schoolYearController.text.isEmpty) {
+                    if (scheduleController.text.isEmpty) {
                       ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text('Vui lòng chọn niên khóa trước.')));
+                          .showSnackBar(SnackBar(content: Text('Vui lòng chọn ca trực trước.')));
                     } else {
                       _buildClassBottomSheet(context);
                     }
@@ -272,7 +306,13 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   maxLines: 1,
                   inputController: nameController,
                   isReadOnly: true,
-                  onTap: () => _buildStudentInClassList(context),
+                  onTap: () {
+                    if (classController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng chọn lớp trước.')));
+                    } else {
+                      _buildStudentInClassList(context);
+                    }
+                  },
                 ),
                 SizedBox(height: 20.0),
                 const Text(
@@ -294,7 +334,14 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   maxLines: 1,
                   inputController: violateGroupController,
                   isReadOnly: true,
-                  onTap: () => _buildViolationGroupBottomSheet(context),
+                  onTap: () {
+                    if (schoolYearController.text.isEmpty) {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text('Vui lòng chọn niên khóa trước.')));
+                    } else {
+                      _buildViolationGroupBottomSheet(context);
+                    }
+                  },
                 ),
                 SizedBox(height: 20.0),
                 const Text(
@@ -692,6 +739,51 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                           }
                           timeController.text = pickerStartDate.toString();
                           getClassList();
+                          Navigator.pop(context);
+                          setState(() {});
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {});
+      }
+    });
+  }
+
+  void _buildScheduleList(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: scheduleList.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(
+                            '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                            '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}'),
+                        onTap: () {
+                          scheduleController.text =
+                              '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                              '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}';
+                          if (kDebugMode) {
+                            print('Ca trực: '
+                                '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                                '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}');
+                          }
+                          scheduleId = scheduleList[index].scheduleId;
                           Navigator.pop(context);
                           setState(() {});
                         },

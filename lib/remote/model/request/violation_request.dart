@@ -5,6 +5,7 @@ class ViolationRequest {
   int? schoolYear;
   int classId;
   int studentInClassId;
+  int? scheduleId;
   int violationTypeId;
   int? teacherId;
   String violationName;
@@ -17,6 +18,7 @@ class ViolationRequest {
     this.schoolYear,
     required this.classId,
     required this.studentInClassId,
+    this.scheduleId,
     required this.violationTypeId,
     this.teacherId,
     required this.violationName,
@@ -31,6 +33,7 @@ class ViolationRequest {
       schoolYear: json['Year'],
       classId: json['ClassId'],
       studentInClassId: json['StudentInClassId'],
+      scheduleId: json['ScheduleId'],
       violationTypeId: json['ViolationTypeId'],
       teacherId: json['TeacherId'],
       violationName: json['ViolationName'],
@@ -46,6 +49,7 @@ class ViolationRequest {
       'Year': schoolYear,
       'ClassId': classId,
       'StudentInClassId': studentInClassId,
+      'ScheduleId': scheduleId,
       'ViolationTypeId': violationTypeId,
       'TeacherId': teacherId,
       'ViolationName': violationName,
@@ -57,6 +61,6 @@ class ViolationRequest {
 
   @override
   String toString() {
-    return 'ViolationRequest(SchoolId: $schoolId, SchoolYear: $schoolYear ,classId: $classId, studentInClassId: $studentInClassId, violationTypeId: $violationTypeId, teacherId: $teacherId, violationName: $violationName, description: $description, date: $date, images: $images)';
+    return 'ViolationRequest(SchoolId: $schoolId, SchoolYear: $schoolYear ,classId: $classId, studentInClassId: $studentInClassId, scheduleId : $scheduleId, violationTypeId: $violationTypeId, teacherId: $teacherId, violationName: $violationName, description: $description, date: $date, images: $images)';
   }
 }

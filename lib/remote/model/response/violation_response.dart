@@ -13,9 +13,9 @@ class ViolationResponse {
   String? date;
   List<String>? imageUrls;
   String? createdAt;
-  int? createdBy;
+  String? createdBy;
   String? updatedAt;
-  int? updatedBy;
+  String? updatedBy;
   String? status;
 
   ViolationResponse(
