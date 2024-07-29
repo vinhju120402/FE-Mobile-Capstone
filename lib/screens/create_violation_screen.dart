@@ -162,6 +162,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
     ViolationRequest violationRequest = ViolationRequest(
       schoolId: schoolId,
+      userId: int.parse(await localClientImpl.readData(Constants.user_id)),
       schoolYear: schoolYearController.text.isNotEmpty ? int.parse(schoolYearController.text) : 0,
       studentInClassId: studentInClassId ?? 0,
       scheduleId: scheduleId ?? 0,

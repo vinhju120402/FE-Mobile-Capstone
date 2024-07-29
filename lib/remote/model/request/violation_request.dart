@@ -1,7 +1,9 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
 class ViolationRequest {
   int? schoolId;
+  int? userId;
   int? schoolYear;
   int classId;
   int studentInClassId;
@@ -15,6 +17,7 @@ class ViolationRequest {
 
   ViolationRequest({
     this.schoolId,
+    this.userId,
     this.schoolYear,
     required this.classId,
     required this.studentInClassId,
@@ -30,6 +33,7 @@ class ViolationRequest {
   factory ViolationRequest.fromJson(Map<String, dynamic> json) {
     return ViolationRequest(
       schoolId: json['SchoolId'],
+      userId: json['UserId'],
       schoolYear: json['Year'],
       classId: json['ClassId'],
       studentInClassId: json['StudentInClassId'],
@@ -46,6 +50,7 @@ class ViolationRequest {
   Map<String, dynamic> toJson() {
     return {
       'SchoolId': schoolId,
+      'UserId': userId,
       'Year': schoolYear,
       'ClassId': classId,
       'StudentInClassId': studentInClassId,
@@ -61,6 +66,6 @@ class ViolationRequest {
 
   @override
   String toString() {
-    return 'ViolationRequest(SchoolId: $schoolId, SchoolYear: $schoolYear ,classId: $classId, studentInClassId: $studentInClassId, scheduleId : $scheduleId, violationTypeId: $violationTypeId, teacherId: $teacherId, violationName: $violationName, description: $description, date: $date, images: $images)';
+    return 'ViolationRequest(SchoolId: $schoolId, UserId: $userId ,SchoolYear: $schoolYear ,classId: $classId, studentInClassId: $studentInClassId, scheduleId : $scheduleId, violationTypeId: $violationTypeId, teacherId: $teacherId, violationName: $violationName, description: $description, date: $date, images: $images)';
   }
 }
