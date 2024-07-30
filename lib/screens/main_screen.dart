@@ -317,7 +317,7 @@ Widget _buildHeaderContent(BuildContext context, LocalClientImpl localClient, Se
                     ),
                   ),
                   Text(
-                    isAdmin ? 'Teacher' : 'Student',
+                    isAdmin ? 'Giám Thị' : 'Học sinh',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.normal,

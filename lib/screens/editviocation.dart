@@ -268,7 +268,7 @@ class EditviocationState extends State<Editviocation> {
       child: Scaffold(
         appBar: CustomAppbar(
           onBack: () => context.pop(),
-          title: 'Edit Violation',
+          title: 'Chỉnh sửa vi phạm',
         ),
         body: isLoading
             ? const Center(

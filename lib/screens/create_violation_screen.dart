@@ -262,24 +262,26 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   inputController: schoolYearController,
                   onTap: () => _buildSchoolYearList(context),
                 ),
-                SizedBox(height: 20.0),
-                const Text(
-                  'Ca trực',
-                  style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
-                ),
-                CommonTextField(
-                  maxLines: 1,
-                  isReadOnly: true,
-                  inputController: scheduleController,
-                  onTap: () {
-                    if (schoolYearController.text.isEmpty) {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text('Vui lòng chọn niên khóa trước.')));
-                    } else {
-                      _buildScheduleList(context);
-                    }
-                  },
-                ),
+                if (!isAdmin) SizedBox(height: 20.0),
+                if (!isAdmin)
+                  const Text(
+                    'Ca trực',
+                    style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                  ),
+                if (!isAdmin)
+                  CommonTextField(
+                    maxLines: 1,
+                    isReadOnly: true,
+                    inputController: scheduleController,
+                    onTap: () {
+                      if (schoolYearController.text.isEmpty) {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(content: Text('Vui lòng chọn niên khóa trước.')));
+                      } else {
+                        _buildScheduleList(context);
+                      }
+                    },
+                  ),
                 SizedBox(height: 20.0),
                 const Text(
                   'Lớp',
@@ -290,7 +292,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   inputController: classController,
                   isReadOnly: true,
                   onTap: () {
-                    if (scheduleController.text.isEmpty) {
+                    if (scheduleController.text.isEmpty && !isAdmin) {
                       ScaffoldMessenger.of(context)
                           .showSnackBar(SnackBar(content: Text('Vui lòng chọn ca trực trước.')));
                     } else {

@@ -53,16 +53,17 @@ class ViolationAPI {
     }
 
     FormData formData = FormData.fromMap({
-      'schoolId': violationRequest.schoolId,
-      'year': violationRequest.schoolYear,
-      'classId': violationRequest.classId,
-      'studentInClassId': violationRequest.studentInClassId,
-      'violationTypeId': violationRequest.violationTypeId,
-      'teacherId': violationRequest.teacherId,
-      'violationName': violationRequest.violationName,
-      'description': violationRequest.description,
-      'date': violationRequest.date?.toIso8601String(),
-      'images': imageFiles,
+      'SchoolId ': violationRequest.schoolId,
+      'UserId': violationRequest.userId,
+      'Year': violationRequest.schoolYear,
+      'ClassId': violationRequest.classId,
+      'StudentInClassId': violationRequest.studentInClassId,
+      'ScheduleId': violationRequest.scheduleId,
+      'ViolationTypeId': violationRequest.violationTypeId,
+      'ViolationName': violationRequest.violationName,
+      'Description': violationRequest.description,
+      'Date': violationRequest.date?.toIso8601String(),
+      'Images': imageFiles,
     });
     LocalClientImpl localClientImpl = LocalClientImpl();
     bool isTeacher = await localClientImpl.readData('isAdmin');
