@@ -44,7 +44,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   List<ViolationGroupResponse> violationGroup = [];
   List<ViolationTypeResponse> violationType = [];
   List<StudentInClassResponse> studentInClass = [];
-  List<ClassResponse> classList = [];
+  ClassResponse classResponse = ClassResponse();
   bool isSelectedViolationGroup = false;
   int? classId;
   int? studentInClassId;
@@ -202,11 +202,12 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     violationType = response;
   }
 
-  void getClassList() async {
-    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
-    var response = await classRepository.getListClass(schoolId);
-    classList = response;
-    classList.removeWhere((x) => x.schoolYearId != schoolYearId);
+  void getClassBySchedule(int scheduleId) async {
+    var response = await classRepository.getClassBySchedule(scheduleId);
+    classResponse = response;
+    classController.text = classResponse.name ?? '';
+    classId = classResponse.classId;
+    getSutdentInClass(classId);
   }
 
   void getSutdentInClass(int? classId) async {
@@ -291,14 +292,14 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   maxLines: 1,
                   inputController: classController,
                   isReadOnly: true,
-                  onTap: () {
-                    if (scheduleController.text.isEmpty && !isAdmin) {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text('Vui lòng chọn ca trực trước.')));
-                    } else {
-                      _buildClassBottomSheet(context);
-                    }
-                  },
+                  // onTap: () {
+                  //   if (scheduleController.text.isEmpty && !isAdmin) {
+                  //     ScaffoldMessenger.of(context)
+                  //         .showSnackBar(SnackBar(content: Text('Vui lòng chọn ca trực trước.')));
+                  //   } else {
+                  //     _buildClassBottomSheet(context);
+                  //   }
+                  // },
                 ),
                 SizedBox(height: 20.0),
                 const Text(
@@ -598,66 +599,66 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     });
   }
 
-  void _buildClassBottomSheet(BuildContext context) {
-    TextEditingController searchController = TextEditingController();
-    List filteredClassList = List.from(classList);
+  // void _buildClassBottomSheet(BuildContext context) {
+  //   TextEditingController searchController = TextEditingController();
+  //   List filteredClassList = List.from(classList);
 
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Tìm kiếm',
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        filteredClassList = classList.where((classItem) {
-                          return classItem.name?.toLowerCase().contains(value.toLowerCase()) ?? false;
-                        }).toList();
-                      });
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredClassList.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(filteredClassList[index].name ?? ''),
-                        onTap: () {
-                          nameController.clear();
-                          classController.text = filteredClassList[index].name ?? '';
-                          if (kDebugMode) {
-                            print('ID lớp: ${filteredClassList[index].classId}');
-                          }
-                          classId = filteredClassList[index].classId;
-                          getSutdentInClass(filteredClassList[index].classId);
-                          Navigator.pop(context);
-                          setState(() {});
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    ).then((value) {
-      if (value != null) {
-        setState(() {});
-      }
-    });
-  }
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return StatefulBuilder(
+  //         builder: (BuildContext context, StateSetter setState) {
+  //           return Column(
+  //             children: [
+  //               Padding(
+  //                 padding: const EdgeInsets.all(8.0),
+  //                 child: TextField(
+  //                   controller: searchController,
+  //                   decoration: InputDecoration(
+  //                     hintText: 'Tìm kiếm',
+  //                     prefixIcon: Icon(Icons.search),
+  //                   ),
+  //                   onChanged: (value) {
+  //                     setState(() {
+  //                       filteredClassList = classList.where((classItem) {
+  //                         return classItem.name?.toLowerCase().contains(value.toLowerCase()) ?? false;
+  //                       }).toList();
+  //                     });
+  //                   },
+  //                 ),
+  //               ),
+  //               Expanded(
+  //                 child: ListView.builder(
+  //                   itemCount: filteredClassList.length,
+  //                   itemBuilder: (context, index) {
+  //                     return ListTile(
+  //                       title: Text(filteredClassList[index].name ?? ''),
+  //                       onTap: () {
+  //                         nameController.clear();
+  //                         classController.text = filteredClassList[index].name ?? '';
+  //                         if (kDebugMode) {
+  //                           print('ID lớp: ${filteredClassList[index].classId}');
+  //                         }
+  //                         classId = filteredClassList[index].classId;
+  //                         getSutdentInClass(filteredClassList[index].classId);
+  //                         Navigator.pop(context);
+  //                         setState(() {});
+  //                       },
+  //                     );
+  //                   },
+  //                 ),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   ).then((value) {
+  //     if (value != null) {
+  //       setState(() {});
+  //     }
+  //   });
+  // }
 
   void _buildStudentInClassList(BuildContext context) {
     TextEditingController searchController = TextEditingController();
@@ -741,7 +742,6 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                             print('Niên khóa: ${schoolYear[index].year}');
                           }
                           timeController.text = pickerStartDate.toString();
-                          getClassList();
                           Navigator.pop(context);
                           setState(() {});
                         },
@@ -782,11 +782,12 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                               '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
                               '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}';
                           if (kDebugMode) {
-                            print('Ca trực: '
+                            print('Ca trực: id: ${scheduleList[index].scheduleId} - '
                                 '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
                                 '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}');
                           }
                           scheduleId = scheduleList[index].scheduleId;
+                          getClassBySchedule(scheduleId!);
                           Navigator.pop(context);
                           setState(() {});
                         },

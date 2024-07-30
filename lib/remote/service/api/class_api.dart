@@ -6,6 +6,25 @@ import 'package:eduappui/remote/network/network_client.dart';
 class ClassApi {
   final NetworkClient networkClient = NetworkClient();
 
+  Future getClassBySchedule(int scheduleId, {Map<String, String>? sortOrders}) async {
+    final response = await networkClient.invoke("${Constants.class_list}/schedule/$scheduleId", RequestType.get,
+        queryParameters: sortOrders);
+
+    if (response.statusCode == 200) {
+      if (response.data['data'] == null) {
+        return [];
+      } else {
+        return response.data['data'];
+      }
+    } else {
+      throw ServerException.withException(
+          dioError: DioException(
+        response: response,
+        requestOptions: response.requestOptions,
+      ));
+    }
+  }
+
   Future getListClass(int schoolId, {Map<String, String>? sortOrders}) async {
     final response = await networkClient.invoke("${Constants.class_list}/school/$schoolId", RequestType.get,
         queryParameters: sortOrders);
