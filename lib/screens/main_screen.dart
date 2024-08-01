@@ -74,7 +74,8 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   getSchedule() async {
-    var schedule = await scheduleRepository.getDutySchedule();
+    int userId = int.parse(await localClientImpl.readData(Constants.user_id));
+    var schedule = await scheduleRepository.getDutyScheduleBySupervisorId(userId);
     scheduleList = schedule;
     firstOngoing = getFirstOngoingSchedule(scheduleList);
     setState(() {});
@@ -227,8 +228,7 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
                           style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       SizedBox(height: 10),
                       Text('Giám Thị:', style: TextStyle(fontSize: 12)),
-                      Text(firstOngoing?.teacherName ?? '',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      Text(firstOngoing?.userName ?? '', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       SizedBox(height: 10),
                       Text.rich(
                         TextSpan(

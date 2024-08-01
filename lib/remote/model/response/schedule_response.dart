@@ -1,10 +1,13 @@
 class ScheduleResponse {
   int? scheduleId;
   int? classId;
+  int? userId;
+  String? userName;
   int? supervisorId;
   String? supervisorName;
-  int? teacherId;
-  String? teacherName;
+  String? name;
+  int? slot;
+  String? time;
   String? from;
   String? to;
   String? status;
@@ -12,10 +15,13 @@ class ScheduleResponse {
   ScheduleResponse(
       {this.scheduleId,
       this.classId,
+      this.userId,
+      this.userName,
       this.supervisorId,
       this.supervisorName,
-      this.teacherId,
-      this.teacherName,
+      this.name,
+      this.slot,
+      this.time,
       this.from,
       this.to,
       this.status});
@@ -23,10 +29,13 @@ class ScheduleResponse {
   ScheduleResponse.fromJson(Map<String, dynamic> json) {
     scheduleId = json['scheduleId'];
     classId = json['classId'];
+    userId = json['userId'];
+    userName = json['userName'];
     supervisorId = json['supervisorId'];
     supervisorName = json['supervisorName'];
-    teacherId = json['teacherId'];
-    teacherName = json['teacherName'];
+    name = json['name'];
+    slot = json['slot'];
+    time = json['time'];
     from = json['from'];
     to = json['to'];
     status = json['status'];
@@ -36,10 +45,13 @@ class ScheduleResponse {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['scheduleId'] = scheduleId;
     data['classId'] = classId;
+    data['userId'] = userId;
+    data['userName'] = userName;
     data['supervisorId'] = supervisorId;
     data['supervisorName'] = supervisorName;
-    data['teacherId'] = teacherId;
-    data['teacherName'] = teacherName;
+    data['name'] = name;
+    data['slot'] = slot;
+    data['time'] = time;
     data['from'] = from;
     data['to'] = to;
     data['status'] = status;

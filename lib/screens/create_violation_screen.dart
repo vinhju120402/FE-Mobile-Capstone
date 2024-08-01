@@ -241,7 +241,8 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   }
 
   void getSchedule() async {
-    var schedule = await scheduleRepository.getDutySchedule();
+    int userId = int.parse(await localClientImpl.readData(Constants.user_id));
+    var schedule = await scheduleRepository.getDutyScheduleBySupervisorId(userId);
     scheduleList = schedule;
     // filter schedule by status ongoing
     scheduleList = scheduleList.where((element) => element.status == 'ONGOING').toList();

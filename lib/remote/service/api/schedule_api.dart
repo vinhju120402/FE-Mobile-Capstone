@@ -6,9 +6,9 @@ import 'package:eduappui/remote/network/network_client.dart';
 class ScheduleApi {
   final NetworkClient networkClient = NetworkClient();
 
-  Future getDutySchedule() async {
+  Future getDutyScheduleBySupervisorId(int id) async {
     var response = await networkClient.invoke(
-      Constants.get_duty_schedule,
+      '${Constants.get_duty_schedule}/supervisor/$id',
       RequestType.get,
     );
     if (response.statusCode == 200) {

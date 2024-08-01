@@ -1,3 +1,5 @@
+import 'package:eduappui/remote/constant/constants.dart';
+import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/response/schedule_response.dart';
 import 'package:eduappui/remote/service/repository/schedule_repository.dart';
 import 'package:eduappui/widget/Select_Dropdown/multiselect_dropdown.dart';
@@ -18,6 +20,7 @@ class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
   ScheduleRepositoryImpl scheduleRepository = ScheduleRepositoryImpl();
   List<ScheduleResponse> scheduleList = [];
   bool isLoading = true;
+  LocalClientImpl localClientImpl = LocalClientImpl();
   @override
   void initState() {
     super.initState();
@@ -25,7 +28,8 @@ class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
   }
 
   void getSchedule() async {
-    var schedule = await scheduleRepository.getDutySchedule();
+    int userId = int.parse(await localClientImpl.readData(Constants.user_id));
+    var schedule = await scheduleRepository.getDutyScheduleBySupervisorId(userId);
     scheduleList = schedule;
     isLoading = false;
     setState(() {});
@@ -37,7 +41,8 @@ class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
       getSchedule();
       return;
     }
-    var schedule = await scheduleRepository.getDutySchedule();
+    int userId = int.parse(await localClientImpl.readData(Constants.user_id));
+    var schedule = await scheduleRepository.getDutyScheduleBySupervisorId(userId);
     scheduleList = schedule.where((element) => element.status == status).toList();
     setState(() {});
   }
@@ -95,7 +100,7 @@ class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
                         supervisorName: scheduleList[index].supervisorName ?? '',
                         from: scheduleList[index].from.toString(),
                         to: scheduleList[index].to.toString(),
-                        teacherName: scheduleList[index].teacherName ?? '',
+                        teacherName: scheduleList[index].userName ?? '',
                         status: scheduleList[index].status ?? '',
                       );
                     },
