@@ -45,8 +45,7 @@ class ViolationRepositoryImpl extends ViolationRepository {
 
   @override
   Future<List<ViolationTypeResponse>> getListViolationTypeByGroup(int groupId, {String? sortOrder}) async {
-    List<dynamic> dynamicList = await historyViolationAPI
-        .getViolationTypeByGroupId(query: {"vioGroupId": groupId, "sortOrder": sortOrder ?? "desc"});
+    List<dynamic> dynamicList = await historyViolationAPI.getViolationTypeByGroupId(groupId);
     List<ViolationTypeResponse> responseList = dynamicList.map((item) => ViolationTypeResponse.fromJson(item)).toList();
     return responseList;
   }

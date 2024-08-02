@@ -189,85 +189,114 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 13),
             width: double.infinity,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
+            child: firstOngoing?.scheduleId == null
+                ? SizedBox(
+                    height: 100,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Không có lịch trực sắp tới...'),
+                        InkWell(
+                          onTap: () => context.push(ScreenRoute.dutyScheduleScreen),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Xem chi tiết',
+                                style: TextStyle(fontSize: 12, color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116)),
+                              ),
+                              Icon(
+                                Icons.navigate_next_outlined,
+                                size: 20,
+                                color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ))
+                : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (firstOngoing != null)
-                        Text(
-                          DateFormat('dd/MM/yyyy').format(DateTime.parse(firstOngoing.from ?? '')),
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                      Text('đến', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                      if (firstOngoing != null)
-                        Text(
-                          DateFormat('dd/MM/yyyy').format(DateTime.parse(firstOngoing.to ?? '')),
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 130,
-                  width: 1,
-                  color: Colors.black,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Sao Đỏ:', style: TextStyle(fontSize: 12)),
-                      Text(firstOngoing?.supervisorName ?? '',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 10),
-                      Text('Giám Thị:', style: TextStyle(fontSize: 12)),
-                      Text(firstOngoing?.userName ?? '', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 10),
-                      Text.rich(
-                        TextSpan(
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            TextSpan(
-                              text: 'Lớp: ',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            TextSpan(
-                              text: firstOngoing?.classId.toString() ?? '',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
+                            if (firstOngoing != null)
+                              Text(
+                                DateFormat('dd/MM/yyyy').format(DateTime.parse(firstOngoing.from ?? '')),
+                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            Text('đến', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                            if (firstOngoing != null)
+                              Text(
+                                DateFormat('dd/MM/yyyy').format(DateTime.parse(firstOngoing.to ?? '')),
+                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
                           ],
+                        ),
+                      ),
+                      Container(
+                        height: 130,
+                        width: 1,
+                        color: Colors.black,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Sao Đỏ:', style: TextStyle(fontSize: 12)),
+                            Text(firstOngoing?.supervisorName ?? '',
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            SizedBox(height: 10),
+                            Text('Giám Thị:', style: TextStyle(fontSize: 12)),
+                            Text(firstOngoing?.userName ?? '',
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            SizedBox(height: 10),
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Lớp: ',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  TextSpan(
+                                    text: firstOngoing?.classId.toString() ?? '',
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => context.push(ScreenRoute.dutyScheduleScreen),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Xem chi tiết',
+                                style: TextStyle(fontSize: 12, color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116)),
+                              ),
+                              Icon(
+                                Icons.navigate_next_outlined,
+                                size: 20,
+                                color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116),
+                              ),
+                            ],
+                          ),
                         ),
                       )
                     ],
                   ),
-                ),
-                Expanded(
-                    child: InkWell(
-                  onTap: () => context.push(ScreenRoute.dutyScheduleScreen),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Xem chi tiết',
-                        style: TextStyle(fontSize: 12, color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116)),
-                      ),
-                      Icon(
-                        Icons.navigate_next_outlined,
-                        size: 20,
-                        color: isAdmin ? Color(0xFF55B5F3) : Color(0xFFAF1116),
-                      ),
-                    ],
-                  ),
-                ))
-              ],
-            ),
           ),
         )
       ],

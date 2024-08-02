@@ -12,7 +12,7 @@ class Constants {
 
   static String violation_group = '$api_base_url/violation-groups';
 
-  static String violation_type = '$api_base_url/violation-types/search';
+  static String violation_type = '$api_base_url/violation-types';
 
   static String class_list = '$api_base_url/classes';
 

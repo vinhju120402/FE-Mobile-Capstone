@@ -96,8 +96,9 @@ class ViolationAPI {
     }
   }
 
-  Future getViolationTypeByGroupId({Map<String, dynamic>? query}) async {
-    final response = await networkClient.invoke(Constants.violation_type, RequestType.get, queryParameters: query);
+  Future getViolationTypeByGroupId(int groupId, {Map<String, dynamic>? query}) async {
+    final response = await networkClient.invoke('${Constants.violation_type}/violation-group/$groupId', RequestType.get,
+        queryParameters: query);
 
     if (response.statusCode == 200) {
       return response.data['data'];
