@@ -2,6 +2,7 @@ import 'package:eduappui/remote/constant/constants.dart';
 import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/local/secure_storage.dart';
 import 'package:eduappui/remote/model/request/login_request.dart';
+import 'package:eduappui/remote/model/response/login_response.dart';
 import 'package:eduappui/remote/service/repository/login_repository.dart';
 import 'package:eduappui/routers/screen_route.dart';
 import 'package:eduappui/widget/TextField/common_text_field.dart';
@@ -35,6 +36,13 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<void> storageToCache(LoginResponse response, Map<String, dynamic> decodedToken) async {
+    secureStorageImpl.saveAccessToken(response.token);
+    await localClientImpl.saveData(Constants.expired_at, decodedToken['exp'].toString());
+    await localClientImpl.saveData(Constants.user_id, decodedToken['UserId']);
+    await localClientImpl.saveData(Constants.school_id, decodedToken['SchoolId']);
+  }
+
   Future<void> _signIn() async {
     // Lấy dữ liệu từ ô nhập liệu
     String phoneNumber = phoneNumberController.text;
@@ -50,12 +58,9 @@ class LoginPageState extends State<LoginPage> {
       var response = await loginRepository.login(LoginRequest(phoneNumber: phoneNumber, password: password));
       showProgress();
       if (response.token != null) {
-        secureStorageImpl.saveAccessToken(response.token);
         Map<String, dynamic> decodedToken = JwtDecoder.decode(response.token!);
-        await localClientImpl.saveData(Constants.expired_at, decodedToken['exp'].toString());
-        await localClientImpl.saveData(Constants.user_id, decodedToken['UserId']);
-        await localClientImpl.saveData(Constants.school_id, decodedToken['SchoolId']);
         if (decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] == 'STUDENT_SUPERVISOR') {
+          storageToCache(response, decodedToken);
           if (kDebugMode) {
             print(decodedToken['UserId']);
             print(
@@ -65,7 +70,8 @@ class LoginPageState extends State<LoginPage> {
           await Future.delayed(const Duration(seconds: 2), () {
             context.pushReplacement(ScreenRoute.homeScreen, extra: {'isAdmin': false});
           });
-        } else {
+        } else if (decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] == 'SUPERVISOR') {
+          storageToCache(response, decodedToken);
           if (kDebugMode) {
             print(decodedToken['UserId']);
             print(
@@ -75,6 +81,13 @@ class LoginPageState extends State<LoginPage> {
           await Future.delayed(const Duration(seconds: 2), () {
             context.pushReplacement(ScreenRoute.homeScreen, extra: {'isAdmin': true});
           });
+        } else {
+          if (mounted) {
+            _progressDialog!.close();
+            ScaffoldMessenger.of(context)
+                .showSnackBar(const SnackBar(content: Text('Tài khoản của bạn không có quyền truy cập')));
+            return;
+          }
         }
       }
     } catch (e) {

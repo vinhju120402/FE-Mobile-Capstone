@@ -26,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController codeController = TextEditingController();
   String? password;
   int? schoolId;
+  bool isAdmin = false;
 
   getCurrentUser() async {
     userId = int.parse(await localClientImpl.readData(Constants.user_id));
@@ -63,6 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    isAdmin = localClientImpl.readData("isAdmin");
     getCurrentUser();
   }
 
@@ -78,8 +80,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             const SizedBox(height: 16.0),
             _buildAvatarSection('https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg'),
-            _buildPersonalInfoSection(
-                nameController, addrressController, phoneController, schoolController, codeController, editProfile),
+            _buildPersonalInfoSection(isAdmin, nameController, addrressController, phoneController, schoolController,
+                codeController, editProfile),
           ],
         ),
       ),
@@ -143,6 +145,7 @@ Widget _buildAvatarSection(String image) {
 }
 
 Widget _buildPersonalInfoSection(
+  bool isAdmin,
   TextEditingController nameController,
   TextEditingController addrressController,
   TextEditingController phoneNumberController,
@@ -207,7 +210,7 @@ Widget _buildPersonalInfoSection(
           child: ElevatedButton(
             onPressed: ontap,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue, // Màu nền xanh cho nút Sign In
+              backgroundColor: isAdmin ? Colors.blue : const Color(0xFFB74848), // Màu nền xanh cho nút Sign In
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20), // Bo góc tròn
               ),
