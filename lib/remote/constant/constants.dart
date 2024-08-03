@@ -30,7 +30,7 @@ class Constants {
 
   static String get_violation_config = '$api_base_url/violation-configs';
 
-  static String get_user = '$api_base_url/users';
+  static String user = '$api_base_url/users';
 
   static String get_school_year = '$api_base_url/school-years';
 

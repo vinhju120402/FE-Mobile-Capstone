@@ -13,7 +13,6 @@ class SchoolYearApi {
       if (response.data['data'] == null) {
         return [];
       } else {
-        print(response.data['data']);
         return response.data['data'];
       }
     } else {
