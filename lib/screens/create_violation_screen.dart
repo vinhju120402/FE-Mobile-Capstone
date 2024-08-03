@@ -827,4 +827,5 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       }
     });
   }
+
 }

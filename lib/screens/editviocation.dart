@@ -3,10 +3,13 @@ import 'package:eduappui/remote/constant/constants.dart';
 import 'package:eduappui/remote/local/local_client.dart';
 import 'package:eduappui/remote/model/request/violation_request.dart';
 import 'package:eduappui/remote/model/response/class_reponse.dart';
+import 'package:eduappui/remote/model/response/schedule_response.dart';
+import 'package:eduappui/remote/model/response/school_year_response.dart';
 import 'package:eduappui/remote/model/response/student_in_class_response.dart';
 import 'package:eduappui/remote/model/response/violation_group_response.dart';
 import 'package:eduappui/remote/model/response/violation_type_response.dart';
 import 'package:eduappui/remote/service/repository/class_repository.dart';
+import 'package:eduappui/remote/service/repository/school_year_repository.dart';
 import 'package:eduappui/remote/service/repository/student_in_class_repository.dart';
 import 'package:eduappui/remote/service/repository/violation_repository.dart';
 import 'package:eduappui/widget/TextField/common_text_field.dart';
@@ -51,6 +54,16 @@ class EditviocationState extends State<Editviocation> {
   List<File> imageFiles = [];
   LocalClientImpl localClientImpl = LocalClientImpl();
   bool isAdmin = false;
+  List<SchoolYearResponse> schoolYear = [];
+  final TextEditingController schoolYearController = TextEditingController();
+  List<ScheduleResponse> scheduleList = [];
+  final TextEditingController scheduleController = TextEditingController();
+  int? scheduleId;
+  int? schoolYearId;
+  DateTime? pickerStartDate;
+  DateTime? pickerEndDate;
+  ClassResponse classResponse = ClassResponse();
+  SchoolYearRepositoryImpl schoolYearRepository = SchoolYearRepositoryImpl();
 
   @override
   void initState() {
@@ -143,6 +156,7 @@ class EditviocationState extends State<Editviocation> {
         print('Violation: $violation');
       }
       if (violation.violationId != null) {
+        schoolYearController.text = violation.year.toString();
         classController.text = classList.firstWhere((element) => element.classId == violation.classId).name ?? '';
         classId = violation.classId;
         await getSutdentInClass(violation.classId);
@@ -203,6 +217,7 @@ class EditviocationState extends State<Editviocation> {
   }
 
   Future<void> initializeData() async {
+    await getSchoolYear();
     await getClassList();
     await getViolationGroup();
     await getViolationById(widget.id);
@@ -215,6 +230,10 @@ class EditviocationState extends State<Editviocation> {
 
   Future<void> editViolation(int id) async {
     ViolationRequest violationRequest = ViolationRequest(
+      schoolId: int.parse(await localClientImpl.readData(Constants.school_id)),
+      userId: int.parse(await localClientImpl.readData(Constants.user_id)),
+      schoolYear: schoolYearController.text.isNotEmpty ? int.parse(schoolYearController.text) : 0,
+      scheduleId: scheduleId ?? 0,
       classId: classId ?? 0,
       studentInClassId: studentInClassId ?? 0,
       violationTypeId: violationTypeId ?? 0,
@@ -261,6 +280,22 @@ class EditviocationState extends State<Editviocation> {
     });
   }
 
+  void getClassBySchedule(int scheduleId) async {
+    var response = await classRepository.getClassBySchedule(scheduleId);
+    classResponse = response;
+    classController.text = classResponse.name ?? '';
+    classId = classResponse.classId;
+    getSutdentInClass(classId);
+  }
+
+  Future<void> getSchoolYear() async {
+    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
+    var response = await schoolYearRepository.getListSchoolYear(schoolId);
+    if (response.isNotEmpty) {
+      schoolYear = response;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
@@ -282,7 +317,37 @@ class EditviocationState extends State<Editviocation> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const Text(
-                          'Class',
+                          'Niên khóa',
+                          style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                        ),
+                        CommonTextField(
+                          maxLines: 1,
+                          isReadOnly: true,
+                          inputController: schoolYearController,
+                          onTap: () => _buildSchoolYearList(context),
+                        ),
+                        if (!isAdmin) SizedBox(height: 20.0),
+                        if (!isAdmin)
+                          const Text(
+                            'Ca trực',
+                            style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
+                          ),
+                        if (!isAdmin)
+                          CommonTextField(
+                            maxLines: 1,
+                            isReadOnly: true,
+                            inputController: scheduleController,
+                            onTap: () {
+                              if (schoolYearController.text.isEmpty) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(content: Text('Vui lòng chọn niên khóa trước.')));
+                              } else {
+                                _buildScheduleList(context);
+                              }
+                            },
+                          ),
+                        const Text(
+                          'Lớp',
                           style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                         ),
                         CommonTextField(
@@ -293,7 +358,7 @@ class EditviocationState extends State<Editviocation> {
                         ),
                         const SizedBox(height: 20.0),
                         const Text(
-                          'Student name',
+                          'Tên học sinh',
                           style: TextStyle(fontSize: 14, color: Color(0xfff8a8bb3)),
                         ),
                         CommonTextField(
@@ -498,6 +563,97 @@ class EditviocationState extends State<Editviocation> {
                           // isSelectedViolationGroup = true;
                           // getViolationTypeByGroup(filteredViolationGroup[index].violationGroupId ?? 0);
                           Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {});
+      }
+    });
+  }
+
+  void _buildSchoolYearList(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: schoolYear.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(schoolYear[index].year.toString()),
+                        onTap: () {
+                          schoolYearController.text = schoolYear[index].year.toString();
+                          schoolYearId = schoolYear[index].schoolYearId;
+                          pickerStartDate = DateTime.parse(schoolYear[index].startDate ?? '');
+                          pickerEndDate = DateTime.parse(schoolYear[index].endDate ?? '');
+                          if (kDebugMode) {
+                            print('Niên khóa: ${schoolYear[index].year}');
+                          }
+                          timeController.text = pickerStartDate.toString();
+                          if (isAdmin) {
+                            getClassList();
+                          }
+                          Navigator.pop(context);
+                          setState(() {});
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {});
+      }
+    });
+  }
+
+  void _buildScheduleList(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: scheduleList.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(
+                            '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                            '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}'),
+                        onTap: () {
+                          scheduleController.text =
+                              '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                              '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}';
+                          if (kDebugMode) {
+                            print('Ca trực: id: ${scheduleList[index].scheduleId} - '
+                                '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                                '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}');
+                          }
+                          scheduleId = scheduleList[index].scheduleId;
+                          getClassBySchedule(scheduleId!);
+                          Navigator.pop(context);
+                          setState(() {});
                         },
                       );
                     },

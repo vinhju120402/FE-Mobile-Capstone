@@ -57,6 +57,7 @@ class LoginPageState extends State<LoginPage> {
         await localClientImpl.saveData(Constants.school_id, decodedToken['SchoolId']);
         if (decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] == 'STUDENT_SUPERVISOR') {
           if (kDebugMode) {
+            print(decodedToken['UserId']);
             print(
                 'is admin -- false , Role:  ${decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']}');
           }
@@ -66,6 +67,7 @@ class LoginPageState extends State<LoginPage> {
           });
         } else {
           if (kDebugMode) {
+            print(decodedToken['UserId']);
             print(
                 'is admin -- true , Role: ${decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']}');
           }

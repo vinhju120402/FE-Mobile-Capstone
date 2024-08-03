@@ -44,6 +44,9 @@ class ViolationAPI {
 
   Future createViolation(ViolationRequest violationRequest) async {
     List<MultipartFile> imageFiles = [];
+    LocalClientImpl localClientImpl = LocalClientImpl();
+    bool isTeacher = await localClientImpl.readData('isAdmin');
+    FormData formData;
 
     if (violationRequest.images != null && violationRequest.images!.isNotEmpty) {
       imageFiles = violationRequest.images!
@@ -51,22 +54,34 @@ class ViolationAPI {
           .map((file) => MultipartFile.fromFileSync(file.path))
           .toList();
     }
-
-    FormData formData = FormData.fromMap({
-      'SchoolId ': violationRequest.schoolId,
-      'UserId': violationRequest.userId,
-      'Year': violationRequest.schoolYear,
-      'ClassId': violationRequest.classId,
-      'StudentInClassId': violationRequest.studentInClassId,
-      'ScheduleId': violationRequest.scheduleId,
-      'ViolationTypeId': violationRequest.violationTypeId,
-      'ViolationName': violationRequest.violationName,
-      'Description': violationRequest.description,
-      'Date': violationRequest.date?.toIso8601String(),
-      'Images': imageFiles,
-    });
-    LocalClientImpl localClientImpl = LocalClientImpl();
-    bool isTeacher = await localClientImpl.readData('isAdmin');
+    if (isTeacher) {
+      formData = FormData.fromMap({
+        'SchoolId': violationRequest.schoolId,
+        'UserId': violationRequest.userId,
+        'Year': violationRequest.schoolYear,
+        'ClassId': violationRequest.classId,
+        'ViolationTypeId': violationRequest.violationTypeId,
+        'StudentInClassId': violationRequest.studentInClassId,
+        'ViolationName': violationRequest.violationName,
+        'Description': violationRequest.description,
+        'Date': violationRequest.date?.toIso8601String(),
+        'Images': imageFiles,
+      });
+    } else {
+      formData = FormData.fromMap({
+        'SchoolId': violationRequest.schoolId,
+        'UserId': violationRequest.userId,
+        'Year': violationRequest.schoolYear,
+        'ClassId': violationRequest.classId,
+        'ViolationTypeId': violationRequest.violationTypeId,
+        'StudentInClassId': violationRequest.studentInClassId,
+        'ScheduleId': violationRequest.scheduleId,
+        'ViolationName': violationRequest.violationName,
+        'Description': violationRequest.description,
+        'Date': violationRequest.date?.toIso8601String(),
+        'Images': imageFiles,
+      });
+    }
 
     final response = await networkClient.invoke(
       isTeacher ? Constants.create_teacher_violation : Constants.create_student_violation,
@@ -113,6 +128,9 @@ class ViolationAPI {
 
   Future editViolation(int id, ViolationRequest violationRequest) async {
     List<MultipartFile> imageFiles = [];
+    LocalClientImpl localClientImpl = LocalClientImpl();
+    bool isTeacher = await localClientImpl.readData('isAdmin');
+    FormData formData;
 
     if (violationRequest.images != null && violationRequest.images!.isNotEmpty) {
       imageFiles = violationRequest.images!
@@ -121,19 +139,39 @@ class ViolationAPI {
           .toList();
     }
 
-    FormData formData = FormData.fromMap({
-      'classId': violationRequest.classId,
-      'studentInClassId': violationRequest.studentInClassId,
-      'violationTypeId': violationRequest.violationTypeId,
-      'teacherId': violationRequest.teacherId,
-      'violationName': violationRequest.violationName,
-      'description': violationRequest.description,
-      'date': violationRequest.date?.toIso8601String(),
-      'images': imageFiles,
-    });
+    if (isTeacher) {
+      formData = FormData.fromMap({
+        'SchoolId': violationRequest.schoolId,
+        'UserId': violationRequest.userId,
+        'Year': violationRequest.schoolYear,
+        'ClassId': violationRequest.classId,
+        'ViolationTypeId': violationRequest.violationTypeId,
+        'StudentInClassId': violationRequest.studentInClassId,
+        'ViolationName': violationRequest.violationName,
+        'Description': violationRequest.description,
+        'Date': violationRequest.date?.toIso8601String(),
+        'Images': imageFiles,
+      });
+    } else {
+      formData = FormData.fromMap({
+        'SchoolId': violationRequest.schoolId,
+        'UserId': violationRequest.userId,
+        'Year': violationRequest.schoolYear,
+        'ClassId': violationRequest.classId,
+        'ViolationTypeId': violationRequest.violationTypeId,
+        'StudentInClassId': violationRequest.studentInClassId,
+        'ScheduleId': violationRequest.scheduleId,
+        'ViolationName': violationRequest.violationName,
+        'Description': violationRequest.description,
+        'Date': violationRequest.date?.toIso8601String(),
+        'Images': imageFiles,
+      });
+    }
+
+    print(formData.fields);
 
     final response = await networkClient.invoke(
-      '${Constants.edit_violation_history}?id=$id',
+      isTeacher ? '${Constants.create_teacher_violation}?id=$id' : '${Constants.edit_violation}?id=$id',
       RequestType.put,
       requestBody: formData,
     );

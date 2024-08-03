@@ -40,7 +40,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   void getHistoryViolation() async {
     int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
-    var response = await historyViolationRepositoryImpl.getListViolation(schoolId);
+    var response = await historyViolationRepositoryImpl.getListViolation(schoolId, sortOrder: 'desc');
     historyViolationResponse = response;
     numberResult = historyViolationResponse.length;
     historyViolationResponse = response;
