@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 class ScheduleItem extends StatelessWidget {
   final String from;
   final String to;
-  final String supervisorName;
   final String className;
   final String teacherName;
   final String status;
@@ -13,7 +12,6 @@ class ScheduleItem extends StatelessWidget {
       {super.key,
       required this.from,
       required this.to,
-      required this.supervisorName,
       required this.className,
       required this.teacherName,
       required this.status});
@@ -61,17 +59,31 @@ class ScheduleItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Sao Đỏ: $supervisorName'),
+                  Row(
+                    children: [
+                      Text(
+                        'Lớp: ',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                      Text(className, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                   SizedBox(height: 10),
-                  Text('Lớp: $className'),
-                  SizedBox(height: 10),
-                  Text('Giám Thị: $teacherName'),
+                  Row(
+                    children: [
+                      Text(
+                        'Giám Thị: ',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                      Text(teacherName, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                   SizedBox(height: 10),
                   Row(
                     children: [
                       const Text(
                         'Trạng Thái: ',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 13),
                       ),
                       Text(
                         status,

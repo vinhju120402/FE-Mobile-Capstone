@@ -250,10 +250,6 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Sao Đỏ:', style: TextStyle(fontSize: 12)),
-                            Text(firstOngoing?.supervisorName ?? '',
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 10),
                             Text('Giám Thị:', style: TextStyle(fontSize: 12)),
                             Text(firstOngoing?.userName ?? '',
                                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
@@ -266,7 +262,7 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
                                     style: TextStyle(fontSize: 12),
                                   ),
                                   TextSpan(
-                                    text: firstOngoing?.classId.toString() ?? '',
+                                    text: firstOngoing?.className ?? '',
                                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                                   ),
                                 ],

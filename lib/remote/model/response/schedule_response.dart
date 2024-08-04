@@ -1,6 +1,7 @@
 class ScheduleResponse {
   int? scheduleId;
   int? classId;
+  String? className;
   int? userId;
   String? userName;
   int? supervisorId;
@@ -15,6 +16,7 @@ class ScheduleResponse {
   ScheduleResponse(
       {this.scheduleId,
       this.classId,
+      this.className,
       this.userId,
       this.userName,
       this.supervisorId,
@@ -29,6 +31,7 @@ class ScheduleResponse {
   ScheduleResponse.fromJson(Map<String, dynamic> json) {
     scheduleId = json['scheduleId'];
     classId = json['classId'];
+    className = json['className'];
     userId = json['userId'];
     userName = json['userName'];
     supervisorId = json['supervisorId'];
@@ -45,6 +48,7 @@ class ScheduleResponse {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['scheduleId'] = scheduleId;
     data['classId'] = classId;
+    data['className'] = className;
     data['userId'] = userId;
     data['userName'] = userName;
     data['supervisorId'] = supervisorId;

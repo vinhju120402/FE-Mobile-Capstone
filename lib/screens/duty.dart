@@ -96,8 +96,7 @@ class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
                     itemCount: scheduleList.length,
                     itemBuilder: (context, index) {
                       return ScheduleItem(
-                        className: scheduleList[index].classId.toString(),
-                        supervisorName: scheduleList[index].supervisorName ?? '',
+                        className: scheduleList[index].className.toString(),
                         from: scheduleList[index].from.toString(),
                         to: scheduleList[index].to.toString(),
                         teacherName: scheduleList[index].userName ?? '',
