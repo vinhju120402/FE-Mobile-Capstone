@@ -29,8 +29,13 @@ class ViolationAPI {
   }
 
   Future getListViolationByUserId(int userId, {Map<String, String>? sortOrders}) async {
+    LocalClientImpl localClientImpl = LocalClientImpl();
+    bool isTeacher = await localClientImpl.readData('isAdmin');
     final response = await networkClient.invoke(
-        '${Constants.history_violation}/user/$userId/supervisors', RequestType.get,
+        isTeacher
+            ? '${Constants.history_violation}/user/$userId/supervisors'
+            : '${Constants.history_violation}/user/$userId/student-supervisors',
+        RequestType.get,
         queryParameters: sortOrders);
 
     if (response.statusCode == 200) {
@@ -187,8 +192,6 @@ class ViolationAPI {
         'Images': imageFiles,
       });
     }
-
-    print(formData.fields);
 
     final response = await networkClient.invoke(
       isTeacher ? '${Constants.create_teacher_violation}?id=$id' : '${Constants.edit_violation}?id=$id',
