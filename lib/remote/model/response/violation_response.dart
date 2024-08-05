@@ -2,6 +2,7 @@ class ViolationResponse {
   int? violationId;
   int? userId;
   String? createdBy;
+  String? scheduleName;
   int? classId;
   String? className;
   int? year;
@@ -24,6 +25,7 @@ class ViolationResponse {
       {this.violationId,
       this.userId,
       this.createdBy,
+      this.scheduleName,
       this.classId,
       this.className,
       this.year,
@@ -46,6 +48,7 @@ class ViolationResponse {
     violationId = json['violationId'];
     userId = json['userId'];
     createdBy = json['createdBy'];
+    scheduleName = json['scheduleName'];
     classId = json['classId'];
     className = json['className'];
     year = json['year'];
@@ -70,6 +73,7 @@ class ViolationResponse {
     data['violationId'] = violationId;
     data['userId'] = userId;
     data['createdBy'] = createdBy;
+    data['scheduleName'] = scheduleName;
     data['classId'] = classId;
     data['className'] = className;
     data['year'] = year;

@@ -9,9 +9,11 @@ import 'package:eduappui/remote/model/response/student_in_class_response.dart';
 import 'package:eduappui/remote/model/response/violation_group_response.dart';
 import 'package:eduappui/remote/model/response/violation_type_response.dart';
 import 'package:eduappui/remote/service/repository/class_repository.dart';
+import 'package:eduappui/remote/service/repository/schedule_repository.dart';
 import 'package:eduappui/remote/service/repository/school_year_repository.dart';
 import 'package:eduappui/remote/service/repository/student_in_class_repository.dart';
 import 'package:eduappui/remote/service/repository/violation_repository.dart';
+import 'package:eduappui/routers/screen_route.dart';
 import 'package:eduappui/widget/TextField/common_text_field.dart';
 import 'package:eduappui/widget/app_bar.dart';
 import 'package:eduappui/widget/base_main_content.dart';
@@ -22,6 +24,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:sn_progress_dialog/progress_dialog.dart';
 
 class Editviocation extends StatefulWidget {
   const Editviocation({super.key, required this.id});
@@ -64,6 +67,8 @@ class EditviocationState extends State<Editviocation> {
   DateTime? pickerEndDate;
   ClassResponse classResponse = ClassResponse();
   SchoolYearRepositoryImpl schoolYearRepository = SchoolYearRepositoryImpl();
+  ScheduleRepositoryImpl scheduleRepository = ScheduleRepositoryImpl();
+  ProgressDialog? _progressDialog;
 
   @override
   void initState() {
@@ -81,6 +86,15 @@ class EditviocationState extends State<Editviocation> {
   }
 
   String selectedViolation = '';
+
+  void showProgress() {
+    _progressDialog = ProgressDialog(context: context);
+    _progressDialog!.show(
+      max: 100,
+      msg: 'Vui lòng chờ giây lát ..',
+      progressBgColor: Colors.red,
+    );
+  }
 
   Future<void> _takePicture() async {
     final picker = ImagePicker();
@@ -142,7 +156,7 @@ class EditviocationState extends State<Editviocation> {
             selectedTime.minute,
           );
           String formattedDateTime =
-              "${fullDateTime.year}-${fullDateTime.month.toString().padLeft(2, '0')}-${fullDateTime.day.toString().padLeft(2, '0')} ${fullDateTime.hour.toString().padLeft(2, '0')}:${fullDateTime.minute.toString().padLeft(2, '0')}:${fullDateTime.second.toString().padLeft(2, '0')}";
+              "${fullDateTime.year}/${fullDateTime.month.toString().padLeft(2, '0')}/${fullDateTime.day.toString().padLeft(2, '0')} ${fullDateTime.hour.toString().padLeft(2, '0')}:${fullDateTime.minute.toString().padLeft(2, '0')}:${fullDateTime.second.toString().padLeft(2, '0')}";
           timeController.text = formattedDateTime;
         });
       }
@@ -157,12 +171,21 @@ class EditviocationState extends State<Editviocation> {
       }
       if (violation.violationId != null) {
         schoolYearController.text = violation.year.toString();
-        classController.text = classList.firstWhere((element) => element.classId == violation.classId).name ?? '';
+        classController.text = violation.className ?? '';
         classId = violation.classId;
+        String scheduleText = '';
+        var schedule = scheduleList.firstWhere((element) => element.name == violation.scheduleName);
+        scheduleId = schedule.scheduleId;
+        String from = DateFormat('yyyy/MM/dd').format(DateTime.parse(schedule.from ?? ''));
+        String to = DateFormat('yyyy/MM/dd').format(DateTime.parse(schedule.to ?? ''));
+        scheduleText = '$from - $to';
+
+        scheduleController.text = scheduleText;
+
         await getSutdentInClass(violation.classId);
         nameController.text = violation.studentName ?? '';
         studentInClassId = violation.studentInClassId;
-        timeController.text = DateFormat.yMd().format(DateTime.parse(violation.date ?? ''));
+        timeController.text = DateFormat('yyyy/MM/dd').format(DateTime.parse(violation.date ?? ''));
         violateGroupController.text = violationGroup
                 .firstWhere((element) => element.violationGroupId == violation.violationGroupId)
                 .vioGroupName ??
@@ -218,8 +241,8 @@ class EditviocationState extends State<Editviocation> {
 
   Future<void> initializeData() async {
     await getSchoolYear();
-    await getClassList();
     await getViolationGroup();
+    await getSchedule();
     await getViolationById(widget.id);
   }
 
@@ -240,24 +263,23 @@ class EditviocationState extends State<Editviocation> {
       teacherId: null,
       violationName: violateTypeController.text,
       description: descriptionController.text,
-      date: DateFormat('M/d/yyyy').parse(timeController.text),
+      date: DateFormat('yyyy/MM/dd').parse(timeController.text),
       images: imageFiles,
     );
 
-    try {
-      var response = await violationRepository.editViolation(id, violationRequest);
-      if (response == 200) {
-        if (mounted) {
-          context.pop();
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Chỉnh sửa vi phạm thành công.')));
-        }
-      }
-    } catch (e) {
+    var response = await violationRepository.editViolation(id, violationRequest);
+    if (response is String) {
       if (kDebugMode) {
-        print(e);
+        print(response);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Chỉnh sửa vi phạm thất bại.')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response)));
+      }
+    } else {
+      if (mounted) {
+        showProgress();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Chỉnh sửa vi phạm thành công.')));
+        GoRouter.of(context).go(ScreenRoute.homeScreen);
       }
     }
   }
@@ -294,6 +316,14 @@ class EditviocationState extends State<Editviocation> {
     if (response.isNotEmpty) {
       schoolYear = response;
     }
+  }
+
+  Future<void> getSchedule() async {
+    int userId = int.parse(await localClientImpl.readData(Constants.user_id));
+    var schedule = await scheduleRepository.getDutyScheduleBySupervisorId(userId);
+    scheduleList = schedule;
+    // filter schedule by status ongoing
+    scheduleList = scheduleList.where((element) => element.status == 'ONGOING').toList();
   }
 
   @override
@@ -638,17 +668,17 @@ class EditviocationState extends State<Editviocation> {
                     itemCount: scheduleList.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(
-                            '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
-                            '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}'),
+                        title:
+                            Text('${DateFormat('yyyy/MM/dd').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                                '${DateFormat('yyyy/MM/dd').format(DateTime.parse(scheduleList[index].to ?? ''))}'),
                         onTap: () {
                           scheduleController.text =
-                              '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
-                              '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}';
+                              '${DateFormat('yyyy/MM/dd').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                              '${DateFormat('yyyy/MM/dd').format(DateTime.parse(scheduleList[index].to ?? ''))}';
                           if (kDebugMode) {
                             print('Ca trực: id: ${scheduleList[index].scheduleId} - '
-                                '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
-                                '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}');
+                                '${DateFormat('yyyy/MM/dd').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                                '${DateFormat('yyyy/MM/dd').format(DateTime.parse(scheduleList[index].to ?? ''))}');
                           }
                           scheduleId = scheduleList[index].scheduleId;
                           getClassBySchedule(scheduleId!);

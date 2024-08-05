@@ -798,17 +798,17 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                     itemCount: scheduleList.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(
-                            '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
-                            '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}'),
+                        title:
+                            Text('${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                                '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].to ?? ''))}'),
                         onTap: () {
                           scheduleController.text =
-                              '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
-                              '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}';
+                              '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                              '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].to ?? ''))}';
                           if (kDebugMode) {
                             print('Ca trực: id: ${scheduleList[index].scheduleId} - '
-                                '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
-                                '${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.parse(scheduleList[index].to ?? ''))}');
+                                '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                                '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].to ?? ''))}');
                           }
                           scheduleId = scheduleList[index].scheduleId;
                           getClassBySchedule(scheduleId!);

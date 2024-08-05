@@ -194,20 +194,17 @@ class ViolationAPI {
     }
 
     final response = await networkClient.invoke(
-      isTeacher ? '${Constants.create_teacher_violation}?id=$id' : '${Constants.edit_violation}?id=$id',
+      isTeacher
+          ? '${Constants.edit_violation}/supervisor?id=$id'
+          : '${Constants.edit_violation}/student-supervisor?id=$id',
       RequestType.put,
       requestBody: formData,
     );
 
-    if (response.statusCode == 200) {
-      return 200;
+    if (response.data['success'] == true) {
+      return response.data;
     } else {
-      throw ServerException.withException(
-        dioError: DioException(
-          response: response,
-          requestOptions: response.requestOptions,
-        ),
-      );
+      return response.data['message'];
     }
   }
 }
