@@ -9,7 +9,7 @@ import 'package:eduappui/remote/network/network_client.dart';
 class ViolationAPI {
   final NetworkClient networkClient = NetworkClient();
 
-  Future getListViolation(int schoolId, {Map<String, String>? sortOrders}) async {
+  Future getListViolationBySchoolId(int schoolId, {Map<String, String>? sortOrders}) async {
     final response = await networkClient.invoke('${Constants.history_violation}/school/$schoolId', RequestType.get,
         queryParameters: sortOrders);
 
@@ -18,6 +18,26 @@ class ViolationAPI {
         return [];
       } else {
         return response.data['data'];
+      }
+    } else {
+      throw ServerException.withException(
+          dioError: DioException(
+        response: response,
+        requestOptions: response.requestOptions,
+      ));
+    }
+  }
+
+  Future getListViolationByUserId(int userId, {Map<String, String>? sortOrders}) async {
+    final response = await networkClient.invoke(
+        '${Constants.history_violation}/user/$userId/supervisors', RequestType.get,
+        queryParameters: sortOrders);
+
+    if (response.statusCode == 200) {
+      if (response.data['data'] is List) {
+        return response.data['data'];
+      } else {
+        return [];
       }
     } else {
       throw ServerException.withException(

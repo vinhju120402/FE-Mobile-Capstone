@@ -174,6 +174,9 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       description: descriptionController.text,
       images: listImage,
     );
+    if (kDebugMode) {
+      print(violationRequest.toJson());
+    }
     var res = await violationRepository.createViolation(violationRequest);
 
     if (res is String) {
@@ -827,5 +830,4 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       }
     });
   }
-
 }

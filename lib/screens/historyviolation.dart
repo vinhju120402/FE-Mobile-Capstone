@@ -25,6 +25,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<ViolationResponse> historyViolationResponse = [];
   bool isAdmin = false;
   LocalClientImpl localClientImpl = LocalClientImpl();
+  List<ViolationResponse> filteredHistoryViolationResponse = [];
 
   @override
   void initState() {
@@ -39,15 +40,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void getHistoryViolation() async {
-    int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
-    var response = await historyViolationRepositoryImpl.getListViolation(schoolId);
+    int userId = int.parse(await localClientImpl.readData(Constants.user_id));
+    var response = await historyViolationRepositoryImpl.getListViolationByUserId(userId);
     historyViolationResponse = response;
 
     historyViolationResponse.sort((a, b) => b.violationId!.compareTo(a.violationId!));
+    filteredHistoryViolationResponse = historyViolationResponse;
 
-    numberResult = historyViolationResponse.length;
+    numberResult = filteredHistoryViolationResponse.length;
     historyViolationLoading = false;
     setState(() {});
+  }
+
+  void _filterSearchResults(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        filteredHistoryViolationResponse = historyViolationResponse;
+      });
+    } else {
+      setState(() {
+        filteredHistoryViolationResponse = historyViolationResponse.where((violation) {
+          return violation.studentName!.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      });
+    }
   }
 
   @override
@@ -80,21 +96,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: CommonTextField(
                     border: 20.0,
                     hintText: 'Tìm kiếm',
-                    onChanged: (value) {},
+                    onChanged: (value) {
+                      _filterSearchResults(value);
+                    },
                   ),
                 ),
                 ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: historyViolationResponse.length,
+                  itemCount: filteredHistoryViolationResponse.length,
                   itemBuilder: (context, index) {
                     return HistoryViolationItem(
-                      date: historyViolationResponse[index].date ?? '',
-                      name: historyViolationResponse[index].studentName ?? '',
-                      violationName: historyViolationResponse[index].violationName ?? '',
+                      date: filteredHistoryViolationResponse[index].date ?? '',
+                      name: filteredHistoryViolationResponse[index].studentName ?? '',
+                      violationName: filteredHistoryViolationResponse[index].violationName ?? '',
                       ontapFunction: () {
                         context.push(ScreenRoute.violationEditScreen, extra: {
-                          'id': historyViolationResponse[index].violationId,
+                          'id': filteredHistoryViolationResponse[index].violationId,
                         });
                       },
                     );

@@ -21,6 +21,7 @@ class _RuleScreenState extends State<RuleScreen> {
   bool ruleLoading = true;
   bool isAdmin = false;
   LocalClientImpl localClientImpl = LocalClientImpl();
+  List<ViolationConfigResponse> filteredRuleResponse = [];
 
   @override
   void initState() {
@@ -38,8 +39,23 @@ class _RuleScreenState extends State<RuleScreen> {
     int schoolId = int.parse(await localClientImpl.readData(Constants.school_id));
     var response = await ruleRepositoryImpl.getRule(schoolId);
     ruleResponse = response;
+    filteredRuleResponse = ruleResponse;
     ruleLoading = false;
     setState(() {});
+  }
+
+  void _filterSearchResults(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        filteredRuleResponse = ruleResponse;
+      });
+    } else {
+      setState(() {
+        filteredRuleResponse = ruleResponse.where((rule) {
+          return rule.violationTypeName!.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      });
+    }
   }
 
   @override
@@ -59,7 +75,7 @@ class _RuleScreenState extends State<RuleScreen> {
                   child: Row(
                     children: [
                       Text(
-                        'Showing ${ruleResponse.length} results',
+                        'Showing ${filteredRuleResponse.length} results',
                         style: TextStyle(
                           fontSize: 16.0,
                         ),
@@ -73,13 +89,15 @@ class _RuleScreenState extends State<RuleScreen> {
                   child: CommonTextField(
                     border: 20.0,
                     hintText: 'Tìm kiếm',
-                    onChanged: (value) {},
+                    onChanged: (value) {
+                      _filterSearchResults(value);
+                    },
                   ),
                 ),
                 ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: ruleResponse.length,
+                  itemCount: filteredRuleResponse.length,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -97,7 +115,10 @@ class _RuleScreenState extends State<RuleScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(10),
                               border: Border(
-                                left: BorderSide(color: isAdmin ? Colors.blue : Color(0xFFB74848), width: 5.0),
+                                left: BorderSide(
+                                  color: isAdmin ? Colors.blue : Color(0xFFB74848),
+                                  width: 5.0,
+                                ),
                               ),
                               boxShadow: const [
                                 BoxShadow(
@@ -112,15 +133,15 @@ class _RuleScreenState extends State<RuleScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  ruleResponse[index].violationTypeName ?? '',
+                                  filteredRuleResponse[index].violationTypeName ?? '',
                                   style: TextStyle(color: Colors.black, fontSize: 12.0, fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  ruleResponse[index].description ?? '',
+                                  filteredRuleResponse[index].description ?? '',
                                   style: TextStyle(color: Colors.black, fontSize: 9.0, fontStyle: FontStyle.italic),
                                 ),
                                 Text(
-                                  'Điểm Trừ: -${ruleResponse[index].minusPoints ?? ''}',
+                                  'Điểm Trừ: -${filteredRuleResponse[index].minusPoints ?? ''}',
                                   style: TextStyle(color: Colors.red, fontSize: 9.0, fontStyle: FontStyle.italic),
                                 ),
                               ],
