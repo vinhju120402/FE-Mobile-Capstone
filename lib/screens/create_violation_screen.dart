@@ -249,6 +249,9 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     scheduleList = schedule;
     // filter schedule by status ongoing
     scheduleList = scheduleList.where((element) => element.status == 'ONGOING').toList();
+    scheduleController.text = '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList.first.from ?? ''))} - '
+        '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList.first.to ?? ''))}';
+    scheduleId = scheduleList.first.scheduleId;
   }
 
   @override
@@ -285,6 +288,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                   CommonTextField(
                     maxLines: 1,
                     isReadOnly: true,
+                    isDisable: true,
                     inputController: scheduleController,
                     onTap: () {
                       if (schoolYearController.text.isEmpty) {
