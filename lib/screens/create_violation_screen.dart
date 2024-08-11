@@ -174,6 +174,20 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       description: descriptionController.text,
       images: listImage,
     );
+    if (schoolId == 0 ||
+        violationRequest.userId == 0 ||
+        violationRequest.schoolYear == 0 ||
+        violationRequest.studentInClassId == 0 ||
+        violationRequest.scheduleId == 0 ||
+        violationRequest.classId == 0 ||
+        violationRequest.date == null ||
+        violationRequest.violationTypeId == 0 ||
+        violationRequest.violationName.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng điền đầy đủ thông tin.')));
+      }
+      return;
+    }
     if (kDebugMode) {
       print(violationRequest.toJson());
     }
@@ -248,6 +262,10 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     var schedule = await scheduleRepository.getDutyScheduleBySupervisorId(userId);
     scheduleList = schedule;
     // filter schedule by status ongoing
+    if (scheduleList.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Không có ca trực nào.')));
+      return;
+    }
     scheduleList = scheduleList.where((element) => element.status == 'ONGOING').toList();
     scheduleController.text = '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList.first.from ?? ''))} - '
         '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList.first.to ?? ''))}';
