@@ -173,14 +173,15 @@ class EditviocationState extends State<Editviocation> {
         schoolYearController.text = violation.year.toString();
         classController.text = violation.className ?? '';
         classId = violation.classId;
-        String scheduleText = '';
-        var schedule = scheduleList.firstWhere((element) => element.name == violation.scheduleName);
-        scheduleId = schedule.scheduleId;
-        String from = DateFormat('yyyy/MM/dd').format(DateTime.parse(schedule.from ?? ''));
-        String to = DateFormat('yyyy/MM/dd').format(DateTime.parse(schedule.to ?? ''));
-        scheduleText = '$from - $to';
-
-        scheduleController.text = scheduleText;
+        if (!isAdmin) {
+          String scheduleText = '';
+          var schedule = scheduleList.firstWhere((element) => element.name == violation.scheduleName);
+          scheduleId = schedule.scheduleId;
+          String from = DateFormat('yyyy/MM/dd').format(DateTime.parse(schedule.from ?? ''));
+          String to = DateFormat('yyyy/MM/dd').format(DateTime.parse(schedule.to ?? ''));
+          scheduleText = '$from - $to';
+          scheduleController.text = scheduleText;
+        }
 
         await getSutdentInClass(violation.classId);
         nameController.text = violation.studentName ?? '';
