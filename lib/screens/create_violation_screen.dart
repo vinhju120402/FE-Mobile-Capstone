@@ -174,20 +174,6 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       description: descriptionController.text,
       images: listImage,
     );
-    if (schoolId == 0 ||
-        violationRequest.userId == 0 ||
-        violationRequest.schoolYear == 0 ||
-        violationRequest.studentInClassId == 0 ||
-        violationRequest.scheduleId == 0 ||
-        violationRequest.classId == 0 ||
-        violationRequest.date == null ||
-        violationRequest.violationTypeId == 0 ||
-        violationRequest.violationName.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Vui lòng điền đầy đủ thông tin.')));
-      }
-      return;
-    }
     if (kDebugMode) {
       print(violationRequest.toJson());
     }
@@ -270,6 +256,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     scheduleController.text = '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList.first.from ?? ''))} - '
         '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList.first.to ?? ''))}';
     scheduleId = scheduleList.first.scheduleId;
+    getClassBySchedule(scheduleId!);
   }
 
   @override
