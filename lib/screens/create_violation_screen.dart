@@ -70,7 +70,11 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     isAdmin = localClientImpl.readData("isAdmin");
     getSchoolYear();
     getViolationGroup();
-    getSchedule();
+    if (!isAdmin) {
+      getSchedule();
+    } else {
+      getClassList();
+    }
   }
 
   @override
@@ -241,6 +245,10 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
     if (response.isNotEmpty) {
       schoolYear = response;
     }
+    // find the biggest year from school year list
+    schoolYear.sort((a, b) => b.year!.compareTo(a.year!));
+    schoolYearController.text = schoolYear.first.year.toString();
+    schoolYearId = schoolYear.first.schoolYearId;
   }
 
   void getSchedule() async {
@@ -280,6 +288,7 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                 CommonTextField(
                   maxLines: 1,
                   isReadOnly: true,
+                  isDisable: true,
                   inputController: schoolYearController,
                   onTap: () => _buildSchoolYearList(context),
                 ),

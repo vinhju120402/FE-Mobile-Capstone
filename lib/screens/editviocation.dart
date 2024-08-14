@@ -354,6 +354,7 @@ class EditviocationState extends State<Editviocation> {
                         CommonTextField(
                           maxLines: 1,
                           isReadOnly: true,
+                          isDisable: true,
                           inputController: schoolYearController,
                           onTap: () => _buildSchoolYearList(context),
                         ),

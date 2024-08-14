@@ -137,11 +137,21 @@ class ViolationAPI {
   }
 
   Future getViolationTypeByGroupId(int groupId, {Map<String, dynamic>? query}) async {
-    final response = await networkClient.invoke('${Constants.violation_type}/violation-group/$groupId', RequestType.get,
+    LocalClientImpl localClientImpl = LocalClientImpl();
+    bool isTeacher = await localClientImpl.readData('isAdmin');
+    final response = await networkClient.invoke(
+        isTeacher
+            ? '${Constants.violation_type}/violation-group/$groupId'
+            : '${Constants.violation_type}//api/violation-types/by-group-for-student-supervisor/$groupId',
+        RequestType.get,
         queryParameters: query);
 
     if (response.statusCode == 200) {
-      return response.data['data'];
+      if (isTeacher) {
+        return response.data['data'];
+      } else {
+        return response.data;
+      }
     } else {
       throw ServerException.withException(
           dioError: DioException(
