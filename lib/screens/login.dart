@@ -95,7 +95,7 @@ class LoginPageState extends State<LoginPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Đăng nhập thất bai'),
+            title: const Text('Đăng nhập thất bại'),
             content: const Text('Vui lòng kiểm tra số điện thoại và mật khẩu của bạn'),
             actions: [
               TextButton(
