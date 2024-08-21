@@ -91,6 +91,7 @@ class LoginPageState extends State<LoginPage> {
         }
       }else{
          if (mounted) {
+        _progressDialog!.close();
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
