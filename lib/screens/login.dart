@@ -89,6 +89,24 @@ class LoginPageState extends State<LoginPage> {
             return;
           }
         }
+      }else{
+         if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Đăng nhập thất bai'),
+            content: const Text('Vui lòng kiểm tra số điện thoại và mật khẩu của bạn'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
       }
     } catch (e) {
       if (mounted) {
