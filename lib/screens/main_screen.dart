@@ -225,7 +225,8 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
                           children: [
                             if (firstOngoing != null)
                               Text(
-                                DateFormat('dd/MM/yyyy').format(DateTime.parse(firstOngoing.from ?? '')),
+                                DateFormat('dd/MM/yyyy')
+                                    .format(DateTime.parse('${firstOngoing.from}  ${firstOngoing.time} ')),
                                 style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                                 textAlign: TextAlign.center,
                               ),
