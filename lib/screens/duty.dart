@@ -101,6 +101,7 @@ class _DutyScheduleScreenState extends State<DutyScheduleScreen> {
                         to: scheduleList[index].to.toString(),
                         teacherName: scheduleList[index].userName ?? '',
                         status: scheduleList[index].status ?? '',
+                        time: scheduleList[index].time.toString(),
                       );
                     },
                   ),

@@ -7,6 +7,7 @@ class ScheduleItem extends StatelessWidget {
   final String className;
   final String teacherName;
   final String status;
+  final String time;
 
   const ScheduleItem(
       {super.key,
@@ -14,7 +15,8 @@ class ScheduleItem extends StatelessWidget {
       required this.to,
       required this.className,
       required this.teacherName,
-      required this.status});
+      required this.status,
+      required this.time});
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +40,10 @@ class ScheduleItem extends StatelessWidget {
                 children: [
                   Text(
                     DateFormat('dd/MM/yyyy').format(DateTime.parse(from)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    time,
                     style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                   Text('đến', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
