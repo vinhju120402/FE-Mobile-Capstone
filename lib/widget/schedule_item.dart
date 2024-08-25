@@ -42,10 +42,6 @@ class ScheduleItem extends StatelessWidget {
                     DateFormat('dd/MM/yyyy').format(DateTime.parse(from)),
                     style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                   ),
-                  Text(
-                    time,
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                  ),
                   Text('đến', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                   Text(
                     DateFormat('dd/MM/yyyy').format(DateTime.parse(to)),
@@ -99,6 +95,16 @@ class ScheduleItem extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        'Thời Gian: ',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                      Text(time, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ],

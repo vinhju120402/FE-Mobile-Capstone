@@ -252,6 +252,8 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
   }
 
   void getSchedule() async {
+    List<ScheduleResponse> morningSchedule = [];
+    List<ScheduleResponse> afternoonSchedule = [];
     int userId = int.parse(await localClientImpl.readData(Constants.user_id));
     var schedule = await scheduleRepository.getDutyScheduleBySupervisorId(userId);
     scheduleList = schedule;
@@ -261,8 +263,22 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
       return;
     }
     scheduleList = scheduleList.where((element) => element.status == 'ONGOING').toList();
+    for (var element in scheduleList) {
+      //time format like 07:00:00
+      //if time is before 12:00:00 then it is morning schedule
+      if (element.time != null && element.time!.compareTo('12:00:00') < 0) {
+        morningSchedule.add(element);
+      } else {
+        afternoonSchedule.add(element);
+      }
+    }
+    if (DateTime.now().hour < 12) {
+      scheduleList = morningSchedule;
+    } else {
+      scheduleList = afternoonSchedule;
+    }
     scheduleController.text = '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList.first.from ?? ''))} - '
-        '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList.first.to ?? ''))}';
+        '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList.first.to ?? ''))} lúc ${scheduleList.first.time}';
     scheduleId = scheduleList.first.scheduleId;
     getClassBySchedule(scheduleId!);
   }
@@ -816,9 +832,9 @@ class CreateViolationScreenState extends State<CreateViolationScreen> {
                     itemCount: scheduleList.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title:
-                            Text('${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
-                                '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].to ?? ''))}'),
+                        title: Text(
+                            '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].from ?? ''))} - '
+                            '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].to ?? ''))} lúc ${scheduleList[index].time}'),
                         onTap: () {
                           scheduleController.text =
                               '${DateFormat('yyyy-MM-dd').format(DateTime.parse(scheduleList[index].from ?? ''))} - '

@@ -1,0 +1,32 @@
+    {
+      "scheduleId": 55,
+      "classId": 11,
+      "className": "10A2",
+      "userId": 3,
+      "userName": "Giám thị BT1",
+      "supervisorId": 10,
+      "supervisorName": "Sao đỏ BT10",
+      "name": "test",
+      "slot": 1,
+      "time": "07:00:00",
+      "from": "2024-08-15T00:00:00",
+      "to": "2024-08-30T00:00:00",
+      "year": 2024,
+      "status": "ONGOING"
+    },
+    {
+      "scheduleId": 56,
+      "classId": 11,
+      "className": "10A2",
+      "userId": 3,
+      "userName": "Giám thị BT1",
+      "supervisorId": 10,
+      "supervisorName": "Sao đỏ BT10",
+      "name": "test2",
+      "slot": 1,
+      "time": "15:00:00",
+      "from": "2024-08-15T00:00:00",
+      "to": "2024-08-30T00:00:00",
+      "year": 2024,
+      "status": "ONGOING"
+    }

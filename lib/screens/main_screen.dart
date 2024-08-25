@@ -225,7 +225,7 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
                           children: [
                             if (firstOngoing != null)
                               Text(
-                                '${DateFormat('dd/MM/yyyy').format(DateTime.parse('${firstOngoing.from}'))}  ${firstOngoing.time}',
+                                DateFormat('dd/MM/yyyy').format(DateTime.parse('${firstOngoing.from}')),
                                 style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                                 textAlign: TextAlign.center,
                               ),
@@ -253,7 +253,7 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
                             Text('Giám Thị:', style: TextStyle(fontSize: 12)),
                             Text(firstOngoing?.userName ?? '',
                                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 10),
+                            SizedBox(height: 4),
                             Text.rich(
                               TextSpan(
                                 children: [
@@ -267,7 +267,16 @@ Widget _buildUpcomingSchedule(BuildContext context, ScheduleResponse? firstOngoi
                                   ),
                                 ],
                               ),
-                            )
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Thời Gian: ',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            Text(
+                              firstOngoing?.time ?? '',
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
                           ],
                         ),
                       ),

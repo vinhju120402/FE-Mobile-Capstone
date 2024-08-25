@@ -122,7 +122,7 @@ class ViolationAPI {
   }
 
   Future getViolationGroup(int schoolId, {Map<String, String>? sortOrders}) async {
-    final response = await networkClient.invoke("${Constants.violation_group}/school/$schoolId", RequestType.get,
+    final response = await networkClient.invoke("${Constants.violation_group}/school/$schoolId/active", RequestType.get,
         queryParameters: sortOrders);
 
     if (response.statusCode == 200) {
@@ -141,8 +141,8 @@ class ViolationAPI {
     bool isTeacher = await localClientImpl.readData('isAdmin');
     final response = await networkClient.invoke(
         isTeacher
-            ? '${Constants.violation_type}/violation-group/$groupId'
-            : '${Constants.violation_type}//api/violation-types/by-group-for-student-supervisor/$groupId',
+            ? '${Constants.violation_type}/$groupId'
+            : '${Constants.violation_type}/by-group-for-student-supervisor/$groupId',
         RequestType.get,
         queryParameters: query);
 
