@@ -141,7 +141,7 @@ class ViolationAPI {
     bool isTeacher = await localClientImpl.readData('isAdmin');
     final response = await networkClient.invoke(
         isTeacher
-            ? '${Constants.violation_type}/$groupId'
+            ? '${Constants.violation_type}/violation-group/$groupId'
             : '${Constants.violation_type}/by-group-for-student-supervisor/$groupId',
         RequestType.get,
         queryParameters: query);
