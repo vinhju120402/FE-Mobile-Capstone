@@ -593,7 +593,7 @@ class EditviocationState extends State<Editviocation> {
                             print('ID nhóm vi phạm: ${filteredViolationGroup[index].violationGroupId}');
                           }
                           // isSelectedViolationGroup = true;
-                          // getViolationTypeByGroup(filteredViolationGroup[index].violationGroupId ?? 0);
+                          getViolationTypeByGroup(filteredViolationGroup[index].violationGroupId ?? 0);
                           Navigator.pop(context);
                         },
                       );

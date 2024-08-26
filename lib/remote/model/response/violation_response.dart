@@ -93,4 +93,8 @@ class ViolationResponse {
     data['status'] = status;
     return data;
   }
+  @override
+  String toString() {
+    return 'ViolationResponse{violationId: $violationId, userId: $userId, createdBy: $createdBy, scheduleName: $scheduleName, classId: $classId, className: $className, year: $year, studentInClassId: $studentInClassId, studentName: $studentName, studentCode: $studentCode, violationTypeId: $violationTypeId, violationTypeName: $violationTypeName, violationGroupId: $violationGroupId, violationGroupName: $violationGroupName, violationName: $violationName, description: $description, date: $date, imageUrls: $imageUrls, createdAt: $createdAt, updatedAt: $updatedAt, status: $status}';
+  }
 }
