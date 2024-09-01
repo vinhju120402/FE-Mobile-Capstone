@@ -23,6 +23,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_watermark/image_watermark.dart';
 import 'package:intl/intl.dart';
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
@@ -101,33 +102,33 @@ class EditviocationState extends State<Editviocation> {
     final pickedImage = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedImage != null) {
+      // Convert the picked image to Uint8List
+      final imgBytes = await pickedImage.readAsBytes();
+
+      // Apply watermark to the image
+      final watermarkedImg = await ImageWatermark.addTextWatermark(
+        imgBytes: imgBytes,
+        watermarkText: DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now()).toString(),
+        dstX: 10,
+        dstY: 10,
+        color: Colors.red,
+      );
+
+      // Convert the watermarked image to File
+      final watermarkedFile = File('${pickedImage.path}_watermarked.png');
+      await watermarkedFile.writeAsBytes(watermarkedImg);
+
+      // Add the watermarked image to the list if the limit is not exceeded
       if (imageFiles.length < 2) {
         setState(() {
-          imageFiles.add(File(pickedImage.path));
+          imageFiles.add(watermarkedFile);
         });
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Bạn chỉ có thể chọn tối đa 2 hình ảnh.')),
+            SnackBar(content: Text('Bạn chỉ có thể chọn tối đa 2 ảnh.')),
           );
         }
-      }
-    }
-  }
-
-  Future<void> _selectPicture() async {
-    final picker = ImagePicker();
-    final pickedImages = await picker.pickMultiImage();
-
-    if (imageFiles.length + pickedImages.length <= 2) {
-      setState(() {
-        imageFiles.addAll(pickedImages.map((pickedImage) => File(pickedImage.path)).toList());
-      });
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Bạn chỉ có thể chọn tối đa 2 hình ảnh.')),
-        );
       }
     }
   }
@@ -442,85 +443,105 @@ class EditviocationState extends State<Editviocation> {
                           inputController: descriptionController,
                         ),
                         const SizedBox(height: 20.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: _takePicture,
-                              icon: const Icon(Icons.camera_alt, color: Colors.white),
-                              label: const Text('Chụp ảnh', style: TextStyle(fontSize: 14, color: Colors.white)),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15.0,
-                                  horizontal: 20.0,
-                                ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          child: ElevatedButton.icon(
+                            onPressed: _takePicture,
+                            icon: const Icon(Icons.camera_alt, color: Colors.white),
+                            label: const Text('Chụp ảnh', style: TextStyle(fontSize: 14, color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 15.0,
+                                horizontal: 20.0,
                               ),
                             ),
-                            ElevatedButton.icon(
-                              onPressed: _selectPicture,
-                              icon: const Icon(Icons.photo_library, color: Colors.white),
-                              label: const Text('Chọn ảnh', style: TextStyle(fontSize: 14, color: Colors.white)),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isAdmin ? Colors.blue : Color(0xFFB74848),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15.0,
-                                  horizontal: 20.0,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                         const SizedBox(height: 10.0),
                         if (imageFiles.isNotEmpty)
                           GridView.builder(
                             shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
                               crossAxisSpacing: 10,
                               mainAxisSpacing: 10,
                             ),
                             itemCount: imageFiles.length,
                             itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Colors.black26, // Shadow color
-                                      blurRadius: 10.0, // Shadow blur radius
-                                      offset: Offset(0, 5), // Shadow offset
+                              return GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Image.file(
+                                            width: MediaQuery.of(context).size.width * 0.95,
+                                            imageFiles[index],
+                                            fit: BoxFit.cover,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.red,
+                                              ),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text(
+                                                'Close',
+                                                style: TextStyle(color: Colors.white),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  width: 120.0,
+                                  height: 120.0,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 10.0,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 2.0,
                                     ),
-                                  ],
-                                  border: Border.all(
-                                    color: Colors.white, // Border color
-                                    width: 2.0, // Border width
+                                    image: DecorationImage(
+                                      image: FileImage(imageFiles[index]),
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
-                                  image: DecorationImage(
-                                    image: FileImage(imageFiles[index]),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                padding: const EdgeInsets.all(8.0), // Padding inside the container
-                                margin: const EdgeInsets.all(8.0), // Margin outside the container
-                                child: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      imageFiles.removeAt(index);
-                                    });
-                                  },
-                                  child: const Column(
+                                  padding: const EdgeInsets.all(8.0),
+                                  margin: const EdgeInsets.all(8.0),
+                                  child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Icon(Icons.close, color: Colors.red, size: 20.0),
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            imageFiles.removeAt(index);
+                                          });
+                                        },
+                                        child: Icon(Icons.close, color: Colors.red, size: 20.0),
+                                      ),
                                     ],
                                   ),
                                 ),

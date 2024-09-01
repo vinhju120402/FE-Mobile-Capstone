@@ -89,25 +89,25 @@ class LoginPageState extends State<LoginPage> {
             return;
           }
         }
-      }else{
-         if (mounted) {
-        _progressDialog!.close();
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Đăng nhập thất bại'),
-            content: const Text('Vui lòng kiểm tra số điện thoại và mật khẩu của bạn'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-      }
+      } else {
+        if (mounted) {
+          _progressDialog!.close();
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Đăng nhập thất bại'),
+              content: const Text('Vui lòng kiểm tra số điện thoại và mật khẩu của bạn'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -137,6 +137,7 @@ class LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
