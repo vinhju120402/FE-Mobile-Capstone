@@ -407,6 +407,7 @@ class EditviocationState extends State<Editviocation> {
                         ),
                         CommonTextField(
                           maxLines: 1,
+                         isDisable: true,
                           inputController: timeController,
                           isReadOnly: true,
                           onTap: () => _selectDateTime(),
